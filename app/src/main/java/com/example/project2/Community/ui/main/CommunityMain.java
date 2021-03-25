@@ -1,4 +1,4 @@
-package com.example.project2.cm.ui.main;
+package com.example.project2.Community.ui.main;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -19,8 +19,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.project2.R;
-import com.example.project2.cm.listView.listViewAdapter;
-import com.example.project2.cm.listView.listViewClass;
+import com.example.project2.Community.listView.listViewAdapter;
+import com.example.project2.Community.listView.listViewClass;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;

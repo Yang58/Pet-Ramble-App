@@ -1,4 +1,4 @@
-package com.example.project2.cm.ui.main;
+package com.example.project2.Community.ui.main;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -77,7 +77,7 @@ public class CommunityDetailView extends Fragment {
         int profile_img = getArguments().getInt("profile_img");
 
         ListView commentList = v.findViewById(R.id.cm_detail_container_listView);
-        com.example.project2.cm.listView.listViewAdapter commentAdapter = new com.example.project2.cm.listView.listViewAdapter();
+        com.example.project2.Community.listView.listViewAdapter commentAdapter = new com.example.project2.Community.listView.listViewAdapter();
         commentList.setAdapter(commentAdapter);
         commentAdapter.addItem("@something","이름","Color-coded labels help you categorize and filter your issues (just like labels in email)","");
         commentAdapter.addItem("@effe","강아지","One assignee is responsible for working on the issue at any given time","");

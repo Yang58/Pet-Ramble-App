@@ -1,4 +1,4 @@
-package com.example.project2.cm;
+package com.example.project2.Community;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.project2.R;
-import com.example.project2.cm.ui.main.CommunityMain;
+import com.example.project2.Community.ui.main.CommunityMain;
 
 public class MainActivity extends AppCompatActivity {
 

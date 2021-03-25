@@ -1,4 +1,4 @@
-package com.example.project2.cm.listView;
+package com.example.project2.Community;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,10 +11,10 @@ import com.example.project2.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link listViewItem#newInstance} factory method to
+ * Use the {@link custom_circular_loading#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class listViewItem extends Fragment {
+public class custom_circular_loading extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,7 +25,7 @@ public class listViewItem extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public listViewItem() {
+    public custom_circular_loading() {
         // Required empty public constructor
     }
 
@@ -35,11 +35,11 @@ public class listViewItem extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment listViewItem.
+     * @return A new instance of fragment custom_circular_loading.
      */
     // TODO: Rename and change types and number of parameters
-    public static listViewItem newInstance(String param1, String param2) {
-        listViewItem fragment = new listViewItem();
+    public static custom_circular_loading newInstance(String param1, String param2) {
+        custom_circular_loading fragment = new custom_circular_loading();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -60,6 +60,6 @@ public class listViewItem extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_list_view_item, container, false);
+        return inflater.inflate(R.layout.fragment_custom_circular_loading, container, false);
     }
 }

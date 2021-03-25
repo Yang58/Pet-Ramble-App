@@ -1,4 +1,4 @@
-package com.example.project2.cm.functions;
+package com.example.project2.Community.functions;
 
 import android.app.AlertDialog;
 import android.graphics.Color;

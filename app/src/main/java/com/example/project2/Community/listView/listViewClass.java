@@ -1,4 +1,4 @@
-package com.example.project2.cm.listView;
+package com.example.project2.Community.listView;
 
 public class listViewClass {
     private String profile;

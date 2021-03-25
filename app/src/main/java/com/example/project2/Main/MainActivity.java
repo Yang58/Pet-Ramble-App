@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,17 +17,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.project2.CalenderActivity;
 import com.example.project2.Camera.CameraActivity;
-import com.example.project2.Community.CommunityFragment;
 import com.example.project2.Data.Userinfo;
 import com.example.project2.GoogleMap.MapsFragment;
 import com.example.project2.Login_Membership.LoginActivity;
 import com.example.project2.Login_Membership.UserinfoActivity;
 import com.example.project2.R;
-import com.example.project2.cm.ui.main.CommunityMain;
+import com.example.project2.Community.ui.main.CommunityMain;
+import com.example.project2.Setting.MyInfomationFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,10 +61,10 @@ public class MainActivity extends AppCompatActivity{
 
     FragmentManager FM;
 
-    CommunityFragment fragment_Community;
+
+    CommunityMain fragment_Community;
     MapsFragment fragmentMap;
-    //MyInfomationFragment fragmentInfo;
-    CommunityMain fragmentInfo;
+    MyInfomationFragment fragmentInfo;
 
 
     ViewPager pager;
@@ -176,53 +178,53 @@ public class MainActivity extends AppCompatActivity{
         //프래그먼트는 뷰와 다르게 context를 매개변수로 넣어줄 필요가 없다.
 
         FM = getSupportFragmentManager();
+        LinearLayout frag_container = (LinearLayout) findViewById(R.id.fragment_container);
 
+        //지도
         Button buttonMap = findViewById(R.id.btn_Map);
         buttonMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(fragmentMap == null){
                     fragmentMap = new MapsFragment();
-                    FM.beginTransaction().add(R.id.container,fragmentMap).commit();
                 }
-                if(fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
-                if(fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
-
-
-
+                FM.beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .replace(R.id.container,fragmentMap,"frag_map")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
+        //커뮤니티
         Button community = findViewById(R.id.btn_community);
         community.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(fragment_Community == null){
-                    fragment_Community = new CommunityFragment();
-                    FM.beginTransaction().add(R.id.container,fragment_Community).commit();
-
+                    fragment_Community = new CommunityMain();
                 }
-                if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                if(fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
-                if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
-
+                FM.beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .replace(R.id.container,fragment_Community,"frag_community")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
+        //내정보
         Button btn_set = findViewById(R.id.btn_Setting);
         btn_set.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 if(fragmentInfo == null){
-                    //fragmentInfo = new MyInfomationFragment();
-                    fragmentInfo = new CommunityMain();
-                    FM.beginTransaction().add(R.id.container,fragmentInfo).commit();
+                    fragmentInfo = new MyInfomationFragment();
                 }
-                if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                if(fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                if(fragmentInfo != null) FM.beginTransaction().show(fragmentInfo).commit();
-//                getSupportFragmentManager().beginTransaction().replace(R.id.container,fragmentInfo).commit();
+                FM.beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .replace(R.id.container, fragmentInfo, "frag_info")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

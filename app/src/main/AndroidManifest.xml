@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.project2"
+    tools:ignore="ExtraText">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".Main.InquiryActivity"></activity>
+        <activity android:name=".CalenderActivity" />
+        <activity
+
+            android:name=".GoogleMap.WalkFinishPopup"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity android:name=".Camera.MediaScanner" />
+        <activity android:name=".Setting.MyInfomationFragment" />
+        <activity android:name=".Login_Membership.ResetpasswordActivity" />
+        <activity android:name=".Login_Membership.UserinfoActivity" />
+        <activity android:name=".Login_Membership.UserJoinActivity" />
+        <activity android:name=".GoogleMap.MarkerClickPopup" />
+        <activity android:name=".Login_Membership.LoginActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAQGWv908JYEp5-FLUKogG55e_3JtaNJ0c" />
+
+        <activity android:name=".Community.CommunityFragment" />
+        <activity android:name=".Search.SearchFragment" />
+        <activity android:name=".GoogleMap.MapsFragment" />
+        <activity android:name=".Camera.CameraActivity" />
+        <activity android:name=".Main.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.project2"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

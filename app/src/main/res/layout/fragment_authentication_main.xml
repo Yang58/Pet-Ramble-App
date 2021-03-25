@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="@color/light_blue_600"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".authentication">
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="@font/tmoneyroundwindextrabold"
+        android:text="어서 오세요!\n계정은 갖고 계신가요?"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:typeface="normal" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="31dp" />
+
+    <Button
+        android:id="@+id/auth_btn_join"
+        android:layout_width="255dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:fontFamily="sans-serif"
+        android:text="가입하기" />
+
+    <Button
+        android:id="@+id/auth_btn_login"
+        android:layout_width="255dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:fontFamily="sans-serif"
+        android:text="로그인" />
+</LinearLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_camera"
+        android:title="Camera"
+        android:icon="@drawable/ic_menu_camera"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/action_search"
+        android:title="gallery"
+        android:icon="@drawable/ic_menu_gallery"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/action_calender"
+        android:title="Calender"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/action_LoginOut"
+        android:title="로그아웃"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/action_setting"
+        android:title="설정"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/action_inquiry"
+        android:title="문의하기"
+        app:showAsAction="ifRoom"/>
+
+</menu>

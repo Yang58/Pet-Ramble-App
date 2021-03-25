@@ -1,0 +1,9 @@
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="250"
+    android:interpolator="@android:anim/cycle_interpolator"
+    android:cycles="4"
+    android:shareInterpolator="true">
+
+    <translate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromXDelta="0" android:toXDelta="10" android:duration="250" />
+</set>

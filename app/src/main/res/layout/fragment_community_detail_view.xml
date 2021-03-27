@@ -5,6 +5,7 @@
     android:id="@+id/cm_detail_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/defaultBG"
     tools:context=".ui.main.community_detail_view">
 
     <ScrollView
@@ -41,7 +42,6 @@
                         android:forceDarkAllowed="false"
                         android:foreground="@drawable/rounded_fg"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/img"
                         app:srcCompat="@drawable/dog" />
                 </LinearLayout>
 
@@ -124,7 +124,7 @@
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider" />
 
-            <com.example.community_t1.listView.customListView
+            <com.example.project2.Community.listView.customListView
                 android:id="@+id/cm_detail_container_listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

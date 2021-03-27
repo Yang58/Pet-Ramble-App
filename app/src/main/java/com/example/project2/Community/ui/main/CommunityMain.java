@@ -152,7 +152,7 @@ public class CommunityMain extends Fragment {
     public void showDetail(int position) {
         listViewClass obj = (listViewClass)adapter.getItem(position);
         FragmentManager fm = getParentFragmentManager();
-        Fragment currentFragment = fm.findFragmentById(R.id.fragment_container);
+        Fragment currentFragment = fm.findFragmentById(R.id.container);
         Bundle bundle = new Bundle();
         bundle.putString("id", obj.getId());
         bundle.putString("name", obj.getName());
@@ -162,7 +162,7 @@ public class CommunityMain extends Fragment {
         cdv.setArguments(bundle);
         fm.beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .replace(R.id.fragment_container, cdv)
+                .replace(R.id.container, cdv)
                 .addToBackStack("tag1")
                 .commit();
     }

@@ -74,7 +74,7 @@ public class CommunityDetailView extends Fragment {
         String id = getArguments().getString("id");
         String name = getArguments().getString("name");
         String context_ = getArguments().getString("context");
-        int profile_img = getArguments().getInt("profile_img");
+        String profile_img = getArguments().getString("profile_img");
 
         ListView commentList = v.findViewById(R.id.cm_detail_container_listView);
         com.example.project2.Community.listView.listViewAdapter commentAdapter = new com.example.project2.Community.listView.listViewAdapter();
@@ -87,7 +87,7 @@ public class CommunityDetailView extends Fragment {
         idV.setText(id);
         nameV.setText(name);
         contextV.setText(context_);
-        profile_imgV.setImageResource(profile_img);
+        //profile_imgV.setImageResource(profile_img);
 
         LinearLayout.LayoutParams layoutScale = new LinearLayout.LayoutParams(
                 500, 500);

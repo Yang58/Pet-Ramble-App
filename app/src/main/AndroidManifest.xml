@@ -20,10 +20,8 @@
         android:theme="@style/AppTheme">
         <activity android:name=".Main.InquiryActivity"></activity>
         <activity android:name=".CalenderActivity" />
-        <activity
-
-            android:name=".GoogleMap.WalkFinishPopup"
-            android:theme="@android:style/Theme.Dialog" />
+        <activity android:name=".GoogleMap.WalkFinishPopup"
+                  android:theme="@android:style/Theme.Dialog" />
         <activity android:name=".Camera.MediaScanner" />
         <activity android:name=".Setting.MyInfomationFragment" />
         <activity android:name=".Login_Membership.ResetpasswordActivity" />
@@ -34,7 +32,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAQGWv908JYEp5-FLUKogG55e_3JtaNJ0c" />
+            android:value="AIzaSyB8NAN4VfMVsaboxOc9qtECUiulJMrH5nI" />
 
         <activity android:name=".Community.CommunityFragment" />
         <activity android:name=".Search.SearchFragment" />

@@ -1,5 +1,6 @@
 package com.example.project2.Main;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity{
     Button btnCamera;
 
     FragmentManager FM;
-
+    Fragment lastFragment;
 
     CommunityMain fragment_Community;
     MapsFragment fragmentMap;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         petname = findViewById(R.id.MPN);
         petage = findViewById(R.id.MPA);
@@ -176,9 +178,7 @@ public class MainActivity extends AppCompatActivity{
         btnCamera = (Button)findViewById(R.id.action_camera);
 
         //프래그먼트는 뷰와 다르게 context를 매개변수로 넣어줄 필요가 없다.
-
         FM = getSupportFragmentManager();
-        LinearLayout frag_container = (LinearLayout) findViewById(R.id.fragment_container);
 
         //지도
         Button buttonMap = findViewById(R.id.btn_Map);
@@ -188,10 +188,11 @@ public class MainActivity extends AppCompatActivity{
                 if(fragmentMap == null){
                     fragmentMap = new MapsFragment();
                 }
+                Fragment lastFragment = getFragmentManager().findFragmentById(R.id.container);
                 FM.beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .replace(R.id.container,fragmentMap,"frag_map")
-                        .addToBackStack(null)
+                        .addToBackStack("map")
                         .commit();
             }
         });
@@ -204,10 +205,11 @@ public class MainActivity extends AppCompatActivity{
                 if(fragment_Community == null){
                     fragment_Community = new CommunityMain();
                 }
+                Fragment lastFragment = getFragmentManager().findFragmentById(R.id.container);
                 FM.beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .replace(R.id.container,fragment_Community,"frag_community")
-                        .addToBackStack(null)
+                        .addToBackStack("community")
                         .commit();
             }
         });
@@ -220,10 +222,11 @@ public class MainActivity extends AppCompatActivity{
                 if(fragmentInfo == null){
                     fragmentInfo = new MyInfomationFragment();
                 }
+                Fragment lastFragment = getFragmentManager().findFragmentById(R.id.container);
                 FM.beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .replace(R.id.container, fragmentInfo, "frag_info")
-                        .addToBackStack(null)
+                        .addToBackStack("info")
                         .commit();
             }
         });
@@ -297,22 +300,27 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
-        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지났으면 Toast 출력
-        // 2500 milliseconds = 2.5 seconds
-        if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
-            backKeyPressedTime = System.currentTimeMillis();
-            toast = Toast.makeText(this, "한 번 더 누르시면 종료됩니다.", Toast.LENGTH_LONG);
-            toast.show();
-            return;
-        }
+        //메뉴를 한번 이상 이동했을 경우 뒤로가기 눌렀을 때 이전 프래그먼트로 이동해야함
+        //따라서 뒤로가기 두번 시행시 어플 종료는 backstack이 0일때만 작동해야함
+        if(FM.getBackStackEntryCount()>0) {
+            FM.popBackStack();
+        }else{
+            // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
+            // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지났으면 Toast 출력
+            // 2500 milliseconds = 2.5 seconds
+            if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
+                backKeyPressedTime = System.currentTimeMillis();
+                toast = Toast.makeText(this, "한 번 더 누르시면 종료됩니다.", Toast.LENGTH_LONG);
+                toast.show();
+                return;
+            }
 
-        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
-        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 종료
-        if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
-            moveTaskToBack(true);
-            System.exit(1);
-
+            // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
+            // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 종료
+            if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
+                moveTaskToBack(true);
+                System.exit(1);
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.project2.CalenderActivity;
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity{
                 if(fragmentMap == null){
                     fragmentMap = new MapsFragment();
                 }
-                Fragment lastFragment = getFragmentManager().findFragmentById(R.id.container);
+
                 FM.beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .replace(R.id.container,fragmentMap,"frag_map")
@@ -204,13 +206,14 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 if(fragment_Community == null){
                     fragment_Community = new CommunityMain();
+                }else {
+                    FM.beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .replace(R.id.container, fragment_Community, "frag_community")
+                            .addToBackStack("community")
+                            .commit();
+
                 }
-                Fragment lastFragment = getFragmentManager().findFragmentById(R.id.container);
-                FM.beginTransaction()
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .replace(R.id.container,fragment_Community,"frag_community")
-                        .addToBackStack("community")
-                        .commit();
             }
         });
 
@@ -222,7 +225,6 @@ public class MainActivity extends AppCompatActivity{
                 if(fragmentInfo == null){
                     fragmentInfo = new MyInfomationFragment();
                 }
-                Fragment lastFragment = getFragmentManager().findFragmentById(R.id.container);
                 FM.beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .replace(R.id.container, fragmentInfo, "frag_info")

@@ -79,8 +79,6 @@ public class CommunityDetailView extends Fragment {
         ListView commentList = v.findViewById(R.id.cm_detail_container_listView);
         com.example.project2.Community.listView.listViewAdapter commentAdapter = new com.example.project2.Community.listView.listViewAdapter();
         commentList.setAdapter(commentAdapter);
-        commentAdapter.addItem("@something","이름","Color-coded labels help you categorize and filter your issues (just like labels in email)","");
-        commentAdapter.addItem("@effe","강아지","One assignee is responsible for working on the issue at any given time","");
         commentAdapter.setReverse(true);
         commentAdapter.notifyDataSetChanged();
 

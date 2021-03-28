@@ -1,8 +1,19 @@
 package com.example.project2.Community.listView;
 
+import com.google.firebase.Timestamp;
+
 public class listViewClass {
     private String profile;
     private String name, id, context;
+    private Timestamp timestamp;
+
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public String getProfile_img() {
         return profile;

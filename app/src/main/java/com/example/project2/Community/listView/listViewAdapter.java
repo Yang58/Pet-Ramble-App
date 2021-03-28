@@ -1,6 +1,7 @@
 package com.example.project2.Community.listView;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.project2.R;
 
+import com.google.firebase.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -68,13 +70,16 @@ public class listViewAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void addItem(String id, String name, String context, String profile_img){
+    public void addItem(String id, String name, String context, String profile_img, Timestamp uptime){
         listViewClass listViewItem = new listViewClass();
 
         listViewItem.setId(id);
         listViewItem.setName(name);
         listViewItem.setContext(context);
         listViewItem.setProfile_img(profile_img);
+        listViewItem.setTimestamp(uptime);
+        listViewItemList.add(listViewItem);
+        /*
         if(isReversed){
             setReverse(false);
             listViewItemList.add(listViewItem);
@@ -82,8 +87,9 @@ public class listViewAdapter extends BaseAdapter {
         }else{
             listViewItemList.add(listViewItem);
         }
+        */
     }
-
+/*
     public void addItem(int num, String id, String name, String context, String profile_img){
         listViewClass listViewItem = new listViewClass();
 
@@ -93,6 +99,15 @@ public class listViewAdapter extends BaseAdapter {
         listViewItem.setProfile_img(profile_img);
 
         listViewItemList.add(num, listViewItem);
+    }
+*/
+    public void sortItems(){
+        Log.wtf("정보","호출됨");
+        Collections.sort(listViewItemList,new sortTimestamp());
+    }
+
+    public void removeAllItem(){
+        listViewItemList.clear();
     }
 
     public void setReverse(boolean b){

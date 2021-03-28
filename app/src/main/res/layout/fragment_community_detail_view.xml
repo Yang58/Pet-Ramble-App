@@ -65,7 +65,8 @@
                         android:layout_height="wrap_content"
                         android:duplicateParentState="true"
                         android:text="@id"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        app:autoSizeTextType="uniform" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -79,7 +80,8 @@
                 android:layout_marginEnd="5dp"
                 android:duplicateParentState="true"
                 android:paddingRight="7dp"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textSize="18sp" />
 
             <FrameLayout
                 android:id="@+id/cm_detail_container_gallary"
@@ -93,6 +95,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 

@@ -80,20 +80,14 @@ public class MainActivity extends AppCompatActivity{
     // 첫 번째 뒤로 가기 버튼을 누를 때 표시
     private Toast toast;
 
-    FirebaseDatabase database;
-    final List<Userinfo> Userinfos = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         petname = findViewById(R.id.MPN);
         petage = findViewById(R.id.MPA);
         petkind = findViewById(R.id.MPK);
-
-
 
 //        DBHelper dbHelper = new DBHelper(this);
 //        SQLiteDatabase sqldb;
@@ -141,10 +135,8 @@ public class MainActivity extends AppCompatActivity{
             Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
             startActivity(intent);
         }else{ // 회원가입 또는 로그인 성공시 바로 메인화면이동
-
             FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
             DocumentReference docRef = FBdb.collection("users").document(user.getUid());
-
             docRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -205,12 +197,10 @@ public class MainActivity extends AppCompatActivity{
                 if(fragment_Community == null){
                     fragment_Community = new CommunityMain();
                     FM.beginTransaction().add(R.id.container,fragment_Community).commit();
-
                 }
                 if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
                 if(fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
                 if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
-
             }
         });
 
@@ -230,7 +220,6 @@ public class MainActivity extends AppCompatActivity{
         });
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -298,7 +287,6 @@ public class MainActivity extends AppCompatActivity{
                 toast.show();
                 return;
             }
-
             // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
             // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 종료
             if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {

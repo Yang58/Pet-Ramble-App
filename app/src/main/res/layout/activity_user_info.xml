@@ -13,24 +13,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:gravity="center"
         android:layout_margin="10dp"
+        android:paddingLeft="10dp"
         android:text="회원 정보 "
         android:textColor="@android:color/black"
         android:textSize="25dp"
         android:textStyle="bold" />
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginBottom="5dp"
-        app:cardCornerRadius="100dp" >
+
 
         <ImageView
             android:id="@+id/profile_imageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             app:srcCompat="@android:drawable/star_big_on" />
-    </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="이미지를 누르면 프로필 사진을 추가 할 수 있습니다."
+            android:textStyle="bold"
+            android:gravity="center"/>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,7 +68,7 @@
                 android:layout_margin="5dp"
                 android:ems="8"
                 android:gravity="center"
-                android:hint="나이"
+                android:hint="생년월일"
                 android:inputType="number"
                 android:textStyle="bold" />
 
@@ -98,7 +104,6 @@
                 android:hint="나이"
                 android:inputType="number"
                 android:textStyle="bold" />
-
 
 
             <EditText

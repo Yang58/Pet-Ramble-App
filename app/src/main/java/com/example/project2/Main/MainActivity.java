@@ -282,21 +282,6 @@ public class MainActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    //프래그먼트와 프래그먼트끼리 직접접근을하지않는다. 프래그먼트와 엑티비티가 접근함 / - 사용 안함 -
-    public void onFragmentChange(int index){
-        if(index == 0 ){
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragmentMap).commit();
-        }else if(index == 1){
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragmentMap).commit(); // SreachFragment
-        }
-        else if(index == 2){
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragmentMap).commit();// CommunityFragment
-        }
-        else if(index == 3){
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragmentMap).commit(); // Myinfomation
-        }
-    }
-
     @Override
     public void onBackPressed() {
         //메뉴를 한번 이상 이동했을 경우 뒤로가기 눌렀을 때 이전 프래그먼트로 이동해야함

@@ -1,4 +1,4 @@
-package com.example.community_t1.DB;
+package com.example.project2.Community.DB;
 
 public class user {
     private String cover_photo,id,name,password;

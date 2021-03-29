@@ -189,13 +189,11 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 if(fragmentMap == null){
                     fragmentMap = new MapsFragment();
+                    FM.beginTransaction().add(R.id.container,fragmentMap).commit();
                 }
-
-                FM.beginTransaction()
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .replace(R.id.container,fragmentMap,"frag_map")
-                        .addToBackStack("map")
-                        .commit();
+                if(fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
+                if(fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
+                if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
             }
         });
 
@@ -206,14 +204,13 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 if(fragment_Community == null){
                     fragment_Community = new CommunityMain();
-                }else {
-                    FM.beginTransaction()
-                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .replace(R.id.container, fragment_Community, "frag_community")
-                            .addToBackStack("community")
-                            .commit();
+                    FM.beginTransaction().add(R.id.container,fragment_Community).commit();
 
                 }
+                if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
+                if(fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
+                if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
+
             }
         });
 
@@ -224,12 +221,11 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v){
                 if(fragmentInfo == null){
                     fragmentInfo = new MyInfomationFragment();
+                    FM.beginTransaction().add(R.id.container,fragmentInfo).commit();
                 }
-                FM.beginTransaction()
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .replace(R.id.container, fragmentInfo, "frag_info")
-                        .addToBackStack("info")
-                        .commit();
+                if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
+                if(fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
+                if(fragmentInfo != null) FM.beginTransaction().show(fragmentInfo).commit();
             }
         });
 
@@ -253,6 +249,7 @@ public class MainActivity extends AppCompatActivity{
             if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
             return true;
         }
+
         if (id == R.id.action_search) {
             Toast.makeText(this, "갤러리", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(Intent.ACTION_PICK);

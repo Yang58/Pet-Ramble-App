@@ -2,11 +2,23 @@ package com.example.project2.Data;
 
 public class Userinfo {
 
-    private String person_name;
-    private String person_age;
-    private String petName;
-    private String petAge;
-    private String petKind;
+    public String person_name;
+    public String person_age; // 강아지 생일로 변경
+    public String petName;
+    public String petAge;
+    public String petKind;
+    public String photoUrl;
+
+    public Userinfo(String person_name, String person_age, String petName, String petAge, String petKind, String photoUrl){
+
+        this.person_name = person_name;
+        this.person_age = person_age;
+        this.petName = petName;
+        this.petAge = petAge;
+        this.petKind = petKind;
+        this.photoUrl = photoUrl;
+
+    }
 
     public Userinfo(String person_name, String person_age, String petName, String petAge, String petKind){
 
@@ -58,7 +70,12 @@ public class Userinfo {
         this.petKind = petKind;
     }
 
-    public String returnPetinfo(){
-        return petName;
+    public String getPhotoUrl(){
+        return this.photoUrl;
     }
+
+    public void getPhotoUrl(String photoUrl){
+        this.photoUrl = photoUrl;
+    }
+
 }

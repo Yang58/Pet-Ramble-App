@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity{
 
 
         // 액션바
-        getSupportActionBar().setTitle("AppName");
+        getSupportActionBar().setTitle("🦮");
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // 홈버튼 활성화

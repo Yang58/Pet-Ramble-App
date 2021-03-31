@@ -1,12 +1,15 @@
 package com.example.project2.GoogleMap;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
@@ -37,6 +40,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource.*;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,6 +49,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.auth.User;
+import com.google.rpc.context.AttributeContext;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -53,7 +64,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback,GoogleMap.OnMarkerClickListener {
+        ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
 
     private FragmentActivity mContext;
 
@@ -61,6 +72,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private GoogleMap mMap;
     private MapView mapView = null;
     private Marker currentMarker = null;
+    private boolean isWalkStart = false;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient; // Deprecated된 FusedLocationApi를 대체
@@ -78,6 +90,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+
+    private LatLng startPoint=null;
+    private LatLng endPoint=null;
 
     Chronometer mChr;
 
@@ -112,48 +127,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
         final View layout = inflater.inflate(R.layout.activity_maps_fragment, container, false);
 
-        mChr = (Chronometer)layout.findViewById(R.id.chronometer);
-
-        final CardView ct = layout.findViewById(R.id.cardtest);
-        final Button st = (Button)layout.findViewById(R.id.btn_start); //시작
-        final Button fi = (Button)layout.findViewById(R.id.btn_finish); //종료
-
+        final Button st = (Button) layout.findViewById(R.id.btn_start); //시작
+        final Button fi = (Button) layout.findViewById(R.id.btn_finish); //종료
 
         st.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { // 산책 시작 ( 시간체크 칼로리 체크 )
-                ct.setVisibility(View.VISIBLE); // 보이기
-                st.setVisibility(View.GONE); // 시작 버튼 클릭시 숨기고
-                fi.setVisibility(View.VISIBLE); //종료 버튼 활성화
-
-                mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
-                mChr.start();
-
+                setWalkState(true);
             }
         });
 
         fi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { // 산책 종료 ( DB로 데이터 보낸 후 팝업창 출력 )
-
-                ct.setVisibility(View.GONE); // 안보이기
-                st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
-                fi.setVisibility(View.GONE); //시작 버튼 활성화
-
-                long WalkTimeSum = (SystemClock.elapsedRealtime()-mChr.getBase())/1000;
-
-                int min = (int) (WalkTimeSum / 60);
-                int hour = (min / 60);
-                int sec = (int) (WalkTimeSum % 60);
-                min = min % 60 ;
-
-                mChr.stop();
-
-                Intent intent = new Intent(getContext().getApplicationContext(),WalkFinishPopup.class);
-                intent.putExtra("sec",String.valueOf(sec));
-                intent.putExtra("min",String.valueOf(min));
-                intent.putExtra("hour",String.valueOf(hour));
-                startActivityForResult(intent,1);
+                setWalkState(false);
             }
         });
 
@@ -162,9 +149,103 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mapView.onCreate(savedInstanceState);
         }
         mapView.getMapAsync(this);
+
         return layout;
     }
 
+    //위치정보 업데이트 처리 객체
+    public LocationListener loListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            DatabaseReference startRef = database.getReference().child(user.getUid()).child("mapData").child("start");
+            DatabaseReference endRef = database.getReference().child(user.getUid()).child("mapData").child("end");
+
+            startPoint = new LatLng(location.getLatitude(), location.getLongitude());
+            if (endPoint == null) endPoint = new LatLng(location.getLatitude(), location.getLongitude());
+            //리얼타임 데이터베이스에 실시간으로 노드 전송
+            startRef.setValue(startPoint);
+            endRef.setValue(endPoint);
+            //선 그리기
+            PolylineOptions line = new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN);
+            mMap.addPolyline(line);
+            endPoint = startPoint;
+
+            Log.wtf("위치", startPoint.toString() + "+" + endPoint.toString());
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+
+    public void setWalkState(boolean b) {
+        final View view = getView();
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        mChr = (Chronometer) view.findViewById(R.id.chronometer);
+
+        final CardView ct = view.findViewById(R.id.cardtest);
+        final Button st = (Button) view.findViewById(R.id.btn_start); //시작
+        final Button fi = (Button) view.findViewById(R.id.btn_finish); //종료
+
+        isWalkStart = b;
+
+        if (isWalkStart) {
+            //권한 얻기
+            if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            ct.setVisibility(View.VISIBLE); // 보이기
+            st.setVisibility(View.GONE); // 시작 버튼 클릭시 숨기고
+            fi.setVisibility(View.VISIBLE); //종료 버튼 활성화
+
+            mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
+            mChr.start();
+            //위치정보 업데이트 시작
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5,loListener);
+        }else{
+            ct.setVisibility(View.GONE); // 안보이기
+            st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
+            fi.setVisibility(View.GONE); //시작 버튼 활성화
+
+            long WalkTimeSum = (SystemClock.elapsedRealtime()-mChr.getBase())/1000;
+
+            int min = (int) (WalkTimeSum / 60);
+            int hour = (min / 60);
+            int sec = (int) (WalkTimeSum % 60);
+            min = min % 60 ;
+
+            mChr.stop();
+            //위치정보 업데이트 중단
+            lm.removeUpdates(loListener);
+
+            Intent intent = new Intent(getContext().getApplicationContext(),WalkFinishPopup.class);
+            intent.putExtra("sec",String.valueOf(sec));
+            intent.putExtra("min",String.valueOf(min));
+            intent.putExtra("hour",String.valueOf(hour));
+            startActivityForResult(intent,1);
+        }
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -287,6 +368,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         return addressStringBuilder.toString();
     }
 
+
+
     // 마커 클릭시 보여지는 주소와 위도 경도 ( 후에 사용자 정보로 변경 )
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -315,8 +398,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
 
     };
-
-
 
     private String CurrentTime() {
         Date today = new Date();
@@ -453,7 +534,5 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
         return false;
     }
-
-
 }
 

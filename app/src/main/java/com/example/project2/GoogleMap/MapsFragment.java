@@ -169,6 +169,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             endRef.setValue(endPoint);
             //선 그리기
             PolylineOptions line = new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN);
+            //움직이는동안 마커 일단 지우기
+            currentMarker.remove();
+            //카메라 부드럽게 중앙으로 이동
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(endPoint,18));
             mMap.addPolyline(line);
             endPoint = startPoint;
 
@@ -222,7 +226,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
             mChr.start();
             //위치정보 업데이트 시작
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5,loListener);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1,loListener);
         }else{
             ct.setVisibility(View.GONE); // 안보이기
             st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고

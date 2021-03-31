@@ -1,13 +1,8 @@
 package com.example.project2.Login_Membership;
 
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,29 +14,43 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.loader.content.CursorLoader;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Data.DBHelper;
 import com.example.project2.Data.Userinfo;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class UserinfoActivity extends AppCompatActivity {
 
     private static final String TAG = "UserinfoActivity";
+    private static final int PICK_IMAGE = 0;
 
     private Button Check;
 
     ImageView user_profile;
+
+    private String profilePath;
+    private FirebaseUser user;
 
     private EditText petAge;
     private EditText petKind;
@@ -49,11 +58,12 @@ public class UserinfoActivity extends AppCompatActivity {
     private EditText Edit_name;
     private EditText Edit_age;
 
-    int GET_GALLERY_IMAGE = 0;
+    private int GALLEY_CODE = 10;
+    private String imageUrl="";
+
+    int Imagepick = 0;
 
     DBHelper dbHelper;
-
-    String[] items = {"말티즈", "빠삐용","요크셔테리어","시베리아 허스키", "골든 두들","골드 리트리버"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,18 +78,25 @@ public class UserinfoActivity extends AppCompatActivity {
         petName = (EditText)findViewById(R.id.edit_petName);
         petKind = (EditText) findViewById(R.id.edit_petKind);
 
-        user_profile = (ImageView) findViewById(R.id.profile_imageView);
-                user_profile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_PICK);
-                        intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-                        startActivityForResult(intent, 1);
-                    }
-                });
+        user_profile = findViewById(R.id.profile_imageView);
+        user_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+                startActivityForResult(intent,GALLEY_CODE);
+                Imagepick = 1;
+                Toast.makeText(getApplicationContext()," "+Imagepick,Toast.LENGTH_LONG).show();
+            }
+        });
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference();
+
+        // 이미지뷰 원 형태로 변경
+//        user_profile.setBackground(new ShapeDrawable(new OvalShape()));
+//        if(Build.VERSION.SDK_INT >= 21){
+//            user_profile.setClipToOutline(true);
+//        }
+
 
         Check = (Button)findViewById(R.id.btn_Check);
         Check.setOnClickListener(new View.OnClickListener(){
@@ -91,112 +108,48 @@ public class UserinfoActivity extends AppCompatActivity {
                         startActivity(intent);
                         profileUpdate();
                         finish();
-
                     }else{
                         Toast.makeText(UserinfoActivity.this,"애완동물 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
                     }
-
                 }else{
                     Toast.makeText(UserinfoActivity.this,"회원 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
+    //갤러리에서 넘어온 사진의 절대경로를 구한다.
+    private String getRealPathFromUri(Uri uri)
+    {
+        String[] proj =  {MediaStore.Images.Media.DATA};
+        CursorLoader cursorLoader = new CursorLoader(this,uri,proj,null,null,null);
+        Cursor cursor = cursorLoader.loadInBackground();
 
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String url = cursor.getString(columnIndex);
+        cursor.close();
+        return  url;
 
+    }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == GALLEY_CODE)
+        {
+            try {
+                imageUrl = getRealPathFromUri(data.getData());
+                RequestOptions cropOptions = new RequestOptions();
+                Glide.with(getApplicationContext())
+                        .load(imageUrl)
+                        .apply(cropOptions.optionalCircleCrop())
+                        .into(user_profile);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
-
-        try{
-            // 사진을 선택하고 왔을 때만 처리한다.
-            if(resultCode == RESULT_OK){
-                // 선택한 이미지를 지칭하는 Uri 객체를 얻어온다.
-                Uri uri = data.getData();
-                // Uri 객체를 통해서 컨텐츠 프로바이더를 통해 이미지의 정보를 가져온다.
-                ContentResolver resolver = getContentResolver();
-                Cursor cursor = resolver.query(uri, null, null, null, null);
-                cursor.moveToNext();
-
-                // 사용자가 선택한 이미지의 경로 데이터를 가져온다.
-                int index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-                String source = cursor.getString(index);
-
-                // 경로 데이터를 통해서 이미지 객체를 생성한다
-                Bitmap bitmap = BitmapFactory.decodeFile(source);
-
-                // 이미지의 크기를 조정한다.
-                Bitmap bitmap2 = resizeBitmap(1024, bitmap);
-
-                // 회전 각도 값을 가져온다.
-                float degree = getDegree(source);
-                Bitmap bitmap3 = rotateBitmap(bitmap2, degree);
-
-                user_profile.setImageBitmap(bitmap3);
-
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public Bitmap resizeBitmap(int targetWith, Bitmap source){
-        double ratio = (double)targetWith / (double)source.getWidth();
-
-        int targetHeight = (int)(source.getHeight() * ratio);
-
-        Bitmap result = Bitmap.createScaledBitmap(source, targetWith, targetHeight, false);
-
-        if(result != source){
-            source.recycle();
-        }
-        return result;
-    }
-
-    public float getDegree(String source){
-        try{
-            ExifInterface exif = new ExifInterface(source);
-
-            int degree = 0;
-
-            int ori = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
-            switch (ori){
-                case ExifInterface.ORIENTATION_ROTATE_90 :
-                    degree = 90;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180 :
-                    degree = 180;
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270 :
-                    degree = 270;
-                    break;
-            }
-            return (float)degree;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return 0.0f;
-    }
-
-    public Bitmap rotateBitmap(Bitmap bitmap, float degree){
-        try{
-
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-
-            Matrix matrix = new Matrix();
-            matrix.postRotate(degree);
-
-            Bitmap bitmap2 = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-            bitmap.recycle();
-
-            return bitmap2;
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
     }
 
 
@@ -207,35 +160,72 @@ public class UserinfoActivity extends AppCompatActivity {
 
         String petName = ((EditText) findViewById(R.id.edit_petName)).getText().toString();
         String petAge = ((EditText) findViewById(R.id.edit_petAge)).getText().toString();
-        String petKind = ((EditText)findViewById(R.id.edit_petKind)).getText().toString();
+        String petKind = ((EditText) findViewById(R.id.edit_petKind)).getText().toString();
 
         if (person_name.length() > 0 && person_age.length() > 0) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            Userinfo userinfo = new Userinfo(person_name, person_age, petName, petAge, petKind);
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            user = FirebaseAuth.getInstance().getCurrentUser();
 
-            if(user != null){
-                db.collection("users").document(user.getUid()).set(userinfo)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(UserinfoActivity.this, "회원 정보 등록완료 ", Toast.LENGTH_SHORT).show();
-                                finish();
+            StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
+
+
+            if (Imagepick == 0) {
+                Userinfo userinfo = new Userinfo(person_name, person_age, petName, petAge, petKind);
+                storeUploader(userinfo);
+                Log.d("log_test","1");
+            } else if(Imagepick == 1){
+                try {
+                    InputStream stream = new FileInputStream(new File(imageUrl));
+                    UploadTask uploadTask = mountainImagesRef.putStream(stream);
+                    uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
                             }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(UserinfoActivity.this, "회원 정보 등록실패 (다시 시도해주세요!!) ", Toast.LENGTH_LONG).show();
-                                Log.w(TAG, "Error",e);
+                            return mountainImagesRef.getDownloadUrl();
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                Uri downloadUri = task.getResult();
+                                Userinfo userinfo = new Userinfo(person_name, person_age, petName, petAge, petKind, downloadUri.toString());
+                                storeUploader(userinfo);
+                                Log.d("log_test","2");
+                            } else {
+                                Toast.makeText(UserinfoActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
                             }
-                        });
+                        }
+                    });
+                } catch (FileNotFoundException e) {
+                    Log.e("로그", "에러: " + e.toString());
+                }
             }
-
         } else {
             Toast.makeText(this, "회원 정보를 입력해주세요 ", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private  void storeUploader(Userinfo userinfo){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(user.getUid()).set(userinfo)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(UserinfoActivity.this, "회원 정보 등록완료 ", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(UserinfoActivity.this, "회원 정보 등록실패 (다시 시도해주세요!!) ", Toast.LENGTH_LONG).show();
+                        Log.w(TAG, "Error",e);
+                    }
+                });
     }
 
     private void SQLupdate(){

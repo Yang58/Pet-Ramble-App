@@ -4,14 +4,12 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,32 +17,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.project2.CalenderActivity;
 import com.example.project2.Camera.CameraActivity;
-import com.example.project2.Data.Userinfo;
+import com.example.project2.Community.ui.main.CommunityMain;
 import com.example.project2.GoogleMap.MapsFragment;
 import com.example.project2.Login_Membership.LoginActivity;
 import com.example.project2.Login_Membership.UserinfoActivity;
 import com.example.project2.R;
-import com.example.project2.Community.ui.main.CommunityMain;
 import com.example.project2.Setting.MyInfomationFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -89,21 +80,6 @@ public class MainActivity extends AppCompatActivity{
         petage = findViewById(R.id.MPA);
         petkind = findViewById(R.id.MPK);
 
-//        DBHelper dbHelper = new DBHelper(this);
-//        SQLiteDatabase sqldb;
-//        String sql;
-//
-//        sqldb = dbHelper.getReadableDatabase();
-//        sql = "SELECT * FROM info;";
-//        Cursor cursor = sqldb.rawQuery(sql, null);
-//        if(cursor.getCount() > 0){
-//            while (cursor.moveToNext()){
-//                petname.setText(cursor.getString(2));
-//                petage.setText(cursor.getString(3));
-//                petkind.setText(cursor.getString(4));
-//
-//            }
-//        }
 
         // 액션바
         getSupportActionBar().setTitle("AppName");
@@ -131,21 +107,11 @@ public class MainActivity extends AppCompatActivity{
         // Firebase 회원정보
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if(user == null){ // 회원 정보가 없을시 로그인화면이동
+        if(user == null){ // 회원 정보가 없을시 로그인 화면이동
             Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
             startActivity(intent);
-        }else{ // 회원가입 또는 로그인 성공시 바로 메인화면이동
-            FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
-            DocumentReference docRef = FBdb.collection("users").document(user.getUid());
-            docRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                    petname.setText(value.getString("petName"));
-                    petage.setText(value.getString("petAge"));
-                    petkind.setText(value.getString("petKind"));
-                }
-            });
-
+        }else{
+            DocumentReference docRef = FirebaseFirestore.getInstance().collection("users").document(user.getUid());;
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -155,15 +121,26 @@ public class MainActivity extends AppCompatActivity{
                             if (document.exists()) {
                                 Log.d(TAG, "" +document.getId()+
                                         " data: " + document.getData());
-                            } else {
-                                Log.d(TAG, "No such document");
-                                Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
-                                startActivity(intent);
+                                Log.i("log_test","3");
+                            } else { // 유저 uid에 정보가 없다면 정보 입력창 이동
+                                    Log.i("log_test","4");
+                                    Log.d(TAG, "No such document");
+                                    Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
+                                    startActivity(intent);
                             }
                         }
                     } else {
                         Log.d(TAG, "get failed with ", task.getException());
                     }
+                }
+            });
+
+            docRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                    petname.setText(value.getString("petName"));
+                    petage.setText(value.getString("petAge"));
+                    petkind.setText(value.getString("petKind"));
                 }
             });
 

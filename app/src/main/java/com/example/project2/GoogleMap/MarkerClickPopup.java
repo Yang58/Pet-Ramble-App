@@ -1,22 +1,39 @@
 package com.example.project2.GoogleMap;
 
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.project2.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.auth.User;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
 
 public class MarkerClickPopup extends DialogFragment implements View.OnClickListener {
 
@@ -33,6 +50,9 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
     private TextView PetAge;
     private TextView PetKind;
 
+    private ImageView profile;
+
+    private FirebaseUser user;
 
     public static final String TAG_EVENT_DIALOG = "dialog_event";
 
@@ -55,40 +75,49 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
         PetName = v.findViewById(R.id.TV_PetName);
         PetAge = v.findViewById(R.id.TV_PetAge);
         PetKind = v.findViewById(R.id.TV_PetKind);
-               //addListenerForSingleValueEvent
-//        mRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                DataSnapshot name =snapshot.child("name");
-//                Toast.makeText(getContext().getApplicationContext(),"dfjalskdjfljasd"+ name,Toast.LENGTH_LONG).show();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
 
-//        Ref.child().addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-//                for(DataSnapshot snapshot : datasnapshot.getChildren()){
-//                    Log.d("DDD", String.valueOf(docRef.getClass()));
-//                    Userinfo user = snapshot.getValue(Userinfo.class);
-//
-//                    Log.d("DDD", String.valueOf(docRef.getClass()));
-//
-//                    Log.d("DDD", user.getName());
-//
-//                }
-//
-//            }
+        profile = v.findViewById(R.id.Map_Userprofile);
 
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
+        DocumentReference docRef = FBdb.collection("users").document(user.getUid());
+
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                NickName.setText(value.getString("name"));
+               PetName.setText(value.getString("petName"));
+               PetAge.setText(value.getString("petAge"));
+               PetKind.setText(value.getString("petKind"));
+            }
+        });
+
+        File file = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES + "/profile_img");
+        if (!file.isDirectory()) {
+            //디렉토리가 없으면, 디렉토리를 만든다.
+            file.mkdir();
+        }
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference();
+        storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
+                new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(getContext()).load(uri).into(profile);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+        // 이미지뷰 원 형태로 변경
+        profile.setBackground(new ShapeDrawable(new OvalShape()));
+        if(Build.VERSION.SDK_INT >= 21) {
+            profile.setClipToOutline(true);
+        }
 
         btnexit = (Button)v.findViewById(R.id.btn_exit);
         btnexit.setOnClickListener(this);
@@ -107,27 +136,14 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
         });
 
         setCancelable(true); // 화면 밖에 터치시 화면이 꺼지지 않게 하기 위함
-
         return v;
     }
+
+
 
     @Override
     public void onClick(View v) {
         dismiss();
     }
-    public void getUser (String uID){
 
-        mRef.child("users").child(uID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
 }

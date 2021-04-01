@@ -41,6 +41,23 @@
                 android:id="@+id/frameLayout3">
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/cm_main_btn_floating2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="80dp"
+                    android:backgroundTint="@android:color/holo_blue_light"
+                    android:clickable="true"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:fabSize="auto"
+                    app:maxImageSize="30dp"
+                    tools:layout_conversion_absoluteHeight="56dp"
+                    tools:layout_conversion_absoluteWidth="56dp"
+                    tools:layout_editor_absoluteX="0dp"
+                    tools:layout_editor_absoluteY="189dp" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/cm_main_btn_floating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

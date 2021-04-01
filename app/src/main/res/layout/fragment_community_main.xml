@@ -9,115 +9,6 @@
     android:background="@color/defaultBG"
     tools:context="com.example.project2.Community.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="178dp"
-        android:layout_marginTop="10dp">
-
-        <LinearLayout
-            android:layout_width="91dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/cm_main_img_cover_picture"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginBottom="2dp"
-                android:layout_weight="1"
-                android:foreground="@drawable/rounded_fg"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/dog"
-                tools:src="@tools:sample/avatars" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <TextView
-                    android:id="@+id/cm_main_txt_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="48dp"
-                    android:text="@id"
-                    android:textAlignment="center"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-                <TextView
-                    android:id="@+id/cm_main_txt_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    android:text="누구누구"
-                    android:textAlignment="center"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toTopOf="@+id/cm_main_txt_id"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/naeyongField"
-                    android:layout_width="match_parent"
-                    android:layout_height="102dp"
-                    android:ems="10"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:gravity="right|center_vertical"
-                android:orientation="horizontal">
-
-                <Space
-                    android:layout_width="141dp"
-                    android:layout_height="11dp"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/sendButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="공유하기"
-                    app:icon="@drawable/asset_10" />
-            </LinearLayout>
-
-        </LinearLayout>
-    </LinearLayout>
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/cm_main_container_refresh"
         android:layout_width="match_parent"
@@ -144,15 +35,44 @@
                 android:textStyle="bold"
                 android:visibility="gone" />
 
-            <ListView
-                android:id="@+id/listViewItemContainer"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:descendantFocusability="beforeDescendants"
-                android:transcriptMode="disabled">
+                android:id="@+id/frameLayout3">
 
-            </ListView>
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/cm_main_btn_floating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="@android:color/holo_orange_dark"
+                    android:clickable="true"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:fabSize="auto"
+                    app:maxImageSize="30dp"
+                    tools:layout_conversion_absoluteHeight="56dp"
+                    tools:layout_conversion_absoluteWidth="56dp"
+                    tools:layout_editor_absoluteX="0dp"
+                    tools:layout_editor_absoluteY="189dp" />
+
+                <ListView
+                    android:id="@+id/listViewItemContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:descendantFocusability="beforeDescendants"
+                    android:transcriptMode="disabled"
+                    tools:layout_conversion_absoluteHeight="542dp"
+                    tools:layout_editor_absoluteY="189dp"
+                    tools:layout_editor_absoluteX="0dp"
+                    tools:layout_conversion_absoluteWidth="411dp">
+
+                </ListView>
+            </FrameLayout>
+
         </LinearLayout>
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

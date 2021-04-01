@@ -32,6 +32,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -52,13 +53,10 @@ import javax.security.auth.callback.Callback;
  * create an instance of this fragment.
  */
 public class CommunityMain extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
+    //전역변수 추가하는 공간
     private final static FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private final static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final static listViewAdapter adapter = new listViewAdapter();
@@ -118,6 +116,7 @@ public class CommunityMain extends Fragment {
         final SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
         final Button sndBtn = view.findViewById(R.id.sendButton);
         final TextView tField = view.findViewById(R.id.naeyongField);
+        final FloatingActionButton floatBtn = view.findViewById(R.id.cm_main_btn_floating);
 
         //이름 가져오기
         final String[] userName = new String[1];
@@ -127,8 +126,6 @@ public class CommunityMain extends Fragment {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 userName[0] = task.getResult().getString("name");
-                dpName.setText(userName[0]);
-                dpId.setText("&" + task.getResult().getString("petName"));
             }
         });
         ;
@@ -159,21 +156,25 @@ public class CommunityMain extends Fragment {
             }
         });
 
-        sndBtn.setOnClickListener(new View.OnClickListener() {
+        //만약 글 작성, 글 보기 후 나왔다면
+        getParentFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
-            public void onClick(View vv) {
-                if (tField.getText().toString().length() != 0) {
-                    uploadData upData = new uploadData(tField.getText().toString(), new Timestamp(System.currentTimeMillis()));
-                    uploadContent(user, upData);
-                    lv.setAdapter(updateList(user));
-                    tField.setText("");
-                    lv.requestFocusFromTouch();
-                    lv.clearFocus();
-                } else {
-                    Animation shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
-                    tField.startAnimation(shake);
-                    Toast.makeText(c, "적어도 한글자 이상은 적어야해요!", Toast.LENGTH_SHORT).show();
-                }
+                public void onBackStackChanged() {
+                updateList(user);
+            }
+        });
+
+        //플로팅 버튼 작동
+        floatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getParentFragmentManager();
+                CommunityDetailWrite cdw = new CommunityDetailWrite();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_bottom,R.anim.slide_out_bottom,R.anim.slide_in_top,R.anim.slide_out_top)
+                        .add(R.id.container, cdw)
+                        .addToBackStack("frag_communityWrite")
+                        .commit();
             }
         });
 
@@ -249,9 +250,9 @@ public class CommunityMain extends Fragment {
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 friendUserName[0] = task.getResult().getString("name");
                                                 friendDogName[0] = task.getResult().getString("petName");
-                                                Log.wtf("친구정보",friendUserName[0]+friendDogName[0]);
                                             }
                                         });
+                                        Log.wtf("친구정보",friendUserName[0]+friendDogName[0]);
 
                                         //친구들 글 가져오기
                                         communityDB = db.collection("community").document(friendUID);
@@ -271,6 +272,9 @@ public class CommunityMain extends Fragment {
                                                     }
                                                 });
                                     }
+                                    friendUserName[0] = null;
+                                    friendDogName[0] = null;
+                                    System.gc();
                                 }
                                 //친구목록 비었을 시 처리
                             } catch (NullPointerException e) {
@@ -287,23 +291,6 @@ public class CommunityMain extends Fragment {
 
         //adapter를 돌려보내서 ListView에 탑재할 수 있도록 함
         return adapter;
-    }
-
-    public void uploadContent(FirebaseUser user, uploadData upData) {
-        CollectionReference addDB = db.collection("community").document(user.getUid()).collection("article");
-        addDB.add(upData)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.wtf("경고", "정상처리됨");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.wtf("경고", e.getMessage());
-                    }
-                });
     }
 
     public void chkContentCount() {

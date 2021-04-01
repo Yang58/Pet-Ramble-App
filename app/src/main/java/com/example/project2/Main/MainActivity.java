@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity{
         btn_set.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                /*
                 if(fragmentInfo == null){
                     fragmentInfo = new MyInfomationFragment();
                     FM.beginTransaction().add(R.id.container,fragmentInfo).commit();
@@ -193,6 +194,10 @@ public class MainActivity extends AppCompatActivity{
                 if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
                 if(fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
                 if(fragmentInfo != null) FM.beginTransaction().show(fragmentInfo).commit();
+                 */
+
+                Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
+                startActivity(intent);
             }
         });
 

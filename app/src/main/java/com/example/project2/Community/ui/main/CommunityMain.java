@@ -38,12 +38,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.callback.Callback;
 
@@ -117,6 +119,7 @@ public class CommunityMain extends Fragment {
         final Button sndBtn = view.findViewById(R.id.sendButton);
         final TextView tField = view.findViewById(R.id.naeyongField);
         final FloatingActionButton floatBtn = view.findViewById(R.id.cm_main_btn_floating);
+        final FloatingActionButton floatBtn2 = view.findViewById(R.id.cm_main_btn_floating2);
 
         //이름 가져오기
         final String[] userName = new String[1];
@@ -178,6 +181,20 @@ public class CommunityMain extends Fragment {
             }
         });
 
+        floatBtn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    if(!user.getUid().equals("djSTIBJogDTVDv8ZZJIla2yanSI2"))
+                        communityDB.update("friend", FieldValue.arrayUnion("djSTIBJogDTVDv8ZZJIla2yanSI2"));
+                }catch (NullPointerException e){
+                    Map<String,String> data = null;
+                    data.put("friend","");
+                    communityDB.set(data);
+                }
+            }
+        });
+
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -199,31 +216,27 @@ public class CommunityMain extends Fragment {
         //글이 중복으로 들어가면 안되기 때문에 우선 모든 글 제거 후 시작
         adapter.removeAllItem();
 
-        //DB로부터 이름 가져온 후 여기로 꺼내옴
-        final String[] myUserName = new String[1];
-        final String[] myDogName = new String[1];
-
         //내 이름 추출
         usersDB.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        myUserName[0] = task.getResult().getString("name");
-                        myDogName[0] = task.getResult().getString("petName");
-                    }
-                });
-
-        //내 글 가져오기
-        communityDB.collection("article").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot result : task.getResult()) {
-                                adapter.addItem("&" + myDogName[0] , myUserName[0], result.getString("content"), "", result.getTimestamp("uptime"));
-                                Log.wtf(result.getId(), "가져오기 성공");
-                            }
-                        }
+                        String myUserName = task.getResult().getString("name");
+                        String myDogName = task.getResult().getString("petName");
+                        //내 글 가져오기
+                        //내 이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
+                        communityDB.collection("article").get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot result : task.getResult()) {
+                                                adapter.addItem("&" + myDogName , myUserName, result.getString("content"), "", result.getTimestamp("uptime"));
+                                                Log.wtf(result.getId(), "가져오기 성공");
+                                            }
+                                        }
+                                    }
+                                });
                     }
                 });
 
@@ -238,43 +251,36 @@ public class CommunityMain extends Fragment {
                             //친구 목록이 비었는지 체크하고 진행
                             try {
                                 if (!friendList.isEmpty()) {
-                                    //친구 이름 추출되서 임시 저장될 변수
-                                    final String[] friendUserName = new String[1];
-                                    final String[] friendDogName = new String[1];
-
                                     for (String friendUID : friendList) {
                                         //친구들 이름 추출
                                         usersDB = db.collection("users").document(friendUID);
                                         usersDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                friendUserName[0] = task.getResult().getString("name");
-                                                friendDogName[0] = task.getResult().getString("petName");
+                                                String friendUserName = task.getResult().getString("name");
+                                                String friendDogName = task.getResult().getString("petName");
+
+                                                //친구들 글 가져오기
+                                                //친구 이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
+                                                communityDB = db.collection("community").document(friendUID);
+                                                communityDB.collection("article").get()
+                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    for (QueryDocumentSnapshot d : task.getResult()) {
+                                                                        adapter.addItem("&" + friendDogName, friendUserName, d.getString("content"), "", d.getTimestamp("uptime"));
+                                                                    }
+                                                                    adapter.sortItems();
+                                                                    adapter.setReverse(true);
+                                                                    adapter.notifyDataSetChanged();
+                                                                    chkContentCount();
+                                                                }
+                                                            }
+                                                        });
                                             }
                                         });
-                                        Log.wtf("친구정보",friendUserName[0]+friendDogName[0]);
-
-                                        //친구들 글 가져오기
-                                        communityDB = db.collection("community").document(friendUID);
-                                        communityDB.collection("article").get()
-                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                        if (task.isSuccessful()) {
-                                                            for (QueryDocumentSnapshot d : task.getResult()) {
-                                                                adapter.addItem("&" + friendDogName[0], friendUserName[0], d.getString("content"), "", d.getTimestamp("uptime"));
-                                                            }
-                                                            adapter.sortItems();
-                                                            adapter.setReverse(true);
-                                                            adapter.notifyDataSetChanged();
-                                                            chkContentCount();
-                                                        }
-                                                    }
-                                                });
                                     }
-                                    friendUserName[0] = null;
-                                    friendDogName[0] = null;
-                                    System.gc();
                                 }
                                 //친구목록 비었을 시 처리
                             } catch (NullPointerException e) {

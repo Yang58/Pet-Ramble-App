@@ -1,7 +1,6 @@
 package com.example.project2.Community.ui.main;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -42,7 +40,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import javax.security.auth.callback.Callback;
 
@@ -59,16 +56,13 @@ public class CommunityMain extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private final static FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    private final static FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final static listViewAdapter adapter = new listViewAdapter();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String mParam1;
     private String mParam2;
-    private DocumentReference communityDB;
-    private DocumentReference usersDB;
-    private View view;
+    private listViewAdapter adapter;
+    private ViewGroup vg;
 
-    public interface Callback {
+    public interface Callback{
         void run();
     }
 
@@ -107,33 +101,42 @@ public class CommunityMain extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_community_main, container, false);
+        final View v = inflater.inflate(R.layout.fragment_community_main, container, false);
+        vg = container;
+        final Context c = vg.getContext();
+        Callback callback;
+
+        //새로고침 레이아웃
+        SwipeRefreshLayout refreshLayout =(SwipeRefreshLayout) v.findViewById(R.id.cm_main_container_refresh);
+
+        //유저설정
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         //레이아웃 뷰 가져오기
-        final Context c = container.getContext();
-        final TextView dpId = view.findViewById(R.id.cm_main_txt_id);
-        final TextView dpName = view.findViewById(R.id.cm_main_txt_name);
-        final ImageView dpCover = view.findViewById(R.id.cm_main_img_cover_picture);
-        final ListView lv = view.findViewById(R.id.listViewItemContainer);
-        final SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
-        final Button sndBtn = view.findViewById(R.id.sendButton);
-        final TextView tField = view.findViewById(R.id.naeyongField);
-
+        TextView dpId = v.findViewById(R.id.cm_main_txt_id);
+        TextView dpName = v.findViewById(R.id.cm_main_txt_name);
+        ImageView dpCover = v.findViewById(R.id.cm_main_img_cover_picture);
         //이름 가져오기
-        final String[] userName = new String[1];
-
+        final String[] userName = {"a"};
         //onComplete 리스너 없이 통신하면 통신상태가 느릴 경우 null이 출력될 수도 있음
         db.collection("users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 userName[0] = task.getResult().getString("name");
                 dpName.setText(userName[0]);
-                dpId.setText("&" + task.getResult().getString("petName"));
+                dpId.setText("@"+user.getUid());
             }
         });
-        ;
+
+
+        adapter = new listViewAdapter();
+        final ListView lv = v.findViewById(R.id.listViewItemContainer);
         //lv.setDivider(null); <-이거로 글과 글 사이에 나누는 선 설정가능.
-        lv.setAdapter(updateList(user));
+        lv.setAdapter(adapter);
+        updateList(v,adapter,user);
+
+        chkContentCount(v);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -151,28 +154,31 @@ public class CommunityMain extends Fragment {
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem != 0) {
+                if(firstVisibleItem!=0){
                     refreshLayout.setEnabled(false);
-                } else {
+                }else{
                     refreshLayout.setEnabled(true);
                 }
             }
         });
 
-        sndBtn.setOnClickListener(new View.OnClickListener() {
+        Button sndBtn = v.findViewById(R.id.sendButton);
+        sndBtn.setOnClickListener(new View.OnClickListener(){
+        TextView tField = v.findViewById(R.id.naeyongField);
             @Override
             public void onClick(View vv) {
-                if (tField.getText().toString().length() != 0) {
-                    uploadData upData = new uploadData(tField.getText().toString(), new Timestamp(System.currentTimeMillis()));
-                    uploadContent(user, upData);
-                    lv.setAdapter(updateList(user));
-                    tField.setText("");
-                    lv.requestFocusFromTouch();
-                    lv.clearFocus();
-                } else {
+                if(tField.getText().toString().length()!=0) {
+                                uploadData upData = new uploadData(tField.getText().toString(),new Timestamp(System.currentTimeMillis()));
+                                uploadContent(user,upData);
+                                updateList(v,adapter,user);
+                                adapter.notifyDataSetChanged();
+                                tField.setText("");
+                                lv.requestFocusFromTouch();
+                                lv.clearFocus();
+                }else{
                     Animation shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
                     tField.startAnimation(shake);
-                    Toast.makeText(c, "적어도 한글자 이상은 적어야해요!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(c,"적어도 한글자 이상은 적어야해요!",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -180,116 +186,47 @@ public class CommunityMain extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                lv.setAdapter(updateList(user));
+                updateList(v,adapter,user);
+                chkContentCount(v);
             }
         });
 
-        return view;
+        return v;
     }
 
-    public listViewAdapter updateList(FirebaseUser user) {
-        //유저 UID 기반으로 각 컬렉션에 접근
-        communityDB = db.collection("community").document(user.getUid());
-        usersDB = db.collection("users").document(user.getUid());
-
-        //이 함수가 호출된 뒤 새로고침 중단 위해 참조
-        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
-
-        //글이 중복으로 들어가면 안되기 때문에 우선 모든 글 제거 후 시작
+    public void updateList(View v, listViewAdapter adapter, FirebaseUser user){
+        ListView lv = v.findViewById(R.id.listViewItemContainer);
+        lv.setAdapter(adapter);
         adapter.removeAllItem();
-
-        //DB로부터 이름 가져온 후 여기로 꺼내옴
-        final String[] myUserName = new String[1];
-        final String[] myDogName = new String[1];
-
-        //내 이름 추출
-        usersDB.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        myUserName[0] = task.getResult().getString("name");
-                        myDogName[0] = task.getResult().getString("petName");
-                    }
-                });
-
-        //내 글 가져오기
-        communityDB.collection("article").get()
+        //이름 가져오기
+        final String[] userName = {"a"};
+        //onComplete 리스너 없이 통신하면 통신상태가 느릴 경우 null이 출력될 수도 있음
+        db.collection("users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                userName[0] = task.getResult().getString("name");
+            }
+        });
+        db.collection("community").document(user.getUid()).collection("article").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot result : task.getResult()) {
-                                adapter.addItem("&" + myDogName[0] , myUserName[0], result.getString("content"), "", result.getTimestamp("uptime"));
-                                Log.wtf(result.getId(), "가져오기 성공");
+                        if(task.isSuccessful()){
+                            for(QueryDocumentSnapshot d : task.getResult()){
+                                Log.wtf(d.getId(),"가져오기 성공");
+                                adapter.addItem("@"+user.getUid(),userName[0],d.getString("content"),"",d.getTimestamp("uptime"));
                             }
+                            SwipeRefreshLayout refreshLayout = v.findViewById(R.id.cm_main_container_refresh);
+                            refreshLayout.setRefreshing(false);
+                            adapter.sortItems();
+                            adapter.setReverse(true);
+                            adapter.notifyDataSetChanged();
                         }
                     }
                 });
-
-        //친구 글 불러오기
-        communityDB.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            //친구 목록
-                            List<String> friendList = (List<String>) task.getResult().get("friend");
-                            //친구 목록이 비었는지 체크하고 진행
-                            try {
-                                if (!friendList.isEmpty()) {
-                                    //친구 이름 추출되서 임시 저장될 변수
-                                    final String[] friendUserName = new String[1];
-                                    final String[] friendDogName = new String[1];
-
-                                    for (String friendUID : friendList) {
-                                        //친구들 이름 추출
-                                        usersDB = db.collection("users").document(friendUID);
-                                        usersDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                friendUserName[0] = task.getResult().getString("name");
-                                                friendDogName[0] = task.getResult().getString("petName");
-                                                Log.wtf("친구정보",friendUserName[0]+friendDogName[0]);
-                                            }
-                                        });
-
-                                        //친구들 글 가져오기
-                                        communityDB = db.collection("community").document(friendUID);
-                                        communityDB.collection("article").get()
-                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                        if (task.isSuccessful()) {
-                                                            for (QueryDocumentSnapshot d : task.getResult()) {
-                                                                adapter.addItem("&" + friendDogName[0], friendUserName[0], d.getString("content"), "", d.getTimestamp("uptime"));
-                                                            }
-                                                            adapter.sortItems();
-                                                            adapter.setReverse(true);
-                                                            adapter.notifyDataSetChanged();
-                                                            chkContentCount();
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                }
-                                //친구목록 비었을 시 처리
-                            } catch (NullPointerException e) {
-                                adapter.sortItems();
-                                adapter.setReverse(true);
-                                adapter.notifyDataSetChanged();
-                                chkContentCount();
-                            }
-                        }
-                    }
-                });
-
-        refreshLayout.setRefreshing(false);
-
-        //adapter를 돌려보내서 ListView에 탑재할 수 있도록 함
-        return adapter;
     }
 
-    public void uploadContent(FirebaseUser user, uploadData upData) {
+    public void uploadContent(FirebaseUser user, uploadData upData){
         CollectionReference addDB = db.collection("community").document(user.getUid()).collection("article");
         addDB.add(upData)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -301,36 +238,37 @@ public class CommunityMain extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.wtf("경고", e.getMessage());
+                        Log.wtf("경고",e.getMessage());
                     }
                 });
     }
 
-    public void chkContentCount() {
+    public void chkContentCount(View v){
         //글이 하나도 없을 경우
-        TextView noContent = view.findViewById(R.id.cm_main_txt_noContent);
-        Log.wtf("어댑터", adapter.getCount() + "");
-        if (adapter.getCount() <= 0) {
+        TextView noContent = v.findViewById(R.id.cm_main_txt_noContent);
+        Log.wtf("어댑터",adapter.getCount()+"");
+        if(adapter.getCount()<=0){
             noContent.setVisibility(View.VISIBLE);
-        } else {
+        }else{
             noContent.setVisibility(View.GONE);
         }
     }
 
     public void showDetail(int position) {
-        listViewClass obj = (listViewClass) adapter.getItem(position);
+        listViewClass obj = (listViewClass)adapter.getItem(position);
         FragmentManager fm = getParentFragmentManager();
         Fragment currentFragment = fm.findFragmentById(R.id.container);
-        //다음 프래그먼트로 넘길 값 지정
         Bundle bundle = new Bundle();
         bundle.putString("id", obj.getId());
+        bundle.putString("name", obj.getName());
+        bundle.putString("context", obj.getContext());
+        bundle.putString("profile_img", obj.getProfile_img());
         CommunityDetailView cdv = new CommunityDetailView();
-        //다음 프래그먼트에 값 붙이기
         cdv.setArguments(bundle);
         fm.beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .add(R.id.container, cdv)
-                .addToBackStack("frag_communityMain")
+                .replace(R.id.container, cdv)
+                .addToBackStack("tag1")
                 .commit();
     }
 }

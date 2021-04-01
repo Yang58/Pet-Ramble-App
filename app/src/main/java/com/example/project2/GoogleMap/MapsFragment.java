@@ -130,6 +130,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         final Button st = (Button) layout.findViewById(R.id.btn_start); //시작
         final Button fi = (Button) layout.findViewById(R.id.btn_finish); //종료
 
+        mChr = (Chronometer) layout.findViewById(R.id.chronometer);
+
         st.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { // 산책 시작 ( 시간체크 칼로리 체크 )
@@ -198,8 +200,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     public void setWalkState(boolean b) {
         final View view = getView();
         LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-        mChr = (Chronometer) view.findViewById(R.id.chronometer);
 
         final CardView ct = view.findViewById(R.id.cardtest);
         final Button st = (Button) view.findViewById(R.id.btn_start); //시작

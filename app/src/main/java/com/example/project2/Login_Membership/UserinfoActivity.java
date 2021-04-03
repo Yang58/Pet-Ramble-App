@@ -43,13 +43,11 @@ import java.io.InputStream;
 public class UserinfoActivity extends AppCompatActivity {
 
     private static final String TAG = "UserinfoActivity";
-    private static final int PICK_IMAGE = 0;
 
     private Button Check;
 
     ImageView user_profile;
 
-    private String profilePath;
     private FirebaseUser user;
 
     private EditText petAge;
@@ -61,7 +59,7 @@ public class UserinfoActivity extends AppCompatActivity {
     private int GALLEY_CODE = 10;
     private String imageUrl="";
 
-    int Imagepick = 0;
+    int Image_pick = 0;
 
     DBHelper dbHelper;
 
@@ -85,8 +83,8 @@ public class UserinfoActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                 startActivityForResult(intent,GALLEY_CODE);
-                Imagepick = 1;
-                Toast.makeText(getApplicationContext()," "+Imagepick,Toast.LENGTH_LONG).show();
+                Image_pick ++;
+                Toast.makeText(getApplicationContext()," "+Image_pick,Toast.LENGTH_LONG).show();
             }
         });
 
@@ -96,7 +94,6 @@ public class UserinfoActivity extends AppCompatActivity {
 //        if(Build.VERSION.SDK_INT >= 21){
 //            user_profile.setClipToOutline(true);
 //        }
-
 
         Check = (Button)findViewById(R.id.btn_Check);
         Check.setOnClickListener(new View.OnClickListener(){
@@ -134,6 +131,8 @@ public class UserinfoActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if(requestCode == GALLEY_CODE)
         {
             try {
@@ -143,13 +142,11 @@ public class UserinfoActivity extends AppCompatActivity {
                         .load(imageUrl)
                         .apply(cropOptions.optionalCircleCrop())
                         .into(user_profile);
+
             }catch (Exception e){
                 e.printStackTrace();
             }
-
         }
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
 
@@ -170,12 +167,12 @@ public class UserinfoActivity extends AppCompatActivity {
 
             StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
 
-
-            if (Imagepick == 0) {
+            if (Image_pick == 0) {
                 Userinfo userinfo = new Userinfo(person_name, person_age, petName, petAge, petKind);
                 storeUploader(userinfo);
                 Log.d("log_test","1");
-            } else if(Imagepick == 1){
+
+            } else if(Image_pick == 1){
                 try {
                     InputStream stream = new FileInputStream(new File(imageUrl));
                     UploadTask uploadTask = mountainImagesRef.putStream(stream);
@@ -192,7 +189,7 @@ public class UserinfoActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Uri> task) {
                             if (task.isSuccessful()) {
                                 Uri downloadUri = task.getResult();
-                                Userinfo userinfo = new Userinfo(person_name, person_age, petName, petAge, petKind, downloadUri.toString());
+                                Userinfo userinfo = new Userinfo (person_name, person_age, petName, petAge, petKind, downloadUri.toString());
                                 storeUploader(userinfo);
                                 Log.d("log_test","2");
                             } else {

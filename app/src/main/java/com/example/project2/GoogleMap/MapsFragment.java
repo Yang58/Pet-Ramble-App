@@ -40,7 +40,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource.*;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -54,8 +53,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.auth.User;
-import com.google.rpc.context.AttributeContext;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -91,8 +88,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    private LatLng startPoint=null;
-    private LatLng endPoint=null;
+    private LatLng startPoint = null;
+    private LatLng endPoint = null;
 
     Chronometer mChr;
 
@@ -110,10 +107,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // 초기화 해야 하는 리소스들을 여기서 초기화 해준다.
-
         // getActivity().getApplicationContext() * Fragment 에서 this *
-
     }
 
     @Nullable
@@ -165,7 +161,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             DatabaseReference endRef = database.getReference().child(user.getUid()).child("mapData").child("end");
 
             startPoint = new LatLng(location.getLatitude(), location.getLongitude());
-            if (endPoint == null) endPoint = new LatLng(location.getLatitude(), location.getLongitude());
+            if (endPoint == null)
+                endPoint = new LatLng(location.getLatitude(), location.getLongitude());
             //리얼타임 데이터베이스에 실시간으로 노드 전송
             startRef.setValue(startPoint);
             endRef.setValue(endPoint);
@@ -174,7 +171,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             //움직이는동안 마커 일단 지우기
             currentMarker.remove();
             //카메라 부드럽게 중앙으로 이동
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(endPoint,18));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(endPoint, 18));
             mMap.addPolyline(line);
             endPoint = startPoint;
 
@@ -209,7 +206,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
         if (isWalkStart) {
             //권한 얻기
-            if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this.getContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
@@ -226,28 +225,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
             mChr.start();
             //위치정보 업데이트 시작
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1,loListener);
-        }else{
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, loListener);
+        } else {
             ct.setVisibility(View.GONE); // 안보이기
             st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
             fi.setVisibility(View.GONE); //시작 버튼 활성화
 
-            long WalkTimeSum = (SystemClock.elapsedRealtime()-mChr.getBase())/1000;
+            long WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
 
             int min = (int) (WalkTimeSum / 60);
             int hour = (min / 60);
             int sec = (int) (WalkTimeSum % 60);
-            min = min % 60 ;
+            min = min % 60;
 
             mChr.stop();
             //위치정보 업데이트 중단
             lm.removeUpdates(loListener);
 
-            Intent intent = new Intent(getContext().getApplicationContext(),WalkFinishPopup.class);
-            intent.putExtra("sec",String.valueOf(sec));
-            intent.putExtra("min",String.valueOf(min));
-            intent.putExtra("hour",String.valueOf(hour));
-            startActivityForResult(intent,1);
+            Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
+            intent.putExtra("sec", String.valueOf(sec));
+            intent.putExtra("min", String.valueOf(min));
+            intent.putExtra("hour", String.valueOf(hour));
+            startActivityForResult(intent, 1);
         }
     }
 
@@ -373,7 +372,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-
     // 마커 클릭시 보여지는 주소와 위도 경도 ( 후에 사용자 정보로 변경 )
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -496,6 +494,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         mapView.onResume();
         if (mLocationPermissionGranted) {
             Log.d(TAG, "onResume : requestLocationUpdates");
+            if (ActivityCompat.checkSelfPermission(getContext().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getContext().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
             if (mMap != null)
                 mMap.setMyLocationEnabled(true);

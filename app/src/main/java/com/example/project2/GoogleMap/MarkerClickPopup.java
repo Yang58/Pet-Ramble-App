@@ -81,7 +81,6 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
         DocumentReference docRef = FBdb.collection("users").document(user.getUid());
-
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {

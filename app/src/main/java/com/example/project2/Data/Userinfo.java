@@ -2,12 +2,12 @@ package com.example.project2.Data;
 
 public class Userinfo {
 
-    public String person_name;
-    public String person_age; // 강아지 생일로 변경
-    public String petName;
-    public String petAge;
-    public String petKind;
-    public String photoUrl;
+    private String person_name;
+    private String person_age; // 강아지 생일로 변경
+    private String petName;
+    private String petAge;
+    private String petKind;
+    private String photoUrl;
 
     public Userinfo(String person_name, String person_age, String petName, String petAge, String petKind, String photoUrl){
 
@@ -34,7 +34,7 @@ public class Userinfo {
         return this.person_name;
     }
 
-    public void getName(String person_name){
+    public void setName(String person_name){
         this.person_name = person_name;
     }
 
@@ -42,7 +42,7 @@ public class Userinfo {
         return this.person_age;
     }
 
-    public void getPerson_age(String person_age){
+    public void setPerson_age(String person_age){
         this.person_age = person_age;
     }
 
@@ -50,7 +50,7 @@ public class Userinfo {
         return this.petName;
     }
 
-    public void getpetName(String petName){
+    public void setpetName(String petName){
         this.petName = petName;
     }
 
@@ -58,7 +58,7 @@ public class Userinfo {
         return this.petAge;
     }
 
-    public void getpetAge(String petAge){
+    public void setpetAge(String petAge){
         this.petAge = petAge;
     }
 
@@ -66,7 +66,7 @@ public class Userinfo {
         return this.petKind;
     }
 
-    public void getpetKind(String petKind){
+    public void setpetKind(String petKind){
         this.petKind = petKind;
     }
 
@@ -74,7 +74,7 @@ public class Userinfo {
         return this.photoUrl;
     }
 
-    public void getPhotoUrl(String photoUrl){
+    public void setPhotoUrl(String photoUrl){
         this.photoUrl = photoUrl;
     }
 

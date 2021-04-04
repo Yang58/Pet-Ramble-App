@@ -32,8 +32,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,6 +60,10 @@ public class CommunityDetailWrite extends Fragment {
 
     private String mParam1;
     private String mParam2;
+
+    public interface getCallback {
+        public void get(DocumentReference d);
+    }
 
     public CommunityDetailWrite() {
         // Required empty public constructor
@@ -110,8 +118,60 @@ public class CommunityDetailWrite extends Fragment {
             public void onClick(View vv) {
                 if (tField.getText().toString().length() != 0) {
                     uploadData upData = new uploadData(tField.getText().toString(), new Timestamp(System.currentTimeMillis()));
-                    uploadContent(user, upData);
-                    //lv.setAdapter(updateList(user));
+                    if (getArguments().getInt("mode") == 1) {
+                        String userUid = getArguments().getString("userUid");
+                        String articleUid = getArguments().getString("articleUid");
+                        upData.addRelatedID(userUid);
+                        upData.addRelatedID(articleUid);
+
+                        DocumentReference relatedDB = db.collection("community").document(userUid).collection("article").document(articleUid);
+                        uploadContent(user, upData, new getCallback() {
+                            @Override
+                            public void get(DocumentReference d) {
+                                relatedDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        relatedDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                Map<String, ArrayList<String>> result = (Map<String, ArrayList<String>>) task.getResult().get("relatedList");
+                                                try {
+                                                    Map<String, Object> relatedList = new HashMap<>();
+                                                    Map<String, Object> relatedArticle = new HashMap<>();
+
+                                                    ArrayList<String> arrayList = result.get(user.getUid());
+                                                    arrayList.add(d.getId());
+
+                                                    relatedArticle.put(user.getUid(), arrayList);
+                                                    relatedList.put("relatedList", relatedArticle);
+
+                                                    relatedDB.set(relatedList, SetOptions.merge());
+                                                } catch (NullPointerException e) {
+                                                    Map<String, Object> relatedList = new HashMap<>();
+                                                    Map<String, Object> relatedArticle = new HashMap<>();
+
+                                                    ArrayList<String> arrayList = new ArrayList<String>();
+                                                    arrayList.add(d.getId());
+
+                                                    relatedArticle.put(user.getUid(), arrayList);
+                                                    relatedList.put("relatedList", relatedArticle);
+
+                                                    relatedDB.set(relatedList, SetOptions.merge());
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        uploadContent(user, upData, new getCallback() {
+                            @Override
+                            public void get(DocumentReference d) {
+
+                            }
+                        });
+                    }
                     tField.setText("");
                     FragmentManager fm = getParentFragmentManager();
                     fm.popBackStack();
@@ -126,13 +186,14 @@ public class CommunityDetailWrite extends Fragment {
         return view;
     }
 
-    public void uploadContent(FirebaseUser user, uploadData upData) {
+    public void uploadContent(FirebaseUser user, uploadData upData, getCallback inCall) {
         CollectionReference addDB = communityDB.collection("article");
         addDB.add(upData)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.wtf("경고", "정상처리됨");
+                        inCall.get(documentReference);
+                        Log.wtf("정보", "글이 정상적으로 올라감.");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

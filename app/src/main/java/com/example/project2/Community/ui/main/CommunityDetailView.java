@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -30,6 +32,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -57,7 +60,7 @@ public class CommunityDetailView extends Fragment {
     private String userUid;
     private String articleUid;
 
-    public interface getListCallback{
+    public interface getListCallback {
         public void get(Map<String, ArrayList<String>> list);
     }
 
@@ -91,6 +94,7 @@ public class CommunityDetailView extends Fragment {
         FrameLayout gallary = view.findViewById(R.id.cm_detail_container_gallary);
         RecyclerView listView = view.findViewById(R.id.cm_detail_write_container_recyclerView);
         LinearLayout ir = view.findViewById(R.id.cm_detail_container_view);
+        FloatingActionButton floatBtn = view.findViewById(R.id.cm_detail_view_btn_floating);
 
         String dogName = getArguments().getString("dogName");
         String userName = getArguments().getString("userName");
@@ -110,9 +114,27 @@ public class CommunityDetailView extends Fragment {
         listView.setAdapter(adt);
         updateList();
 
+        floatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getParentFragmentManager();
+                Bundle bundle = new Bundle();
+                bundle.putInt("mode", 1);
+                bundle.putString("userUid", userUid);
+                bundle.putString("articleUid", articleUid);
+                CommunityDetailWrite cdw = new CommunityDetailWrite();
+                cdw.setArguments(bundle);
+                fm.beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
+                        .add(R.id.container, cdw)
+                        .addToBackStack("frag_communityWrite")
+                        .commit();
+            }
+        });
+
+        /*
         LinearLayout.LayoutParams layoutScale = new LinearLayout.LayoutParams(
                 500, 500);
-        /*
         ImageView im = new ImageView(v.getContext());
         im.setImageResource(R.drawable.dog);
         im.setVisibility(View.VISIBLE);
@@ -121,14 +143,14 @@ public class CommunityDetailView extends Fragment {
         ir.addView(im);
         */
 
-        View gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x2,null);
+        View gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x2, null);
         gallary.addView(gView);
 
 
         return view;
     }
 
-    public void getRelatedList(String userUid, String articleUid, getListCallback inCall){
+    public void getRelatedList(String userUid, String articleUid, getListCallback inCall) {
         //유저 UID 기반으로 각 컬렉션에 접근
         communityDB = db.collection("community").document(userUid);
         usersDB = db.collection("users").document(userUid);
@@ -142,7 +164,7 @@ public class CommunityDetailView extends Fragment {
         });
     }
 
-    public void updateList(){
+    public void updateList() {
         RecyclerView listView = view.findViewById(R.id.cm_detail_write_container_recyclerView);
         ProgressBar progressBar = view.findViewById(R.id.cm_detail_view_pg_circle);
 
@@ -155,44 +177,42 @@ public class CommunityDetailView extends Fragment {
             @Override
             public void onComplete() {
                 //삭제가 완료되면 새 리스트를 가져옴
-                Log.i("정보","리스트 제거 완료");
+                Log.i("정보", "리스트 제거 완료");
 
-                    getRelatedList(userUid, articleUid, new getListCallback() {
-                        @Override
-                        public void get(Map<String, ArrayList<String>> list) {
-                            try {
-                                for (String i : list.keySet()) {
-                                    for (String j : list.get(i)) {
-                                        getList(i, j.substring(1, j.length() - 1), addList(), new CommunityMain.completeCallback() {
-                                            @Override
-                                            public void onComplete() {
-                                                progressBar.setVisibility(View.GONE);
-                                            }
-                                        });
-                                    }
+                getRelatedList(userUid, articleUid, new getListCallback() {
+                    @Override
+                    public void get(Map<String, ArrayList<String>> list) {
+                        if (list.size() == 0) {
+                            progressBar.setVisibility(View.GONE);
+                        }else {
+                            for (String i : list.keySet()) {
+                                for (String j : list.get(i)) {
+                                    getList(i.replaceAll("\\s+", ""), j, addList(), new CommunityMain.completeCallback() {
+                                        @Override
+                                        public void onComplete() {
+                                            progressBar.setVisibility(View.GONE);
+                                        }
+                                    });
                                 }
-                            } catch (NullPointerException e) {
-                                progressBar.setVisibility(View.GONE);
-                                Log.wtf("경고", e.getMessage());
                             }
                         }
-                    });
+                    }
+                });
             }
         });
     }
 
-    public void removeList(CommunityMain.completeCallback inCall){
+    public void removeList(CommunityMain.completeCallback inCall) {
         adt.removeAll();
         inCall.onComplete();
     }
 
-    public CommunityMain.getCallback addList(){
+    public CommunityMain.getCallback addList() {
         CommunityMain.getCallback callback = new CommunityMain.getCallback() {
             @Override
             public void getRecyclerClass(recyclerClass getItem) {
                 adt.addItem(getItem);
                 adt.sortItems();
-                adt.reverseAll();
                 adt.notifyDataSetChanged();
             }
         };
@@ -222,20 +242,21 @@ public class CommunityDetailView extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
-                                                DocumentSnapshot result = task.getResult();
-                                                recyclerClass tmpItem = new recyclerClass();
-                                                tmpItem.setContext(result.getString("content"));
-                                                tmpItem.setUpTime(result.getTimestamp("uptime"));
-                                                tmpItem.setMyName(userName);
-                                                tmpItem.setDogName("&" + dogName);
+                                            DocumentSnapshot result = task.getResult();
 
-                                                //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-                                                //여기서 addList함수의 getRecyclerClass가 실행됨
-                                                inCall.getRecyclerClass(tmpItem);
-                                                tmpItem = null;
-                                            }
-                                            outCall.onComplete();
+                                            recyclerClass tmpItem = new recyclerClass();
+                                            tmpItem.setContext(result.getString("content"));
+                                            tmpItem.setUpTime(result.getTimestamp("uptime"));
+                                            tmpItem.setMyName(userName);
+                                            tmpItem.setDogName("&" + dogName);
+
+                                            //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+                                            //여기서 addList함수의 getRecyclerClass가 실행됨
+                                            inCall.getRecyclerClass(tmpItem);
+                                            tmpItem = null;
                                         }
+                                        outCall.onComplete();
+                                    }
                                 });
                     }
                 });

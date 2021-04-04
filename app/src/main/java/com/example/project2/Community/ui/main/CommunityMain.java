@@ -156,7 +156,10 @@ public class CommunityMain extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentManager fm = getParentFragmentManager();
+                Bundle bundle = new Bundle();
+                bundle.putInt("mode",0);
                 CommunityDetailWrite cdw = new CommunityDetailWrite();
+                cdw.setArguments(bundle);
                 fm.beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_bottom,R.anim.slide_out_bottom,R.anim.slide_in_top,R.anim.slide_out_top)
                         .add(R.id.container, cdw)

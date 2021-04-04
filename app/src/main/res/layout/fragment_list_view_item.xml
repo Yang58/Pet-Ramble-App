@@ -52,6 +52,14 @@
                 android:layout_height="wrap_content"
                 android:duplicateParentState="true"
                 android:text="@id" />
+
+            <TextView
+                android:id="@+id/uptime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="TextView"
+                android:textAlignment="viewEnd" />
         </LinearLayout>
 
         <LinearLayout

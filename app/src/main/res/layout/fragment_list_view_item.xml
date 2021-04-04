@@ -5,105 +5,121 @@
     android:id="@+id/itemContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     tools:context=".listView.listViewItem">
 
     <LinearLayout
-        android:layout_width="74dp"
-        android:layout_height="match_parent"
-        android:paddingBottom="10dp"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/profile_img"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:duplicateParentState="true"
-            android:forceDarkAllowed="false"
-            android:foreground="@drawable/rounded_fg"
-            android:scaleType="centerCrop"
-            android:src="@drawable/bsod" />
-    </LinearLayout>
-
-    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_width="74dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="10dp">
 
-            <TextView
-                android:id="@+id/name_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/profile_img"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
                 android:duplicateParentState="true"
-                android:text="이름" />
-
-            <TextView
-                android:id="@+id/id_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:duplicateParentState="true"
-                android:text="@id" />
-
-            <TextView
-                android:id="@+id/uptime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="TextView"
-                android:textAlignment="viewEnd" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/contextContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/context_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:duplicateParentState="true"
-                android:text="TextView" />
-
+                android:forceDarkAllowed="false"
+                android:foreground="@drawable/rounded_fg"
+                android:scaleType="centerCrop"
+                android:src="@drawable/bsod" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="♡좋아요!"
-                android:textStyle="bold" />
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="☆공유하기"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/name_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:duplicateParentState="true"
+                    android:text="이름" />
 
-            <Space
-                android:layout_width="150dp"
+                <TextView
+                    android:id="@+id/id_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:duplicateParentState="true"
+                    android:text="@id" />
+
+                <TextView
+                    android:id="@+id/uptime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="TextView"
+                    android:textAlignment="viewEnd" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/contextContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/context_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:duplicateParentState="true"
+                    android:text="TextView" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="♡좋아요!"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="☆공유하기"
+                    android:textStyle="bold" />
+
+                <Space
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
         </LinearLayout>
+
     </LinearLayout>
+
+    <View
+        android:id="@+id/divider4"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_weight="1"
+        android:background="?android:attr/listDivider"
+        tools:visibility="visible" />
 
 </LinearLayout>

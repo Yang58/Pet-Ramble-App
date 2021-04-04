@@ -71,8 +71,8 @@ public class CommunityDetailView extends Fragment {
         TextView nameV = v.findViewById(R.id.cm_detail_txt_name);
         ImageView profile_imgV = v.findViewById(R.id.cm_detail_img_coverPhoto);
 
-        String id = getArguments().getString("id");
-        String name = getArguments().getString("name");
+        String dogName = getArguments().getString("dogName");
+        String userName = getArguments().getString("userName");
         String context_ = getArguments().getString("context");
         String profile_img = getArguments().getString("profile_img");
 
@@ -82,8 +82,8 @@ public class CommunityDetailView extends Fragment {
         commentAdapter.setReverse(true);
         commentAdapter.notifyDataSetChanged();
 
-        idV.setText(id);
-        nameV.setText(name);
+        idV.setText(dogName);
+        nameV.setText(userName);
         contextV.setText(context_);
         //profile_imgV.setImageResource(profile_img);
 

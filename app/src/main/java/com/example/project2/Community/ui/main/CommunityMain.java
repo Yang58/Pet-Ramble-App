@@ -1,41 +1,38 @@
 package com.example.project2.Community.ui.main;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.project2.Community.DB.uploadData;
+import com.example.project2.Community.listView.recyclerAdapter;
+import com.example.project2.Community.listView.recyclerClass;
+import com.example.project2.Community.listView.recyclerOnItemClick;
 import com.example.project2.R;
 import com.example.project2.Community.listView.listViewAdapter;
-import com.example.project2.Community.listView.listViewClass;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -43,11 +40,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.security.auth.callback.Callback;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,15 +56,22 @@ public class CommunityMain extends Fragment {
     //전역변수 추가하는 공간
     private final static FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private final static FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final static listViewAdapter adapter = new listViewAdapter();
+    private static listViewAdapter adapter = new listViewAdapter();
+    private recyclerAdapter adt = new recyclerAdapter();
     private String mParam1;
     private String mParam2;
     private DocumentReference communityDB;
     private DocumentReference usersDB;
     private View view;
 
-    public interface Callback {
-        void run();
+    //리스트의 값을 외부로 뽑기 위해서 사용
+    public interface getCallback {
+        void getRecyclerClass(recyclerClass getItem);
+    }
+
+    //어떤 작업이 완료되기까지 기다리기 위해 사용
+    public interface completeCallback {
+        void onComplete();
     }
 
     public CommunityMain() {
@@ -103,6 +105,7 @@ public class CommunityMain extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -114,7 +117,7 @@ public class CommunityMain extends Fragment {
         final TextView dpId = view.findViewById(R.id.cm_main_txt_id);
         final TextView dpName = view.findViewById(R.id.cm_main_txt_name);
         final ImageView dpCover = view.findViewById(R.id.cm_main_img_cover_picture);
-        final ListView lv = view.findViewById(R.id.listViewItemContainer);
+        final RecyclerView listView = view.findViewById(R.id.cm_main_list_recyclerContainer);
         final SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
         final Button sndBtn = view.findViewById(R.id.sendButton);
         final TextView tField = view.findViewById(R.id.naeyongField);
@@ -131,39 +134,24 @@ public class CommunityMain extends Fragment {
                 userName[0] = task.getResult().getString("name");
             }
         });
-        ;
-        //lv.setDivider(null); <-이거로 글과 글 사이에 나누는 선 설정가능.
-        lv.setAdapter(updateList(user));
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        listView.setAdapter(adt);
+        updateList();
+
+        adt.setOnItemClickListener(new recyclerOnItemClick() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showDetail(position);
-            }
-        });
-
-        //리스트 최상단에 올라와 있을 때만 새로고침 가능하게 설정
-        lv.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem != 0) {
-                    refreshLayout.setEnabled(false);
-                } else {
-                    refreshLayout.setEnabled(true);
-                }
+            public void onClick(int position) {
+                recyclerClass item = adt.getItem(position);
+                showDetail(item);
             }
         });
 
         //만약 글 작성, 글 보기 후 나왔다면
         getParentFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
-                public void onBackStackChanged() {
-                updateList(user);
+            public void onBackStackChanged() {
+                updateList();
             }
         });
 
@@ -188,8 +176,8 @@ public class CommunityMain extends Fragment {
                     if(!user.getUid().equals("djSTIBJogDTVDv8ZZJIla2yanSI2"))
                         communityDB.update("friend", FieldValue.arrayUnion("djSTIBJogDTVDv8ZZJIla2yanSI2"));
                 }catch (NullPointerException e){
-                    Map<String,String> data = null;
-                    data.put("friend","");
+                    Map<String, ArrayList<String>> data = null;
+                    data.put("friend",new ArrayList<String>());
                     communityDB.set(data);
                 }
             }
@@ -198,125 +186,161 @@ public class CommunityMain extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                lv.setAdapter(updateList(user));
+                updateList();
             }
         });
 
         return view;
     }
 
-    public listViewAdapter updateList(FirebaseUser user) {
+    public void updateList(){
+        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
+        RecyclerView listView = view.findViewById(R.id.cm_main_list_recyclerContainer);
+
+        //새로고침 되는동안 잠시 가림
+        listView.setVisibility(View.GONE);
+
+        //새로고침 하면서 글이 중복으로 추가되는 것을 막기 위해서
+        //기존 리스트를 삭제
+        removeList(new completeCallback() {
+            @Override
+            public void onComplete() {
+                //삭제가 완료되면 새 리스트를 가져옴
+                Log.i("정보","리스트 제거 완료");
+                getList(user.getUid(), addList(), new completeCallback() {
+                    @Override
+                    public void onComplete() {
+                        //글이 하나도 없는지 체크
+                        chkContentCount();
+                        Log.i("정보","내 글 불러오기 완료");
+                    }
+                });
+
+                //친구 글 목록 가져오기
+                communityDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        try {
+                            ArrayList<String> result = (ArrayList<String>) task.getResult().get("friend");
+                            for (int i = 0; i < result.size(); i++) {
+                                final ArrayList<Integer> innerAI = new ArrayList<>();
+                                innerAI.add(i);
+                                Log.wtf("innerAI",innerAI+"");
+                                getList(result.get(i), addList(), new completeCallback() {
+                                    @Override
+                                    public void onComplete() {
+                                        if (innerAI.get(0) +1 == result.size()) {
+                                            //가림막 해제
+                                            listView.setVisibility(View.VISIBLE);
+                                            //글이 하나도 없는지 체크
+                                            chkContentCount();
+                                            //새로고침 해제
+                                            refreshLayout.setRefreshing(false);
+                                            Log.wtf("진행도", (innerAI.get(0) +1) + "/" + result.size());
+                                        }
+                                    }
+                                });
+                                Log.wtf("차례", result.get(i));
+                            }
+                        }catch(NullPointerException e){
+                            //가림막 해제
+                            listView.setVisibility(View.VISIBLE);
+                            //새로고침 해제
+                            refreshLayout.setRefreshing(false);
+                            Log.wtf("경고",e.getMessage());
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public void removeList(completeCallback inCall){
+        adt.removeAll();
+        inCall.onComplete();
+    }
+
+    public getCallback addList(){
+        getCallback callback = new getCallback() {
+            @Override
+            public void getRecyclerClass(recyclerClass getItem) {
+                adt.addItem(getItem);
+                adt.sortItems();
+                adt.reverseAll();
+                adt.notifyDataSetChanged();
+            }
+        };
+        return callback;
+    }
+
+    public void getList(String uid, getCallback inCall, completeCallback outCall) {
         //유저 UID 기반으로 각 컬렉션에 접근
-        communityDB = db.collection("community").document(user.getUid());
-        usersDB = db.collection("users").document(user.getUid());
+        communityDB = db.collection("community").document(uid);
+        usersDB = db.collection("users").document(uid);
 
         //이 함수가 호출된 뒤 새로고침 중단 위해 참조
         SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
 
         //글이 중복으로 들어가면 안되기 때문에 우선 모든 글 제거 후 시작
-        adapter.removeAllItem();
+        recyclerAdapter tmpAdapter = new recyclerAdapter();
 
-        //내 이름 추출
+        //이름 추출 이후 글 주출
         usersDB.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        String myUserName = task.getResult().getString("name");
-                        String myDogName = task.getResult().getString("petName");
-                        //내 글 가져오기
-                        //내 이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
+                        String userName = task.getResult().getString("name");
+                        String dogName = task.getResult().getString("petName");
+
+                        //글 가져오기
+                        //이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
                         communityDB.collection("article").get()
                                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         if (task.isSuccessful()) {
                                             for (QueryDocumentSnapshot result : task.getResult()) {
-                                                adapter.addItem("&" + myDogName , myUserName, result.getString("content"), "", result.getTimestamp("uptime"));
-                                                Log.wtf(result.getId(), "가져오기 성공");
+                                                recyclerClass tmpItem = new recyclerClass();
+                                                tmpItem.setContext(result.getString("content"));
+                                                tmpItem.setUpTime(result.getTimestamp("uptime"));
+                                                tmpItem.setMyName(userName);
+                                                tmpItem.setDogName("&" + dogName);
+
+                                                //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+                                                //여기서 addList함수의 getRecyclerClass가 실행됨
+                                                inCall.getRecyclerClass(tmpItem);
+                                                tmpItem = null;
                                             }
+                                            outCall.onComplete();
                                         }
                                     }
                                 });
                     }
                 });
 
-        //친구 글 불러오기
-        communityDB.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            //친구 목록
-                            List<String> friendList = (List<String>) task.getResult().get("friend");
-                            //친구 목록이 비었는지 체크하고 진행
-                            try {
-                                if (!friendList.isEmpty()) {
-                                    for (String friendUID : friendList) {
-                                        //친구들 이름 추출
-                                        usersDB = db.collection("users").document(friendUID);
-                                        usersDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                String friendUserName = task.getResult().getString("name");
-                                                String friendDogName = task.getResult().getString("petName");
-
-                                                //친구들 글 가져오기
-                                                //친구 이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
-                                                communityDB = db.collection("community").document(friendUID);
-                                                communityDB.collection("article").get()
-                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    for (QueryDocumentSnapshot d : task.getResult()) {
-                                                                        adapter.addItem("&" + friendDogName, friendUserName, d.getString("content"), "", d.getTimestamp("uptime"));
-                                                                    }
-                                                                    adapter.sortItems();
-                                                                    adapter.setReverse(true);
-                                                                    adapter.notifyDataSetChanged();
-                                                                    chkContentCount();
-                                                                }
-                                                            }
-                                                        });
-                                            }
-                                        });
-                                    }
-                                }
-                                //친구목록 비었을 시 처리
-                            } catch (NullPointerException e) {
-                                adapter.sortItems();
-                                adapter.setReverse(true);
-                                adapter.notifyDataSetChanged();
-                                chkContentCount();
-                            }
-                        }
-                    }
-                });
-
-        refreshLayout.setRefreshing(false);
-
-        //adapter를 돌려보내서 ListView에 탑재할 수 있도록 함
-        return adapter;
+        //refreshLayout.setRefreshing(false);
     }
 
     public void chkContentCount() {
         //글이 하나도 없을 경우
         TextView noContent = view.findViewById(R.id.cm_main_txt_noContent);
-        Log.wtf("어댑터", adapter.getCount() + "");
-        if (adapter.getCount() <= 0) {
+        Log.wtf("어댑터", adt.getItemCount() + "");
+        if (adt.getItemCount() <= 0) {
             noContent.setVisibility(View.VISIBLE);
         } else {
             noContent.setVisibility(View.GONE);
         }
     }
 
-    public void showDetail(int position) {
-        listViewClass obj = (listViewClass) adapter.getItem(position);
+    public void showDetail(recyclerClass item) {
         FragmentManager fm = getParentFragmentManager();
         Fragment currentFragment = fm.findFragmentById(R.id.container);
         //다음 프래그먼트로 넘길 값 지정
         Bundle bundle = new Bundle();
-        bundle.putString("id", obj.getId());
+        bundle.putString("dogName", item.getDogName());
+        bundle.putString("userName", item.getMyName());
+        bundle.putString("context", item.getContext());
+        bundle.putString("uptime", item.getUpTime().toString());
         CommunityDetailView cdv = new CommunityDetailView();
         //다음 프래그먼트에 값 붙이기
         cdv.setArguments(bundle);

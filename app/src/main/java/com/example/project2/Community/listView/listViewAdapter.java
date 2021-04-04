@@ -101,10 +101,6 @@ public class listViewAdapter extends BaseAdapter {
         listViewItemList.add(num, listViewItem);
     }
 */
-    public void sortItems(){
-        Log.wtf("정보","호출됨");
-        Collections.sort(listViewItemList,new sortTimestamp());
-    }
 
     public void removeAllItem(){
         listViewItemList.clear();

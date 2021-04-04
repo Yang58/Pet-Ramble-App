@@ -90,7 +90,6 @@ public class CommunityDetailWrite extends Fragment {
         final TextView dpId = view.findViewById(R.id.cm_main_txt_id);
         final TextView dpName = view.findViewById(R.id.cm_main_txt_name);
         final ImageView dpCover = view.findViewById(R.id.cm_main_img_cover_picture);
-        final ListView lv = view.findViewById(R.id.listViewItemContainer);
         final Button sndBtn = view.findViewById(R.id.sendButton);
         final TextView tField = view.findViewById(R.id.naeyongField);
 

@@ -13,17 +13,19 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="74dp"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingBottom="10dp">
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/profile_img"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
+                android:layout_marginStart="7dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="7dp"
                 android:duplicateParentState="true"
                 android:forceDarkAllowed="false"
                 android:foreground="@drawable/rounded_fg"
@@ -49,14 +51,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:duplicateParentState="true"
-                    android:text="이름" />
+                    android:text="이름"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/id_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:duplicateParentState="true"
-                    android:text="@id" />
+                    android:text="@id"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/uptime"

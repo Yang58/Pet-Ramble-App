@@ -53,7 +53,6 @@ public class CommunityMain extends Fragment {
     //전역변수 추가하는 공간
     private final static FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private final static FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private static listViewAdapter adapter = new listViewAdapter();
     private recyclerAdapter adt = new recyclerAdapter();
     private String mParam1;
     private String mParam2;
@@ -132,7 +131,7 @@ public class CommunityMain extends Fragment {
             }
         });
 
-        listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        listView.setLayoutManager(new LinearLayoutManager(getContext()));
         listView.setAdapter(adt);
         updateList();
 
@@ -148,7 +147,7 @@ public class CommunityMain extends Fragment {
         getParentFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                updateList();
+                //updateList();
             }
         });
 
@@ -302,6 +301,8 @@ public class CommunityMain extends Fragment {
                                                 tmpItem.setUpTime(result.getTimestamp("uptime"));
                                                 tmpItem.setMyName(userName);
                                                 tmpItem.setDogName("&" + dogName);
+                                                tmpItem.setUserUid(uid);
+                                                tmpItem.setArticleUid(result.getId());
 
                                                 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
                                                 //여기서 addList함수의 getRecyclerClass가 실행됨
@@ -338,6 +339,8 @@ public class CommunityMain extends Fragment {
         bundle.putString("userName", item.getMyName());
         bundle.putString("context", item.getContext());
         bundle.putString("uptime", item.getUpTime().toString());
+        bundle.putString("userUid", item.getUserUid());
+        bundle.putString("articleUid", item.getArticleUid());
         CommunityDetailView cdv = new CommunityDetailView();
         //다음 프래그먼트에 값 붙이기
         cdv.setArguments(bundle);

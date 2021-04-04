@@ -6,8 +6,26 @@ public class recyclerClass {
     private String dogName;
     private String myName;
     private String context;
+    private String userUid;
+    private String articleUid;
     private Timestamp upTime;
     private int likeNum;
+
+    public String getUserUid() {
+        return userUid;
+    }
+
+    public void setUserUid(String userUid) {
+        this.userUid = userUid;
+    }
+
+    public String getArticleUid() {
+        return articleUid;
+    }
+
+    public void setArticleUid(String articleUid) {
+        this.articleUid = articleUid;
+    }
 
     public String getDogName() {
         return dogName;

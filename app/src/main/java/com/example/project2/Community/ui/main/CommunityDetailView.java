@@ -1,5 +1,7 @@
 package com.example.project2.Community.ui.main;
 
+import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,10 +19,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.project2.Community.listView.recyclerAdapter;
 import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,11 +32,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -109,7 +112,6 @@ public class CommunityDetailView extends Fragment {
         userUid = getArguments().getString("userUid");
         articleUid = getArguments().getString("articleUid");
 
-        //listView.setNestedScrollingEnabled(true); //false로 해줘야 scrollview 안에서 recyclerview의 스크롤이 정상동작함
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
         listView.setAdapter(adt);
         updateList();
@@ -143,11 +145,95 @@ public class CommunityDetailView extends Fragment {
         ir.addView(im);
         */
 
-        View gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x2, null);
-        gallary.addView(gView);
-
+        getPhotoes(gallary,inflater);
 
         return view;
+    }
+
+    public void getPhotoes(FrameLayout gallary, LayoutInflater inflater){
+        communityDB = db.collection("community").document(userUid).collection("article").document(articleUid);
+        communityDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                ArrayList<String> photoAddr = (ArrayList<String>) task.getResult().get("photoAddr");
+                ArrayList<ImageView> imageViews = new ArrayList<>();
+                int photoNum = photoAddr.size();
+                View gView = null;
+
+                FirebaseStorage fbs = FirebaseStorage.getInstance();
+                StorageReference fbsRef = fbs.getReference();
+
+                gallary.setVisibility(View.GONE);
+                if(photoNum==1){
+                    gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x1, null);
+                    imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x1_1));
+
+                    fbsRef.child(photoAddr.get(0)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Glide.with(getContext().getApplicationContext()).load(uri).into(imageViews.get(0));
+                            imageViews.get(0).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AlertDialog.Builder dialogbuider = new AlertDialog.Builder(getContext());
+                                    View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                    dialogbuider.setView(dialogView);
+                                    ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                    Glide.with(getContext().getApplicationContext()).load(uri).into(im);
+                                    AlertDialog dialog = dialogbuider.create();
+                                    dialog.show();
+                                }
+                            });
+                            gallary.setVisibility(View.VISIBLE);
+                        }
+                    });
+                    gallary.addView(gView);
+                }else {
+                    if (photoNum == 2) {
+                        gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x2, null);
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x2_1));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x2_2));
+                        gallary.addView(gView);
+                    } else if (photoNum == 3) {
+                        gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x1, null);
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_1));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_2));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_3));
+                        gallary.addView(gView);
+                    } else if (photoNum == 4) {
+                        gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x2, null);
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_1));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_2));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_3));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_4));
+                        gallary.addView(gView);
+                    }
+
+                    for (int i = 0; i < photoNum; i++) {
+                        int innerAI = i;
+                        fbsRef.child(photoAddr.get(i)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Glide.with(getContext().getApplicationContext()).load(uri).into(imageViews.get(innerAI));
+                                imageViews.get(innerAI).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        AlertDialog.Builder dialogbuider = new AlertDialog.Builder(getContext());
+                                        View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                        dialogbuider.setView(dialogView);
+                                        ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                        Glide.with(getContext().getApplicationContext()).load(uri).into(im);
+                                        AlertDialog dialog = dialogbuider.create();
+                                        dialog.show();
+                                    }
+                                });
+                                gallary.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     public void getRelatedList(String userUid, String articleUid, getListCallback inCall) {
@@ -249,6 +335,7 @@ public class CommunityDetailView extends Fragment {
                                             tmpItem.setUpTime(result.getTimestamp("uptime"));
                                             tmpItem.setMyName(userName);
                                             tmpItem.setDogName("&" + dogName);
+                                            tmpItem.setPhotoAddr((ArrayList<String>) result.get("photoAddr"));
 
                                             //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
                                             //여기서 addList함수의 getRecyclerClass가 실행됨

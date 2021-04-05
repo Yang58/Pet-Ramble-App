@@ -40,6 +40,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.Inflater;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -211,6 +212,8 @@ public class CommunityMain extends Fragment {
                     public void onComplete() {
                         //글이 하나도 없는지 체크
                         chkContentCount();
+                        //어댑터 업데이트
+                        adt.notifyDataSetChanged();
                         Log.i("정보","내 글 불러오기 완료");
                     }
                 });
@@ -233,6 +236,8 @@ public class CommunityMain extends Fragment {
                                             listView.setVisibility(View.VISIBLE);
                                             //글이 하나도 없는지 체크
                                             chkContentCount();
+                                            //어댑터 업데이트
+                                            adt.notifyDataSetChanged();
                                             //새로고침 해제
                                             refreshLayout.setRefreshing(false);
                                             Log.wtf("진행도", (innerAI.get(0) +1) + "/" + result.size());
@@ -244,6 +249,8 @@ public class CommunityMain extends Fragment {
                         }catch(NullPointerException e){
                             //가림막 해제
                             listView.setVisibility(View.VISIBLE);
+                            //어댑터 업데이트
+                            adt.notifyDataSetChanged();
                             //새로고침 해제
                             refreshLayout.setRefreshing(false);
                             Log.wtf("경고",e.getMessage());
@@ -266,7 +273,6 @@ public class CommunityMain extends Fragment {
                 adt.addItem(getItem);
                 adt.sortItems();
                 adt.reverseAll();
-                adt.notifyDataSetChanged();
             }
         };
         return callback;
@@ -306,6 +312,7 @@ public class CommunityMain extends Fragment {
                                                 tmpItem.setDogName("&" + dogName);
                                                 tmpItem.setUserUid(uid);
                                                 tmpItem.setArticleUid(result.getId());
+                                                tmpItem.setPhotoAddr((ArrayList<String>) result.get("photoAddr"));
 
                                                 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
                                                 //여기서 addList함수의 getRecyclerClass가 실행됨

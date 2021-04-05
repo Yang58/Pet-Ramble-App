@@ -1,17 +1,35 @@
 package com.example.project2.Community.listView;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.media.Image;
+import android.net.Uri;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.*;
 
+import com.bumptech.glide.Glide;
 import com.example.project2.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +40,8 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
 
     private ArrayList<recyclerClass> itemList = new ArrayList<recyclerClass>();
     private recyclerOnItemClick onItemClickListener;
+    private final static FirebaseStorage db = FirebaseStorage.getInstance();
+    private final static StorageReference dbRef = db.getReference();
 
     @NonNull
     @Override
@@ -83,6 +103,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
         private TextView dogNameTxt;
         private TextView contextTxt;
         private TextView uptimeTxt;
+        private FrameLayout gallary;
 
         public viewHolder(@NonNull View itemView, recyclerOnItemClick listener) {
             super(itemView);
@@ -93,6 +114,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
             dogNameTxt = (TextView) itemView.findViewById(R.id.id_txt);
             contextTxt = (TextView) itemView.findViewById(R.id.context_txt);
             uptimeTxt = (TextView) itemView.findViewById(R.id.uptime);
+            gallary = (FrameLayout) itemView.findViewById(R.id.item_gallary_container);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -105,11 +127,94 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
             });
         }
 
-        public void onHold(recyclerClass item){
+        public void onHold(recyclerClass item) {
             //coverImg
             nameTxt.setText(item.getMyName());
             dogNameTxt.setText(item.getDogName());
             contextTxt.setText(item.getContext());
+
+            try {
+                ArrayList<ImageView> imageViews = new ArrayList<>();
+                int photoNum = item.getPhotoAddrSize();
+                LayoutInflater inflater = (LayoutInflater) itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View gView = null;
+                Log.wtf("e",photoNum+"");
+
+                if(photoNum==1){
+                    gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x1, null);
+                    imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x1_1));
+
+                    dbRef.child(item.getPhotoAddr(0)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(imageViews.get(0));
+                                imageViews.get(0).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
+                                        View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                        dialogbuider.setView(dialogView);
+                                        ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(im);
+                                        AlertDialog dialog = dialogbuider.create();
+                                        dialog.show();
+                                    }
+                                });
+                            }
+                    });
+                    gallary.addView(gView);
+                    gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,600));
+                }else {
+                    if (photoNum == 2) {
+                        gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x2, null);
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x2_1));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x2_2));
+                        gallary.addView(gView);
+                        gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
+                    } else if (photoNum == 3) {
+                        gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x1, null);
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_1));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_2));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_3));
+                        gallary.addView(gView);
+                        gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
+                    } else if (photoNum == 4) {
+                        gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x2, null);
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_1));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_2));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_3));
+                        imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_4));
+                        gallary.addView(gView);
+                        gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
+                    }
+
+                    for (int i = 0; i < photoNum; i++) {
+                        int innerAI = i;
+                        dbRef.child(item.getPhotoAddr(i)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(imageViews.get(innerAI));
+
+                                imageViews.get(innerAI).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
+                                        View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                        dialogbuider.setView(dialogView);
+                                        ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(im);
+                                        AlertDialog dialog = dialogbuider.create();
+                                        dialog.show();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }catch (NullPointerException e){
+                gallary.setVisibility(View.GONE);
+            }
+
             SimpleDateFormat transTimeToAll = new SimpleDateFormat("yy년 MM월 dd일 HH시 mm분");
             SimpleDateFormat transTimeToDay = new SimpleDateFormat("dd일 전");
             SimpleDateFormat transTimeToHour = new SimpleDateFormat("HH시간 전");

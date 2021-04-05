@@ -1,6 +1,10 @@
 package com.example.project2.Community.listView;
 
+import android.view.View;
+
 import com.google.firebase.Timestamp;
+
+import java.util.ArrayList;
 
 public class recyclerClass {
     private String dogName;
@@ -8,8 +12,29 @@ public class recyclerClass {
     private String context;
     private String userUid;
     private String articleUid;
+    private ArrayList<String> photoAddr;
     private Timestamp upTime;
     private int likeNum;
+
+    public ArrayList<String> getPhotoAddr() {
+        return photoAddr;
+    }
+
+    public String getPhotoAddr(int pos) {
+        return photoAddr.get(pos);
+    }
+
+    public int getPhotoAddrSize() {
+        return photoAddr.size();
+    }
+
+    public void setPhotoAddr(ArrayList<String> photoAddr) {
+        this.photoAddr = photoAddr;
+    }
+
+    public void addPhotoAddr(String addr) {
+        this.photoAddr.add(addr);
+    }
 
     public String getUserUid() {
         return userUid;

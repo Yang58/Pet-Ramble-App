@@ -150,9 +150,6 @@ public class CommunityDetailWrite extends Fragment {
                                 //부모 게시글에 댓글 주소를 추가해줌
                                 relatedDB.update("relatedList", FieldValue.arrayUnion(d));
                                 //글쓰기 창 초기화 이후 목록으로 돌아가기
-                                tField.setText("");
-                                FragmentManager fm = getParentFragmentManager();
-                                fm.popBackStack();
                             }
                         });
                     }else{
@@ -160,14 +157,16 @@ public class CommunityDetailWrite extends Fragment {
                             @Override
                             public void get(DocumentReference d) {
                                 //글이 업로드 된 이후
-                                //글쓰기 창 초기화 이후 목록으로 돌아가기
-                                tField.setText("");
-                                FragmentManager fm = getParentFragmentManager();
-                                fm.popBackStack();
                                 Log.i("글쓰기 완료",d.toString());
                             }
                         });
                     }
+                    //글쓰기 창 초기화 이후 목록으로 돌아가기
+                    tField.setText("");
+                    FragmentManager fm = getParentFragmentManager();
+                    fm.popBackStack();
+                    //키보드 내리기
+                    inputManager.hideSoftInputFromWindow(tField.getWindowToken(),0);
                 } else {
                     Animation shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
                     tField.startAnimation(shake);

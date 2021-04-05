@@ -15,7 +15,7 @@ public class uploadData{
     public DocumentReference relatedID;
     public String content;
     public int likeNum;
-    public List<String> photoAddr = new ArrayList<>();
+    public List<String> photoAddr;
     public Timestamp uptime;
 
     public uploadData(){
@@ -27,7 +27,7 @@ public class uploadData{
         this.likeNum=0;
         this.relatedID = null;
         this.relatedList = new ArrayList<DocumentReference>();
-        this.photoAddr.add("noData");
+        this.photoAddr = new ArrayList<>();
         this.uptime=uptime;
     }
 

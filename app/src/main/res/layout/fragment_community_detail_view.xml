@@ -21,7 +21,7 @@
         app:fabSize="auto"
         app:maxImageSize="30dp" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/cm_detail_contaiiner_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -153,9 +153,11 @@
                 android:id="@+id/cm_detail_write_container_recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
                 android:scrollbars="none" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </FrameLayout>

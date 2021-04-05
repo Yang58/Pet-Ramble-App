@@ -11,10 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.*;
 
 import com.example.project2.R;
+import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> implements recyclerOnItemClick {
 
@@ -45,12 +47,18 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
         }
     }
 
+    public ArrayList<recyclerClass> getItemList() {
+        return itemList;
+    }
+
     public void setOnItemClickListener(recyclerOnItemClick listener){
         onItemClickListener = listener;
     }
 
     public void addItem(recyclerClass item){
         itemList.add(item);
+        for(recyclerClass i : itemList)
+        Log.wtf("목록",i.getContext());
     }
 
     public recyclerClass getItem(int position){
@@ -62,7 +70,6 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
     }
 
     public void sortItems(){
-        Log.wtf("정보","호출됨");
         Collections.sort(itemList ,new sortTimestamp());
     }
 
@@ -103,8 +110,34 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
             nameTxt.setText(item.getMyName());
             dogNameTxt.setText(item.getDogName());
             contextTxt.setText(item.getContext());
-            SimpleDateFormat transTime = new SimpleDateFormat("yy-MM-dd HH:mm");
-            uptimeTxt.setText(transTime.format(item.getUpTime().toDate()));
+            SimpleDateFormat transTimeToAll = new SimpleDateFormat("yy년 MM월 dd일 HH시 mm분");
+            SimpleDateFormat transTimeToDay = new SimpleDateFormat("dd일 전");
+            SimpleDateFormat transTimeToHour = new SimpleDateFormat("HH시간 전");
+            SimpleDateFormat transTimeToMinute = new SimpleDateFormat("mm분 전");
+            SimpleDateFormat transTimeToSecond = new SimpleDateFormat("ss초 전");
+            try {
+                long nowTime = TimeUnit.NANOSECONDS.toSeconds(Timestamp.now().getNanoseconds());
+                long uploadTime = TimeUnit.NANOSECONDS.toSeconds(item.getUpTime().getNanoseconds());
+                long allFormat = TimeUnit.NANOSECONDS.toSeconds(4000 * 60 * 60 * 24 * 7);
+                long dayFormat = TimeUnit.NANOSECONDS.toSeconds(4000 * 60 * 60 * 24);
+                long hourFormat = TimeUnit.NANOSECONDS.toSeconds(4000 * 60 * 60);
+                long minFormat = TimeUnit.NANOSECONDS.toSeconds(4000 * 60);
+                long secFormat = TimeUnit.NANOSECONDS.toSeconds(4000);
+                if (nowTime - uploadTime > allFormat) {
+                    uptimeTxt.setText(transTimeToAll.format(item.getUpTime().toDate()));
+                } else if (nowTime - uploadTime > dayFormat) {
+                    uptimeTxt.setText(transTimeToDay.format(item.getUpTime().toDate()));
+                } else if (nowTime - uploadTime > hourFormat) {
+                    uptimeTxt.setText(transTimeToHour.format(item.getUpTime().toDate()));
+                } else if (nowTime - uploadTime > minFormat) {
+                    uptimeTxt.setText(transTimeToMinute.format(item.getUpTime().toDate()));
+                } else {
+                    uptimeTxt.setText(transTimeToSecond.format(item.getUpTime().toDate()));
+                }
+                Log.wtf("?", Timestamp.now().getNanoseconds() + "," + TimeUnit.NANOSECONDS.toSeconds(Timestamp.now().getNanoseconds()) + "");
+            } catch (NullPointerException e){
+                Log.wtf("e", item.toString());
+            }
         }
     }
 }

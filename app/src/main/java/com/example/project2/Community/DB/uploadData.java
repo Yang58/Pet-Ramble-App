@@ -1,5 +1,7 @@
 package com.example.project2.Community.DB;
 
+import com.google.firebase.firestore.DocumentReference;
+
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -9,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public class uploadData{
-    public Map<String,ArrayList<String>> relatedList;
-    public ArrayList<String> relatedID;
+    public ArrayList<DocumentReference> relatedList;
+    public DocumentReference relatedID;
     public String content;
     public int likeNum;
     public List<String> photoAddr = new ArrayList<>();
@@ -23,30 +25,26 @@ public class uploadData{
     public uploadData(String content, Timestamp uptime){
         this.content=content;
         this.likeNum=0;
-        this.relatedID = new ArrayList<String>();
-        this.relatedList = new HashMap<String, ArrayList<String>>();
+        this.relatedID = null;
+        this.relatedList = new ArrayList<DocumentReference>();
         this.photoAddr.add("noData");
         this.uptime=uptime;
     }
 
-    public Map<String, ArrayList<String>> getRelatedList() {
+    public ArrayList<DocumentReference> getRelatedList() {
         return relatedList;
     }
 
-    public void setRelatedList(Map<String, ArrayList<String>> relatedList) {
+    public void setRelatedList(ArrayList<DocumentReference> relatedList) {
         this.relatedList = relatedList;
     }
 
-    public ArrayList<String> getRelatedID() {
+    public DocumentReference getRelatedID() {
         return relatedID;
     }
 
-    public void setRelatedID(ArrayList<String> relatedID) {
+    public void setRelatedID(DocumentReference relatedID) {
         this.relatedID = relatedID;
-    }
-
-    public void addRelatedID(String uid){
-        this.relatedID.add(uid);
     }
 
     public Timestamp getUptime() {

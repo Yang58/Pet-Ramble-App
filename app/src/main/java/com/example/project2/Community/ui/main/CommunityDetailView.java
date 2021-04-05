@@ -61,7 +61,7 @@ public class CommunityDetailView extends Fragment {
     private String articleUid;
 
     public interface getListCallback {
-        public void get(Map<String, ArrayList<String>> list);
+        public void get(ArrayList<DocumentReference> list);
     }
 
     public static CommunityDetailView newInstance(String param1, String param2) {
@@ -109,7 +109,7 @@ public class CommunityDetailView extends Fragment {
         userUid = getArguments().getString("userUid");
         articleUid = getArguments().getString("articleUid");
 
-        listView.setNestedScrollingEnabled(false); //false로 해줘야 scrollview 안에서 recyclerview의 스크롤이 정상동작함
+        //listView.setNestedScrollingEnabled(true); //false로 해줘야 scrollview 안에서 recyclerview의 스크롤이 정상동작함
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
         listView.setAdapter(adt);
         updateList();
@@ -158,7 +158,7 @@ public class CommunityDetailView extends Fragment {
         communityDB.collection("article").document(articleUid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Map<String, ArrayList<String>> tmpList = (Map<String, ArrayList<String>>) task.getResult().get("relatedList");
+                ArrayList<DocumentReference> tmpList = (ArrayList<DocumentReference>) task.getResult().get("relatedList");
                 inCall.get(tmpList);
             }
         });
@@ -181,19 +181,17 @@ public class CommunityDetailView extends Fragment {
 
                 getRelatedList(userUid, articleUid, new getListCallback() {
                     @Override
-                    public void get(Map<String, ArrayList<String>> list) {
+                    public void get(ArrayList<DocumentReference> list) {
                         if (list.size() == 0) {
                             progressBar.setVisibility(View.GONE);
-                        }else {
-                            for (String i : list.keySet()) {
-                                for (String j : list.get(i)) {
-                                    getList(i.replaceAll("\\s+", ""), j, addList(), new CommunityMain.completeCallback() {
-                                        @Override
-                                        public void onComplete() {
-                                            progressBar.setVisibility(View.GONE);
-                                        }
-                                    });
-                                }
+                        } else {
+                            for (DocumentReference i : list) {
+                                getList(i, addList(), new CommunityMain.completeCallback() {
+                                    @Override
+                                    public void onComplete() {
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                });
                             }
                         }
                     }
@@ -219,10 +217,11 @@ public class CommunityDetailView extends Fragment {
         return callback;
     }
 
-    public void getList(String uid, String aid, CommunityMain.getCallback inCall, CommunityMain.completeCallback outCall) {
+    public void getList(DocumentReference docRef, CommunityMain.getCallback inCall, CommunityMain.completeCallback outCall) {
         //유저 UID 기반으로 각 컬렉션에 접근
-        communityDB = db.collection("community").document(uid);
-        usersDB = db.collection("users").document(uid);
+        //게시글ID(docRef)->article->유저ID
+        userUid = docRef.getParent().getParent().getId();
+        usersDB = db.collection("users").document(userUid);
 
         //글이 중복으로 들어가면 안되기 때문에 우선 모든 글 제거 후 시작
         recyclerAdapter tmpAdapter = new recyclerAdapter();
@@ -237,12 +236,13 @@ public class CommunityDetailView extends Fragment {
 
                         //글 가져오기
                         //이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
-                        communityDB.collection("article").document(aid).get()
+                        docRef.get()
                                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
                                             DocumentSnapshot result = task.getResult();
+                                            Log.wtf("e",task.getResult().getString("content"));
 
                                             recyclerClass tmpItem = new recyclerClass();
                                             tmpItem.setContext(result.getString("content"));

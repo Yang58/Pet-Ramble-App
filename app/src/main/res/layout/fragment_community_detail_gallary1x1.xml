@@ -17,8 +17,7 @@
             android:id="@+id/cm_detail_view_gallary_1x1_1"
             android:layout_width="400dp"
             android:layout_height="400dp"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/city" />
+            android:scaleType="centerCrop" />
     </LinearLayout>
 
 </LinearLayout>

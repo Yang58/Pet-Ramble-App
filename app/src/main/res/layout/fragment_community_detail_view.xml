@@ -53,8 +53,7 @@
                         android:duplicateParentState="true"
                         android:forceDarkAllowed="false"
                         android:foreground="@drawable/rounded_fg"
-                        android:scaleType="centerCrop"
-                        app:srcCompat="@drawable/dog" />
+                        android:scaleType="centerCrop" />
                 </LinearLayout>
 
                 <LinearLayout

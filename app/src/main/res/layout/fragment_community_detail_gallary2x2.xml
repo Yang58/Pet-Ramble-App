@@ -19,15 +19,13 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_marginRight="5dp"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/city" />
+            android:scaleType="centerCrop" />
 
         <ImageView
             android:id="@+id/cm_detail_view_gallary_2x2_2"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/green" />
+            android:scaleType="centerCrop" />
 
     </LinearLayout>
 
@@ -42,15 +40,13 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_marginRight="5dp"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/city" />
+            android:scaleType="centerCrop" />
 
         <ImageView
             android:id="@+id/cm_detail_view_gallary_2x2_4"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/green" />
+            android:scaleType="centerCrop" />
     </LinearLayout>
 
 </LinearLayout>

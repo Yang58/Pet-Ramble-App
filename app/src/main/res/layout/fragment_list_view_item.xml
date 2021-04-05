@@ -29,8 +29,7 @@
                 android:duplicateParentState="true"
                 android:forceDarkAllowed="false"
                 android:foreground="@drawable/rounded_fg"
-                android:scaleType="centerCrop"
-                android:src="@drawable/bsod" />
+                android:scaleType="centerCrop"/>
         </LinearLayout>
 
         <LinearLayout

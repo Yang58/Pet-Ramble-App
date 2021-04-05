@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.project2.Community.listView.recyclerAdapter;
 import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.R;
@@ -110,7 +111,7 @@ public class CommunityDetailView extends Fragment {
 
         FirebaseStorage fbs = FirebaseStorage.getInstance();
         StorageReference fbsRef = fbs.getReference();
-        Glide.with(getContext().getApplicationContext()).load(profile_img).into(profile_imgV);
+        Glide.with(getContext().getApplicationContext()).load(profile_img).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(profile_imgV);
 
         userUid = getArguments().getString("userUid");
         articleUid = getArguments().getString("articleUid");

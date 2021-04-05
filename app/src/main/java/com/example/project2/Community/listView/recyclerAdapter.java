@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.*;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -128,15 +129,27 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
         }
 
         public void onHold(recyclerClass item) {
+            LayoutInflater inflater = (LayoutInflater) itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             nameTxt.setText(item.getMyName());
             dogNameTxt.setText(item.getDogName());
             contextTxt.setText(item.getContext());
             Glide.with(itemView.getContext().getApplicationContext()).load(item.getProfileImage()).into(profileImage);
+            profileImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
+                    View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                    dialogbuider.setView(dialogView);
+                    ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                    Glide.with(itemView.getContext().getApplicationContext()).load(item.getProfileImage()).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(im);
+                    AlertDialog dialog = dialogbuider.create();
+                    dialog.show();
+                }
+            });
 
             try {
                 ArrayList<ImageView> imageViews = new ArrayList<>();
                 int photoNum = item.getPhotoAddrSize();
-                LayoutInflater inflater = (LayoutInflater) itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View gView = null;
                 Log.wtf("e",photoNum+"");
 
@@ -155,7 +168,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                                         View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
                                         dialogbuider.setView(dialogView);
                                         ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(im);
+                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(im);
                                         AlertDialog dialog = dialogbuider.create();
                                         dialog.show();
                                     }
@@ -202,7 +215,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                                         View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
                                         dialogbuider.setView(dialogView);
                                         ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(im);
+                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(im);
                                         AlertDialog dialog = dialogbuider.create();
                                         dialog.show();
                                     }

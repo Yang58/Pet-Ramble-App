@@ -296,6 +296,7 @@ public class CommunityMain extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         String userName = task.getResult().getString("name");
                         String dogName = task.getResult().getString("petName");
+                        String profileImage = task.getResult().getString("photoUrl");
 
                         //글 가져오기
                         //이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
@@ -306,6 +307,7 @@ public class CommunityMain extends Fragment {
                                         if (task.isSuccessful()) {
                                             for (QueryDocumentSnapshot result : task.getResult()) {
                                                 recyclerClass tmpItem = new recyclerClass();
+                                                tmpItem.setProfileImage(profileImage);
                                                 tmpItem.setContext(result.getString("content"));
                                                 tmpItem.setUpTime(result.getTimestamp("uptime"));
                                                 tmpItem.setMyName(userName);
@@ -345,6 +347,7 @@ public class CommunityMain extends Fragment {
         Fragment currentFragment = fm.findFragmentById(R.id.container);
         //다음 프래그먼트로 넘길 값 지정
         Bundle bundle = new Bundle();
+        bundle.putString("profileImage", item.getProfileImage());
         bundle.putString("dogName", item.getDogName());
         bundle.putString("userName", item.getMyName());
         bundle.putString("context", item.getContext());

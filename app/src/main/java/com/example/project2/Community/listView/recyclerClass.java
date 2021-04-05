@@ -13,8 +13,17 @@ public class recyclerClass {
     private String userUid;
     private String articleUid;
     private ArrayList<String> photoAddr;
+    private String profileImage;
     private Timestamp upTime;
     private int likeNum;
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
 
     public ArrayList<String> getPhotoAddr() {
         return photoAddr;

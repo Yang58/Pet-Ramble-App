@@ -102,12 +102,15 @@ public class CommunityDetailView extends Fragment {
         String dogName = getArguments().getString("dogName");
         String userName = getArguments().getString("userName");
         String context_ = getArguments().getString("context");
-        String profile_img = getArguments().getString("profile_img");
+        String profile_img = getArguments().getString("profileImage");
 
         idV.setText(dogName);
         nameV.setText(userName);
         contextV.setText(context_);
-        //profile_imgV.setImageResource(profile_img);
+
+        FirebaseStorage fbs = FirebaseStorage.getInstance();
+        StorageReference fbsRef = fbs.getReference();
+        Glide.with(getContext().getApplicationContext()).load(profile_img).into(profile_imgV);
 
         userUid = getArguments().getString("userUid");
         articleUid = getArguments().getString("articleUid");
@@ -319,6 +322,7 @@ public class CommunityDetailView extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         String userName = task.getResult().getString("name");
                         String dogName = task.getResult().getString("petName");
+                        String profileImage = task.getResult().getString("photoUrl");
 
                         //글 가져오기
                         //이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
@@ -331,6 +335,7 @@ public class CommunityDetailView extends Fragment {
                                             Log.wtf("e",task.getResult().getString("content"));
 
                                             recyclerClass tmpItem = new recyclerClass();
+                                            tmpItem.setProfileImage(profileImage);
                                             tmpItem.setContext(result.getString("content"));
                                             tmpItem.setUpTime(result.getTimestamp("uptime"));
                                             tmpItem.setMyName(userName);

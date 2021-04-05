@@ -98,7 +98,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
     }
 
     public class viewHolder extends ViewHolder{
-        private ImageView coverImg;
+        private ImageView profileImage;
         private TextView nameTxt;
         private TextView dogNameTxt;
         private TextView contextTxt;
@@ -109,7 +109,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
             super(itemView);
 
             //참조할 객체들
-            coverImg = (ImageView) itemView.findViewById(R.id.profile_img);
+            profileImage = (ImageView) itemView.findViewById(R.id.profile_img);
             nameTxt = (TextView) itemView.findViewById(R.id.name_txt);
             dogNameTxt = (TextView) itemView.findViewById(R.id.id_txt);
             contextTxt = (TextView) itemView.findViewById(R.id.context_txt);
@@ -128,10 +128,10 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
         }
 
         public void onHold(recyclerClass item) {
-            //coverImg
             nameTxt.setText(item.getMyName());
             dogNameTxt.setText(item.getDogName());
             contextTxt.setText(item.getContext());
+            Glide.with(itemView.getContext().getApplicationContext()).load(item.getProfileImage()).into(profileImage);
 
             try {
                 ArrayList<ImageView> imageViews = new ArrayList<>();
@@ -177,7 +177,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_2));
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x1_3));
                         gallary.addView(gView);
-                        gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
+                        //gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
                     } else if (photoNum == 4) {
                         gView = inflater.inflate(R.layout.fragment_community_detail_gallary2x2, null);
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_1));
@@ -185,7 +185,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_3));
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_4));
                         gallary.addView(gView);
-                        gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
+                        //gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
                     }
 
                     for (int i = 0; i < photoNum; i++) {

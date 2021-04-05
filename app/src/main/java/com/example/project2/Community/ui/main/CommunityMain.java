@@ -212,8 +212,6 @@ public class CommunityMain extends Fragment {
                     public void onComplete() {
                         //글이 하나도 없는지 체크
                         chkContentCount();
-                        //어댑터 업데이트
-                        adt.notifyDataSetChanged();
                         Log.i("정보","내 글 불러오기 완료");
                     }
                 });
@@ -227,7 +225,6 @@ public class CommunityMain extends Fragment {
                             for (int i = 0; i < result.size(); i++) {
                                 final ArrayList<Integer> innerAI = new ArrayList<>();
                                 innerAI.add(i);
-                                Log.wtf("innerAI",innerAI+"");
                                 getList(result.get(i), addList(), new completeCallback() {
                                     @Override
                                     public void onComplete() {

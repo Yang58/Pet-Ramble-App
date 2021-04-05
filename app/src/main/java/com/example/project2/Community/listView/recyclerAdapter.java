@@ -152,7 +152,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                 int photoNum = item.getPhotoAddrSize();
                 View gView = null;
                 Log.wtf("e",photoNum+"");
-
+                gallary.setVisibility(View.GONE);
                 if(photoNum==1){
                     gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x1, null);
                     imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x1_1));
@@ -177,6 +177,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                     });
                     gallary.addView(gView);
                     gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,600));
+                    gallary.setVisibility(View.VISIBLE);
                 }else {
                     if (photoNum == 2) {
                         gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x2, null);
@@ -198,6 +199,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_3));
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_2x2_4));
                         gallary.addView(gView);
+                        gallary.setVisibility(View.VISIBLE);
                         //gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 600));
                     }
 

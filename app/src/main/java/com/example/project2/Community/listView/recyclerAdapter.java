@@ -2,6 +2,9 @@ package com.example.project2.Community.listView;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.net.Uri;
 import android.text.Layout;
@@ -32,6 +35,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,8 +82,6 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
 
     public void addItem(recyclerClass item){
         itemList.add(item);
-        for(recyclerClass i : itemList)
-        Log.wtf("목록",i.getContext());
     }
 
     public recyclerClass getItem(int position){
@@ -151,30 +153,60 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                 ArrayList<ImageView> imageViews = new ArrayList<>();
                 int photoNum = item.getPhotoAddrSize();
                 View gView = null;
-                Log.wtf("e",photoNum+"");
                 gallary.setVisibility(View.GONE);
                 if(photoNum==1){
                     gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x1, null);
                     imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x1_1));
 
-                    dbRef.child(item.getPhotoAddr(0)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(imageViews.get(0));
+                    if(!item.getContentImage().isEmpty()) {
+                        imageViews.get(0).setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(0)));
+                        //이미지 클릭시 확대되는 부분
+                        imageViews.get(0).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //이미지가 보여줄 다이얼로그를 구축하는 부분
+                                AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
+                                View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                dialogbuider.setView(dialogView);
+                                //이미지가 보여지는 부분
+                                ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                im.setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(0)));
+                                AlertDialog dialog = dialogbuider.create();
+                                dialog.show();
+                            }
+                        });
+                    }else {
+                        dbRef.child(item.getPhotoAddr(0)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                //이미지가 보여지는 부분
+                                Glide.with(itemView.getContext().getApplicationContext())
+                                        .load(uri)
+                                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                                        .thumbnail(0.1f)
+                                        .placeholder(new ColorDrawable(Color.parseColor("#D1D1D1")))
+                                        .into(imageViews.get(0));
+                                //이미지 클릭시 확대되는 부분
                                 imageViews.get(0).setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+                                        //이미지가 보여줄 다이얼로그를 구축하는 부분
                                         AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
                                         View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
                                         dialogbuider.setView(dialogView);
+                                        //이미지가 보여지는 부분
                                         ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(im);
+                                        Glide.with(itemView.getContext().getApplicationContext())
+                                                .load(uri)
+                                                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                                                .into(im);
                                         AlertDialog dialog = dialogbuider.create();
                                         dialog.show();
                                     }
                                 });
                             }
-                    });
+                        });
+                    }
                     gallary.addView(gView);
                     gallary.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,600));
                     gallary.setVisibility(View.VISIBLE);
@@ -205,29 +237,60 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
 
                     for (int i = 0; i < photoNum; i++) {
                         int innerAI = i;
-                        dbRef.child(item.getPhotoAddr(i)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                Glide.with(itemView.getContext().getApplicationContext()).load(uri).into(imageViews.get(innerAI));
-
-                                imageViews.get(innerAI).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
-                                        View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
-                                        dialogbuider.setView(dialogView);
-                                        ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                        Glide.with(itemView.getContext().getApplicationContext()).load(uri).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(im);
-                                        AlertDialog dialog = dialogbuider.create();
-                                        dialog.show();
-                                    }
-                                });
-                            }
-                        });
+                        if(!item.getContentImage().isEmpty()) {
+                            imageViews.get(i).setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(i)));
+                            //이미지 클릭시 확대되는 부분
+                            imageViews.get(i).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //이미지가 보여줄 다이얼로그를 구축하는 부분
+                                    AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
+                                    View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                    dialogbuider.setView(dialogView);
+                                    //이미지가 보여지는 부분
+                                    ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                    im.setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(innerAI)));
+                                    AlertDialog dialog = dialogbuider.create();
+                                    dialog.show();
+                                }
+                            });
+                        }else {
+                            dbRef.child(item.getPhotoAddr(i)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    //이미지가 보여지는 부분
+                                    Glide.with(itemView.getContext().getApplicationContext())
+                                            .load(uri)
+                                            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                                            .thumbnail(0.1f)
+                                            .placeholder(new ColorDrawable(Color.parseColor("#D1D1D1")))
+                                            .into(imageViews.get(innerAI));
+                                    //이미지를 확대하는 부분
+                                    imageViews.get(innerAI).setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //이미지가 보여질 다이얼로그를 구축하는 부분
+                                            AlertDialog.Builder dialogbuider = new AlertDialog.Builder(itemView.getContext());
+                                            View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                            dialogbuider.setView(dialogView);
+                                            //이미지가 보여지는 부분
+                                            ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                            Glide.with(itemView.getContext().getApplicationContext())
+                                                    .load(uri)
+                                                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                                                    .into(im);
+                                            AlertDialog dialog = dialogbuider.create();
+                                            dialog.show();
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                 }
-            }catch (NullPointerException e){
+            }catch (Exception e){
                 gallary.setVisibility(View.GONE);
+                e.printStackTrace();
             }
 
             SimpleDateFormat transTimeToAll = new SimpleDateFormat("yy년 MM월 dd일 HH시 mm분");
@@ -254,9 +317,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                 } else {
                     uptimeTxt.setText(transTimeToSecond.format(item.getUpTime().toDate()));
                 }
-                Log.wtf("?", Timestamp.now().getNanoseconds() + "," + TimeUnit.NANOSECONDS.toSeconds(Timestamp.now().getNanoseconds()) + "");
             } catch (NullPointerException e){
-                Log.wtf("e", item.toString());
             }
         }
     }

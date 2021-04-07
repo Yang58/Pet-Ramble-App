@@ -1,6 +1,9 @@
 package com.example.project2.Community.ui.main;
 
 import android.app.AlertDialog;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.project2.Community.functions.loadImage;
 import com.example.project2.Community.listView.recyclerAdapter;
 import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.R;
@@ -36,6 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -91,45 +96,59 @@ public class CommunityDetailView extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_community_detail_view, container, false);
 
-        TextView idV = view.findViewById(R.id.cm_detail_txt_id);
-        TextView contextV = view.findViewById(R.id.cm_detail_txt_context);
-        TextView nameV = view.findViewById(R.id.cm_detail_txt_name);
-        ImageView profile_imgV = view.findViewById(R.id.cm_detail_img_coverPhoto);
-        FrameLayout gallary = view.findViewById(R.id.cm_detail_container_gallary);
-        RecyclerView listView = view.findViewById(R.id.cm_detail_write_container_recyclerView);
-        LinearLayout ir = view.findViewById(R.id.cm_detail_container_view);
-        FloatingActionButton floatBtn = view.findViewById(R.id.cm_detail_view_btn_floating);
+        //사용할 뷰 초기화
+        TextView idV = view.findViewById(R.id.cm_detail_txt_id); //펫 이름
+        TextView contextV = view.findViewById(R.id.cm_detail_txt_context); //글 내용
+        TextView nameV = view.findViewById(R.id.cm_detail_txt_name); //사용자 이름
+        ImageView profile_imgV = view.findViewById(R.id.cm_detail_img_coverPhoto); //프로필 사진
+        FrameLayout gallary = view.findViewById(R.id.cm_detail_container_gallary); //게시글 사진
+        RecyclerView listView = view.findViewById(R.id.cm_detail_write_container_recyclerView); //댓글 목록
+        FloatingActionButton floatBtn = view.findViewById(R.id.cm_detail_view_btn_floating); //글 작성 버튼
 
-        String dogName = getArguments().getString("dogName");
-        String userName = getArguments().getString("userName");
-        String context_ = getArguments().getString("context");
-        String profile_img = getArguments().getString("profileImage");
+        //이전 게시글에서 가져온 정보들 저장
+        String dogName = getArguments().getString("dogName"); //펫 이름
+        String userName = getArguments().getString("userName"); //사용자 이름
+        String context_ = getArguments().getString("context"); //글 내용
+        String profile_img = getArguments().getString("profileImage"); //프로필 사진 경로
 
-        idV.setText(dogName);
-        nameV.setText(userName);
-        contextV.setText(context_);
+        userUid = getArguments().getString("userUid"); //부모 게시글 유저 아이디
+        articleUid = getArguments().getString("articleUid"); //부모 게시글 게시글 아이디
 
+        //부모 게시글의 정보들을 초기화
+        idV.setText(dogName); //펫 이름
+        nameV.setText(userName); //사용자 이름
+        contextV.setText(context_); //글 내용
+
+        getPhotoes(gallary, inflater);
+
+        //부모 게시글의 프로필 사진을 표시
         FirebaseStorage fbs = FirebaseStorage.getInstance();
         StorageReference fbsRef = fbs.getReference();
-        Glide.with(getContext().getApplicationContext()).load(profile_img).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(profile_imgV);
+        Glide.with(getContext().getApplicationContext())
+                .load(profile_img)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC) //디스크에 캐시하도록 설정
+                .thumbnail(0.1f) //실제 사진의 10%크기만
+                .placeholder(new ColorDrawable(Color.parseColor("#D1D1D1"))) //로딩중일 때에 표시되는 임시 이미지
+                .into(profile_imgV);
 
-        userUid = getArguments().getString("userUid");
-        articleUid = getArguments().getString("articleUid");
-
+        //댓글 목록 초기화
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
         listView.setAdapter(adt);
         updateList();
 
+        //글 작성 버튼 눌렀을시에 작동
         floatBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //전달할 정보 초기화
                 FragmentManager fm = getParentFragmentManager();
                 Bundle bundle = new Bundle();
-                bundle.putInt("mode", 1);
-                bundle.putString("userUid", userUid);
-                bundle.putString("articleUid", articleUid);
+                bundle.putInt("mode", 1); //1은 댓글모드, 0은 글작성모드
+                bundle.putString("userUid", userUid); //부모 게시글의 유저 아이디
+                bundle.putString("articleUid", articleUid); //부모 게시글의 게시글 아이디
+                //글 작성 프래그먼트를 띄움
                 CommunityDetailWrite cdw = new CommunityDetailWrite();
-                cdw.setArguments(bundle);
+                cdw.setArguments(bundle); //위에서 지정한 정보들 글 작성 프래그먼트로 전달
                 fm.beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
                         .add(R.id.container, cdw)
@@ -138,61 +157,48 @@ public class CommunityDetailView extends Fragment {
             }
         });
 
-        /*
-        LinearLayout.LayoutParams layoutScale = new LinearLayout.LayoutParams(
-                500, 500);
-        ImageView im = new ImageView(v.getContext());
-        im.setImageResource(R.drawable.dog);
-        im.setVisibility(View.VISIBLE);
-        im.setScaleType(ImageView.ScaleType.FIT_XY);
-        im.setLayoutParams(layoutScale);
-        ir.addView(im);
-        */
-
-        getPhotoes(gallary,inflater);
-
         return view;
     }
 
-    public void getPhotoes(FrameLayout gallary, LayoutInflater inflater){
+    //게시글 사진을 DB로부터 가져와서 표시함
+    //FrameLayout       gallary     : 이미지뷰를 포함한 프래그먼트가 담길 뷰
+    //LayoutInflater    inflater    : gallary에 프래그먼트를 붙이기 위한 인플레이터터
+    public void getPhotoes(FrameLayout gallary, LayoutInflater inflater) {
+        //사용할 DB 초기화
         communityDB = db.collection("community").document(userUid).collection("article").document(articleUid);
+
+        //#1 사진 경로를 구하기 위해 게시글 정보로 접근
         communityDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                ArrayList<String> photoAddr = (ArrayList<String>) task.getResult().get("photoAddr");
-                ArrayList<ImageView> imageViews = new ArrayList<>();
-                int photoNum = photoAddr.size();
-                View gView = null;
-
-                FirebaseStorage fbs = FirebaseStorage.getInstance();
-                StorageReference fbsRef = fbs.getReference();
+                //접근이 성공하면 게시글 정보에서 사진 경로를 구함
+                ArrayList<String> photoAddr = getArguments().getStringArrayList("images"); //사진 경로들이 담긴 배열
+                ArrayList<ImageView> imageViews = new ArrayList<>(); //사진이 담길 이미지뷰 배열
+                int photoNum = photoAddr.size(); //게시글의 사진 개수
+                View gView = null; //이미지 뷰가 포함된 프래그먼트
 
                 gallary.setVisibility(View.GONE);
-                if(photoNum==1){
+                if (photoNum == 1) {
                     gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x1, null);
                     imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x1_1));
 
-                    fbsRef.child(photoAddr.get(0)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    imageViews.get(0).setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(0)));
+                    //#2
+                    imageViews.get(0).setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onSuccess(Uri uri) {
-                            Glide.with(getContext().getApplicationContext()).load(uri).into(imageViews.get(0));
-                            imageViews.get(0).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    AlertDialog.Builder dialogbuider = new AlertDialog.Builder(getContext());
-                                    View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
-                                    dialogbuider.setView(dialogView);
-                                    ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                    Glide.with(getContext().getApplicationContext()).load(uri).into(im);
-                                    AlertDialog dialog = dialogbuider.create();
-                                    dialog.show();
-                                }
-                            });
-                            gallary.setVisibility(View.VISIBLE);
+                        public void onClick(View v) {
+                            AlertDialog.Builder dialogbuider = new AlertDialog.Builder(getContext());
+                            View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                            dialogbuider.setView(dialogView);
+                            ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                            im.setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(0)));
+                            AlertDialog dialog = dialogbuider.create();
+                            dialog.show();
                         }
                     });
+                    gallary.setVisibility(View.VISIBLE);
                     gallary.addView(gView);
-                }else {
+                } else {
                     if (photoNum == 2) {
                         gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x2, null);
                         imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x2_1));
@@ -215,25 +221,20 @@ public class CommunityDetailView extends Fragment {
 
                     for (int i = 0; i < photoNum; i++) {
                         int innerAI = i;
-                        fbsRef.child(photoAddr.get(i)).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        imageViews.get(i).setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(i)));
+                        imageViews.get(i).setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onSuccess(Uri uri) {
-                                Glide.with(getContext().getApplicationContext()).load(uri).into(imageViews.get(innerAI));
-                                imageViews.get(innerAI).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        AlertDialog.Builder dialogbuider = new AlertDialog.Builder(getContext());
-                                        View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
-                                        dialogbuider.setView(dialogView);
-                                        ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                        Glide.with(getContext().getApplicationContext()).load(uri).into(im);
-                                        AlertDialog dialog = dialogbuider.create();
-                                        dialog.show();
-                                    }
-                                });
-                                gallary.setVisibility(View.VISIBLE);
+                            public void onClick(View v) {
+                                AlertDialog.Builder dialogbuider = new AlertDialog.Builder(getContext());
+                                View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
+                                dialogbuider.setView(dialogView);
+                                ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
+                                im.setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(innerAI)));
+                                AlertDialog dialog = dialogbuider.create();
+                                dialog.show();
                             }
                         });
+                        gallary.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -312,6 +313,8 @@ public class CommunityDetailView extends Fragment {
         //게시글ID(docRef)->article->유저ID
         userUid = docRef.getParent().getParent().getId();
         usersDB = db.collection("users").document(userUid);
+        FirebaseStorage storageDB = FirebaseStorage.getInstance();
+        StorageReference storageRef = storageDB.getReference();
 
         //글이 중복으로 들어가면 안되기 때문에 우선 모든 글 제거 후 시작
         recyclerAdapter tmpAdapter = new recyclerAdapter();
@@ -333,7 +336,7 @@ public class CommunityDetailView extends Fragment {
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
                                             DocumentSnapshot result = task.getResult();
-                                            Log.wtf("e",task.getResult().getString("content"));
+                                            Log.wtf("e", task.getResult().getString("content"));
 
                                             recyclerClass tmpItem = new recyclerClass();
                                             tmpItem.setProfileImage(profileImage);
@@ -342,7 +345,33 @@ public class CommunityDetailView extends Fragment {
                                             tmpItem.setMyName(userName);
                                             tmpItem.setDogName("&" + dogName);
                                             tmpItem.setPhotoAddr((ArrayList<String>) result.get("photoAddr"));
+                                            tmpItem.setContentImage(new ArrayList<>());
 
+                                            if (!tmpItem.getPhotoAddr().isEmpty()) {
+                                                for (String i : tmpItem.getPhotoAddr()) {
+                                                    //이미지 파일 캐싱
+                                                    String fileName = String.valueOf(i.hashCode());
+                                                    File imageCache = new File(getContext().getCacheDir(), fileName + ".JPG");
+
+                                                    if (!imageCache.exists()) {
+                                                        //캐싱된 이미지가 아직 존재하지 않을 경우
+                                                        storageRef.child(i).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                            @Override
+                                                            public void onSuccess(Uri uri) {
+                                                                loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName);
+                                                                loadImage.execute();
+                                                            }
+                                                        });
+                                                    } else {
+                                                        File imageCacheList = new File(getContext().getCacheDir().toString());
+                                                        for (File j : imageCacheList.listFiles()) {
+                                                            if (j.getName().equals(fileName + ".JPG")) {
+                                                                tmpItem.addContentImage(j.getPath());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                             //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
                                             //여기서 addList함수의 getRecyclerClass가 실행됨
                                             inCall.getRecyclerClass(tmpItem);

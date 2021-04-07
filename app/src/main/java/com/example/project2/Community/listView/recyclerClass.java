@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.google.firebase.Timestamp;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class recyclerClass {
@@ -13,9 +14,22 @@ public class recyclerClass {
     private String userUid;
     private String articleUid;
     private ArrayList<String> photoAddr;
+    private ArrayList<String> contentImage;
     private String profileImage;
     private Timestamp upTime;
     private int likeNum;
+
+    public ArrayList<String> getContentImage() {
+        return contentImage;
+    }
+
+    public void setContentImage(ArrayList<String> contentImage) {
+        this.contentImage = contentImage;
+    }
+
+    public void addContentImage(String image){
+        this.contentImage.add(image);
+    }
 
     public String getProfileImage() {
         return profileImage;

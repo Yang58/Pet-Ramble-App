@@ -182,7 +182,7 @@ public class CommunityDetailView extends Fragment {
                     gView = inflater.inflate(R.layout.fragment_community_detail_gallary1x1, null);
                     imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x1_1));
 
-                    imageViews.get(0).setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(0)));
+                    Glide.with(getContext().getApplicationContext()).load(photoAddr.get(0)).dontTransform().into(imageViews.get(0));
                     //#2
                     imageViews.get(0).setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -191,7 +191,7 @@ public class CommunityDetailView extends Fragment {
                             View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
                             dialogbuider.setView(dialogView);
                             ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                            im.setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(0)));
+                            Glide.with(getContext().getApplicationContext()).load(photoAddr.get(0)).into(im);
                             AlertDialog dialog = dialogbuider.create();
                             dialog.show();
                         }
@@ -221,7 +221,7 @@ public class CommunityDetailView extends Fragment {
 
                     for (int i = 0; i < photoNum; i++) {
                         int innerAI = i;
-                        imageViews.get(i).setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(i)));
+                        Glide.with(getContext().getApplicationContext()).load(photoAddr.get(i)).into(imageViews.get(i));
                         imageViews.get(i).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -229,7 +229,7 @@ public class CommunityDetailView extends Fragment {
                                 View dialogView = inflater.inflate(R.layout.fragment_community_popup_image, null);
                                 dialogbuider.setView(dialogView);
                                 ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                im.setImageBitmap(BitmapFactory.decodeFile(photoAddr.get(innerAI)));
+                                Glide.with(getContext().getApplicationContext()).load(photoAddr.get(innerAI)).into(im);
                                 AlertDialog dialog = dialogbuider.create();
                                 dialog.show();
                             }
@@ -351,21 +351,30 @@ public class CommunityDetailView extends Fragment {
                                                 for (String i : tmpItem.getPhotoAddr()) {
                                                     //이미지 파일 캐싱
                                                     String fileName = String.valueOf(i.hashCode());
-                                                    File imageCache = new File(getContext().getCacheDir(), fileName + ".JPG");
+                                                    String fileType = null;
+                                                    if (i.contains(".jpg")) {
+                                                        fileType = ".JPG";
+                                                    } else if (i.contains(".png")) {
+                                                        fileType = ".PNG";
+                                                    } else if (i.contains(".gif")) {
+                                                        fileType = ".GIF";
+                                                    }
+                                                    File imageCache = new File(getContext().getCacheDir(), fileName + fileType);
 
                                                     if (!imageCache.exists()) {
                                                         //캐싱된 이미지가 아직 존재하지 않을 경우
+                                                        String innerFileType = fileType;
                                                         storageRef.child(i).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                                             @Override
                                                             public void onSuccess(Uri uri) {
-                                                                loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName);
+                                                                loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName, innerFileType);
                                                                 loadImage.execute();
                                                             }
                                                         });
                                                     } else {
                                                         File imageCacheList = new File(getContext().getCacheDir().toString());
                                                         for (File j : imageCacheList.listFiles()) {
-                                                            if (j.getName().equals(fileName + ".JPG")) {
+                                                            if (j.getName().equals(fileName + fileType)) {
                                                                 tmpItem.addContentImage(j.getPath());
                                                             }
                                                         }

@@ -331,22 +331,32 @@ public class CommunityMain extends Fragment {
                                                     for (String i : tmpItem.getPhotoAddr()) {
                                                         //이미지 파일 캐싱
                                                         String fileName = String.valueOf(i.hashCode());
-                                                        File imageCache = new File(getContext().getCacheDir(), fileName+".JPG");
+                                                        String fileType = null;
+                                                        if (i.contains(".jpg")) {
+                                                            fileType = ".JPG";
+                                                        } else if (i.contains(".png")) {
+                                                            fileType = ".PNG";
+                                                        } else if (i.contains(".gif")) {
+                                                            fileType = ".GIF";
+                                                        }
+                                                        File imageCache = new File(getContext().getCacheDir(), fileName+fileType);
 
                                                         if (!imageCache.exists()) {
                                                             //캐싱된 이미지가 아직 존재하지 않을 경우
+                                                            String innerFileType = fileType;
                                                             storageRef.child(i).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                                                 @Override
                                                                 public void onSuccess(Uri uri) {
-                                                                    loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName);
+                                                                    loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName, innerFileType);
                                                                     loadImage.execute();
                                                                 }
                                                             });
                                                         } else {
                                                             File imageCacheList = new File(getContext().getCacheDir().toString());
                                                             for (File j : imageCacheList.listFiles()) {
-                                                                if(j.getName().equals(fileName+".JPG")) {
+                                                                if(j.getName().equals(fileName+fileType)) {
                                                                     tmpItem.addContentImage(j.getPath());
+                                                                    Log.wtf("이미지 캐싱", j.getPath());
                                                                 }
                                                             }
                                                         }

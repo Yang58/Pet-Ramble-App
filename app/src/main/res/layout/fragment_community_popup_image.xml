@@ -9,10 +9,9 @@
 
     <ImageView
         android:id="@+id/cm_dialog_img_popup"
-        android:layout_width="wrap_content"
+        android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:src="@drawable/bsod" />
+        android:scaleType="fitCenter" />
 </FrameLayout>

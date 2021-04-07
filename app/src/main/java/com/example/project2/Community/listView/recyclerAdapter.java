@@ -159,7 +159,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                     imageViews.add(gView.findViewById(R.id.cm_detail_view_gallary_1x1_1));
 
                     if(!item.getContentImage().isEmpty()) {
-                        imageViews.get(0).setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(0)));
+                        Glide.with(itemView.getContext().getApplicationContext()).load(item.getContentImage().get(0)).dontTransform().into(imageViews.get(0));
                         //이미지 클릭시 확대되는 부분
                         imageViews.get(0).setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -170,7 +170,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                                 dialogbuider.setView(dialogView);
                                 //이미지가 보여지는 부분
                                 ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                im.setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(0)));
+                                Glide.with(itemView.getContext().getApplicationContext()).load(item.getContentImage().get(0)).into(im);
                                 AlertDialog dialog = dialogbuider.create();
                                 dialog.show();
                             }
@@ -238,7 +238,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                     for (int i = 0; i < photoNum; i++) {
                         int innerAI = i;
                         if(!item.getContentImage().isEmpty()) {
-                            imageViews.get(i).setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(i)));
+                            Glide.with(itemView.getContext().getApplicationContext()).load(item.getContentImage().get(i)).into(imageViews.get(i));
                             //이미지 클릭시 확대되는 부분
                             imageViews.get(i).setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -249,7 +249,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                                     dialogbuider.setView(dialogView);
                                     //이미지가 보여지는 부분
                                     ImageView im = dialogView.findViewById(R.id.cm_dialog_img_popup);
-                                    im.setImageBitmap(BitmapFactory.decodeFile(item.getContentImage().get(innerAI)));
+                                    Glide.with(itemView.getContext().getApplicationContext()).load(item.getContentImage().get(innerAI)).into(im);
                                     AlertDialog dialog = dialogbuider.create();
                                     dialog.show();
                                 }

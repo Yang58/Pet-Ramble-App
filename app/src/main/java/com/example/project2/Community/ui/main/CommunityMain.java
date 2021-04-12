@@ -1,6 +1,9 @@
 package com.example.project2.Community.ui.main;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,12 +23,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.project2.Community.functions.loadImage;
 import com.example.project2.Community.listView.recyclerAdapter;
 import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.Community.listView.recyclerOnItemClick;
 import com.example.project2.R;
 import com.example.project2.Community.listView.listViewAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,7 +42,18 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +76,7 @@ public class CommunityMain extends Fragment {
     private String mParam2;
     private DocumentReference communityDB;
     private DocumentReference usersDB;
+    private FirebaseStorage storageDB;
     private View view;
 
     //리스트의 값을 외부로 뽑기 위해서 사용
@@ -212,6 +230,8 @@ public class CommunityMain extends Fragment {
                     public void onComplete() {
                         //글이 하나도 없는지 체크
                         chkContentCount();
+                        //어댑터 업데이트
+                        adt.notifyDataSetChanged();
                         Log.i("정보","내 글 불러오기 완료");
                     }
                 });
@@ -241,13 +261,10 @@ public class CommunityMain extends Fragment {
                                         }
                                     }
                                 });
-                                Log.wtf("차례", result.get(i));
                             }
                         }catch(NullPointerException e){
                             //가림막 해제
                             listView.setVisibility(View.VISIBLE);
-                            //어댑터 업데이트
-                            adt.notifyDataSetChanged();
                             //새로고침 해제
                             refreshLayout.setRefreshing(false);
                             Log.wtf("경고",e.getMessage());
@@ -279,12 +296,8 @@ public class CommunityMain extends Fragment {
         //유저 UID 기반으로 각 컬렉션에 접근
         communityDB = db.collection("community").document(uid);
         usersDB = db.collection("users").document(uid);
-
-        //이 함수가 호출된 뒤 새로고침 중단 위해 참조
-        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
-
-        //글이 중복으로 들어가면 안되기 때문에 우선 모든 글 제거 후 시작
-        recyclerAdapter tmpAdapter = new recyclerAdapter();
+        storageDB = FirebaseStorage.getInstance();
+        StorageReference storageRef = storageDB.getReference();
 
         //이름 추출 이후 글 주출
         usersDB.get()
@@ -303,7 +316,7 @@ public class CommunityMain extends Fragment {
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         if (task.isSuccessful()) {
                                             for (QueryDocumentSnapshot result : task.getResult()) {
-                                                recyclerClass tmpItem = new recyclerClass();
+                                                final recyclerClass tmpItem = new recyclerClass();
                                                 tmpItem.setProfileImage(profileImage);
                                                 tmpItem.setContext(result.getString("content"));
                                                 tmpItem.setUpTime(result.getTimestamp("uptime"));
@@ -312,11 +325,48 @@ public class CommunityMain extends Fragment {
                                                 tmpItem.setUserUid(uid);
                                                 tmpItem.setArticleUid(result.getId());
                                                 tmpItem.setPhotoAddr((ArrayList<String>) result.get("photoAddr"));
+                                                tmpItem.setContentImage(new ArrayList<>());
+
+                                                if(!tmpItem.getPhotoAddr().isEmpty()) {
+                                                    for (String i : tmpItem.getPhotoAddr()) {
+                                                        //이미지 파일 캐싱
+                                                        String fileName = String.valueOf(i.hashCode());
+                                                        String fileType = null;
+                                                        if (i.contains(".jpg")) {
+                                                            fileType = ".JPG";
+                                                        } else if (i.contains(".png")) {
+                                                            fileType = ".PNG";
+                                                        } else if (i.contains(".gif")) {
+                                                            fileType = ".GIF";
+                                                        }
+                                                        File imageCache = new File(getContext().getCacheDir(), fileName+fileType);
+
+                                                        if (!imageCache.exists()) {
+                                                            //캐싱된 이미지가 아직 존재하지 않을 경우
+                                                            String innerFileType = fileType;
+                                                            storageRef.child(i).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                                @Override
+                                                                public void onSuccess(Uri uri) {
+                                                                    loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName, innerFileType);
+                                                                    loadImage.execute();
+                                                                }
+                                                            });
+                                                        } else {
+                                                            File imageCacheList = new File(getContext().getCacheDir().toString());
+                                                            for (File j : imageCacheList.listFiles()) {
+                                                                if(j.getName().equals(fileName+fileType)) {
+                                                                    tmpItem.addContentImage(j.getPath());
+                                                                    Log.wtf("이미지 캐싱", j.getPath());
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
 
                                                 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
                                                 //여기서 addList함수의 getRecyclerClass가 실행됨
                                                 inCall.getRecyclerClass(tmpItem);
-                                                tmpItem = null;
+                                                Log.wtf("상태", "완전완료");
                                             }
                                             outCall.onComplete();
                                         }
@@ -324,6 +374,15 @@ public class CommunityMain extends Fragment {
                                 });
                     }
                 });
+
+
+
+        File file = new File(getContext().getCacheDir().toString());
+        File[] files = file.listFiles();
+
+        for (File tempFile : files) {
+            Log.wtf("MyTag", tempFile.getName());
+        }
 
         //refreshLayout.setRefreshing(false);
     }
@@ -351,6 +410,7 @@ public class CommunityMain extends Fragment {
         bundle.putString("uptime", item.getUpTime().toString());
         bundle.putString("userUid", item.getUserUid());
         bundle.putString("articleUid", item.getArticleUid());
+        bundle.putStringArrayList("images", item.getContentImage());
         CommunityDetailView cdv = new CommunityDetailView();
         //다음 프래그먼트에 값 붙이기
         cdv.setArguments(bundle);

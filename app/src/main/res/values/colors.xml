@@ -16,4 +16,5 @@
     <color name="defaultBG">#FFFFFFFF</color>
     <color name="defaultText">#66000000</color>
     <color name="defaultButtonText">#FF000000</color>
+    <color name="imagePlaceholder">#D1D1D1</color>
 </resources>

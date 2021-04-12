@@ -52,8 +52,6 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
 
     private ImageView profile;
 
-    private FirebaseUser user;
-
     public static final String TAG_EVENT_DIALOG = "dialog_event";
 
     public MarkerClickPopup() {}

@@ -47,8 +47,7 @@ public class UserJoinActivity extends AppCompatActivity {
         btn_UserLogin.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                // 데이터 베이스 비교 후 아이디 생성 완료 되면 애완동물 정보 입력 액티비티 이동
-                Toast.makeText(UserJoinActivity.this,"로그인",Toast.LENGTH_SHORT).show();
+                // 로그인 화면으로 이동
                 Intent intent  = new Intent(getApplicationContext(),LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -115,3 +114,5 @@ public class UserJoinActivity extends AppCompatActivity {
     }
 
 }
+
+

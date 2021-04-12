@@ -22,8 +22,8 @@
     <string name="sns_title">주변 견주분들과 대화해보세요!</string>
     <string name="textview">TextView</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
+    <string name="menu_home">메인</string>
+    <string name="menu_setting">설정</string>
     <string name="menu_slideshow">Slideshow</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

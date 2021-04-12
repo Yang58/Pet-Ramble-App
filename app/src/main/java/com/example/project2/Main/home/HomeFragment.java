@@ -18,10 +18,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.project2.Community.ui.main.CommunityMain;
 import com.example.project2.GoogleMap.MapsFragment;
-import com.example.project2.Login_Membership.UserinfoActivity;
 import com.example.project2.Main.CustomAdapter;
 import com.example.project2.R;
 import com.example.project2.Setting.MyInfomationFragment;
+import com.example.project2.friend.FriendMainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -29,6 +29,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+
+import java.util.Stack;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -42,16 +44,17 @@ public class HomeFragment extends Fragment {
     Button btnCamera;
 
     FragmentManager FM;
-    Fragment lastFragment;
+    FragmentTransaction fragmentTransaction;
 
     CommunityMain fragment_Community;
     MapsFragment fragmentMap;
     MyInfomationFragment fragmentInfo;
 
+    public static Stack<Fragment> fragmentStack;
+
     ViewPager pager;
     CircleIndicator indicator;
 
-    FragmentTransaction fragmentTransaction;
 
 
     private HomeViewModel homeViewModel;
@@ -61,8 +64,6 @@ public class HomeFragment extends Fragment {
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
         View v = inflater.inflate(R.layout.fragment_home, container, false);
-
-        final Button btn_test = v.findViewById(R.id.test);
 
         pager = (ViewPager)v.findViewById(R.id.pager);
 
@@ -94,10 +95,12 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
         btnCamera = (Button)v.findViewById(R.id.action_camera);
         //프래그먼트는 뷰와 다르게 context를 매개변수로 넣어줄 필요가 없다.
         FM = getChildFragmentManager();
-        fragmentTransaction = getChildFragmentManager().beginTransaction();
+
+//        fragmentTransaction = getChildFragmentManager().beginTransaction();
         //지도
         Button buttonMap = v.findViewById(R.id.btn_Map);
         buttonMap.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +116,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        //커뮤니티
+//        //커뮤니티
         Button community = v.findViewById(R.id.btn_community);
         community.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,33 +131,18 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        //내정보
-        Button btn_set = v.findViewById(R.id.btn_Setting);
+        //친구 목록
+        Button btn_set = v.findViewById(R.id.btn_friend);
         btn_set.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                /*
-                if(fragmentInfo == null){
-                    fragmentInfo = new MyInfomationFragment();
-                    FM.beginTransaction().add(R.id.container,fragmentInfo).commit();
-                }
-                if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                if(fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                if(fragmentInfo != null) FM.beginTransaction().show(fragmentInfo).commit();
-                 */
-                Intent intent = new Intent(getContext().getApplicationContext(), UserinfoActivity.class);
+                Intent intent = new Intent(getContext(),FriendMainActivity.class);
                 startActivity(intent);
             }
         });
 
 
         return v;
-    }
-
-    private void UserCheck(){
-        // Firebase 회원정보
-
-
     }
 
 

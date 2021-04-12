@@ -2,7 +2,6 @@ package com.example.project2.Login_Membership;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,7 +19,7 @@ import androidx.loader.content.CursorLoader;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Data.DBHelper;
-import com.example.project2.Data.Userinfo;
+import com.example.project2.Data.User;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
 import com.google.android.gms.tasks.Continuation;
@@ -30,6 +29,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -54,12 +55,12 @@ public class UserinfoActivity extends AppCompatActivity {
     private EditText petKind;
     private EditText petName;
     private EditText Edit_name;
-    private EditText Edit_age;
+    private EditText Edit_birthday;
 
     private int GALLEY_CODE = 10;
-    private String imageUrl="";
+    Uri uri;
+    private String imageUrl;
 
-    int Image_pick = 0;
 
     DBHelper dbHelper;
 
@@ -69,22 +70,20 @@ public class UserinfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
 
-        Edit_name = (EditText)findViewById(R.id.edit_Name);
-        Edit_age = (EditText)findViewById(R.id.edit_Age);
+        user_profile = findViewById(R.id.profile_imageView);
 
-        petAge = (EditText)findViewById(R.id.edit_petAge);
+        Edit_name = (EditText)findViewById(R.id.edit_Name);
+        Edit_birthday = (EditText)findViewById(R.id.edit_birthday);
         petName = (EditText)findViewById(R.id.edit_petName);
+        petAge = (EditText)findViewById(R.id.edit_petAge);
         petKind = (EditText) findViewById(R.id.edit_petKind);
 
-        user_profile = findViewById(R.id.profile_imageView);
         user_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                 startActivityForResult(intent,GALLEY_CODE);
-                Image_pick ++;
-                Toast.makeText(getApplicationContext()," "+Image_pick,Toast.LENGTH_LONG).show();
             }
         });
 
@@ -99,7 +98,7 @@ public class UserinfoActivity extends AppCompatActivity {
         Check.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                if(Edit_name.length() > 0 && Edit_age.length() > 0){ // 회원 정보 입력
+                if(Edit_name.length() > 0 && Edit_birthday.length() > 0){ // 회원 정보 입력
                     if(petAge.length() > 0 && petName.length() > 0 && petKind != null ){
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
@@ -132,10 +131,10 @@ public class UserinfoActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == GALLEY_CODE)
+        if(requestCode == GALLEY_CODE && resultCode == RESULT_OK)
         {
             try {
+                uri = data.getData();
                 imageUrl = getRealPathFromUri(data.getData());
                 RequestOptions cropOptions = new RequestOptions();
                 Glide.with(getApplicationContext())
@@ -149,17 +148,15 @@ public class UserinfoActivity extends AppCompatActivity {
         }
     }
 
-
     private void profileUpdate() {
-
         String person_name = ((EditText) findViewById(R.id.edit_Name)).getText().toString();
-        String person_age = ((EditText) findViewById(R.id.edit_Age)).getText().toString();
+        String petBrithday = ((EditText) findViewById(R.id.edit_birthday)).getText().toString();
 
         String petName = ((EditText) findViewById(R.id.edit_petName)).getText().toString();
         String petAge = ((EditText) findViewById(R.id.edit_petAge)).getText().toString();
         String petKind = ((EditText) findViewById(R.id.edit_petKind)).getText().toString();
 
-        if (person_name.length() > 0 && person_age.length() > 0) {
+        if (person_name.length() > 0 && petBrithday.length() > 0) {
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
@@ -167,12 +164,16 @@ public class UserinfoActivity extends AppCompatActivity {
 
             StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
 
-            if (Image_pick == 0) {
-                Userinfo userinfo = new Userinfo(person_name, person_age, petName, petAge, petKind);
-                storeUploader(userinfo);
-                Log.d("log_test","1");
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference photo = database.getReference("friend").child(user.getUid()).child("photo");
+            DatabaseReference name = database.getReference("friend").child(user.getUid()).child("name");
 
-            } else if(Image_pick == 1){
+            if (uri == null) {
+                User userinfo = new User(person_name, petBrithday, petName, petAge, petKind,null);
+                photo.setValue(null);
+                name.setValue(person_name);
+                storeUploader(userinfo);
+            } else {
                 try {
                     InputStream stream = new FileInputStream(new File(imageUrl));
                     UploadTask uploadTask = mountainImagesRef.putStream(stream);
@@ -189,9 +190,12 @@ public class UserinfoActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Uri> task) {
                             if (task.isSuccessful()) {
                                 Uri downloadUri = task.getResult();
-                                Userinfo userinfo = new Userinfo (person_name, person_age, petName, petAge, petKind, downloadUri.toString());
+
+                                photo.setValue(downloadUri.toString());
+                                name.setValue(person_name);
+
+                                User userinfo = new User(person_name, petBrithday, petName, petAge, petKind, downloadUri.toString());
                                 storeUploader(userinfo);
-                                Log.d("log_test","2");
                             } else {
                                 Toast.makeText(UserinfoActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
                             }
@@ -206,7 +210,8 @@ public class UserinfoActivity extends AppCompatActivity {
         }
     }
 
-    private  void storeUploader(Userinfo userinfo){
+    private  void storeUploader(User userinfo){
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(user.getUid()).set(userinfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -225,23 +230,4 @@ public class UserinfoActivity extends AppCompatActivity {
                 });
     }
 
-    private void SQLupdate(){
-
-        SQLiteDatabase db;
-        String sql;
-
-        String person_name = ((EditText) findViewById(R.id.edit_Name)).getText().toString();
-        String person_age = ((EditText) findViewById(R.id.edit_Age)).getText().toString();
-
-        String petName = ((EditText) findViewById(R.id.edit_petName)).getText().toString();
-        String petAge = ((EditText) findViewById(R.id.edit_petAge)).getText().toString();
-        String petKind = (findViewById(R.id.edit_petKind)).toString();
-
-        db = dbHelper.getWritableDatabase();
-        sql = String.format("INSERT INTO info VALUES('"+person_name+"','"+person_age+"','"+petName+"','"+petAge+"','"+petKind+"',0);");
-
-        db.execSQL(sql);
-        Log.d(TAG,sql);
-
-    }
 }

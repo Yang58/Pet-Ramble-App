@@ -1,26 +1,24 @@
 package com.example.project2.Main;
 
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.project2.CalenderActivity;
 import com.example.project2.Camera.CameraActivity;
 import com.example.project2.Login_Membership.LoginActivity;
 import com.example.project2.Login_Membership.UserinfoActivity;
@@ -32,17 +30,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
+
     private static final String TAG = "MainActivity";
 
-    FragmentManager FM;
-    private long backKeyPressedTime = 0;
+    ImageView imageView;
+    Button button;
 
+    private long backKeyPressedTime = 0;
     final int GET_GALLERY_IMAGE = 200;
 
     @Override
@@ -55,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-        getSupportActionBar().setTitle("🦮");
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+//        getSupportActionBar().setTitle("🦮");
+//        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         // Firebase 회원정보
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -67,17 +65,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             FirebaseFirestore fbdb = FirebaseFirestore.getInstance();
             DocumentReference docRef = fbdb.collection("users").document(user.getUid());
-            ;
-
-            docRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-//                    petname.setText(value.getString("petName"));
-//                    petage.setText(value.getString("petAge"));
-//                    petkind.setText(value.getString("petKind"));
-                }
-            });
-
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -87,12 +74,10 @@ public class MainActivity extends AppCompatActivity {
                             if (document.exists()) {
                                 Log.d(TAG, "" + document.getId() +
                                         " data: " + document.getData());
-                                Log.i("log_test", "3");
                             } else {
-                                // 유저 uid에 정보가 없다면 정보 입력창 이동
+//                                 유저 uid에 정보가 없다면 정보 입력창 이동
                                 Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
                                 startActivity(intent);
-                                Log.i("log_test", "4");
                                 Log.d(TAG, "No such document");
                             }
                         }
@@ -102,16 +87,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-            // Passing each menu ID as a set of Ids because each
-            // menu should be considered as top level destinations.
-            mAppBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.nav_home)
-                    .setDrawerLayout(drawer)
-                    .build();
-//
-            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-            NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-            NavigationUI.setupWithNavController(navigationView, navController);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_home)
+                .setDrawerLayout(drawer)
+                .build();
+
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
 
         }
 
@@ -125,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onOptionsItemSelected (MenuItem item){
             int id = item.getItemId();
-
             if (id == R.id.action_search) {
                 Toast.makeText(this, "갤러리", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Intent.ACTION_PICK);
@@ -149,25 +132,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-            if (id == R.id.action_setting) {
-                Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
-                startActivity(intent);
-            }
             if (id == R.id.action_inquiry) {
                 Toast.makeText(this, "문의하기", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), InquiryActivity.class);
+                Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
                 startActivity(intent);
             }
             return super.onOptionsItemSelected(item);
         }
-
         @Override
         public boolean onSupportNavigateUp() {
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
             return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                     || super.onSupportNavigateUp();
         }
-
     }
 

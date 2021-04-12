@@ -1,4 +1,4 @@
-package com.example.project2;
+package com.example.project2.Main;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.project2.R;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

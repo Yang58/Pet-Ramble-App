@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,84 +12,88 @@
         android:layout_height="match_parent"
         android:name="com.google.android.gms.maps.MapFragment" />
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <Button
-            android:id="@+id/btn_start"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="bottom">
+
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="시작"/>
-        <Button
-            android:id="@+id/btn_finish"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text="종료"/>
-    </FrameLayout>
+            android:layout_height="wrap_content">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardtest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="15dp"
+                android:visibility="invisible"
+                app:cardCornerRadius="20dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardtest"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="15dp"
-            android:visibility="invisible"
-            app:cardCornerRadius="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:weightSum="10"
-                android:layout_margin="10dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <Chronometer
-                    android:id="@+id/chronometer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:format="시간 : %s"
-                    android:textColor="@android:color/black"
-                    android:textSize="20dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:layout_marginLeft="5dp"
-                    android:text="칼로리 : "
-                    android:textColor="@android:color/black"
-                    android:textSize="20dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:hint=" 00 "
-                    android:textColor="@android:color/black"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="10"
+                    android:layout_margin="10dp"
+                    android:layout_gravity="center"
                     android:gravity="center"
-                    android:textSize="20dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text=" kcal "
-                    android:textColor="@android:color/black"
-                    android:gravity="right"
-                    android:textSize="20dp"/>
+                    android:orientation="horizontal">
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    <Chronometer
+                        android:id="@+id/chronometer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:format="시간 : %s"
+                        android:textColor="@android:color/black"
+                        android:textSize="20dp"/>
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:layout_marginLeft="5dp"
+                        android:text="칼로리 : "
+                        android:textColor="@android:color/black"
+                        android:textSize="20dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:hint=" 00 "
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:textSize="20dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text=" kcal "
+                        android:textColor="@android:color/black"
+                        android:gravity="right"
+                        android:textSize="20dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
 
-    </FrameLayout>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp">
+            <Button
+                android:id="@+id/btn_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="시작"/>
+            <Button
+                android:id="@+id/btn_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="종료"/>
+        </FrameLayout>
 
-
+    </LinearLayout>
 
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.example.project2.Search;
+package com.example.project2.Main.Search;
 
 import android.content.Context;
 import android.os.Bundle;

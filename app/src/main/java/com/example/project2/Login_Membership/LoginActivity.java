@@ -63,6 +63,8 @@ public class LoginActivity extends AppCompatActivity {
         pw  = (EditText) findViewById(R.id.edit_Login_pw);
 
 
+
+
         getSupportActionBar().setTitle("AppName");
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -84,7 +86,6 @@ public class LoginActivity extends AppCompatActivity {
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
         });
-
 
         // 로그인 버튼 클릭  firebase 서버 이용해서 로그인 가능하게
         btn_login = (Button) findViewById(R.id.btn_login);
@@ -144,10 +145,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     }
-
     // Google ID Login
     private void firebaseAuthWithGoogle(String idToken) {
-
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -157,10 +156,9 @@ public class LoginActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Google Login 실패", Toast.LENGTH_SHORT).show();
                         } else {
-//                             Sign in success, update UI with the signed-in user's information 구글 로그인 성공
-                            UserinfoCheck();
+                            // Sign in success, update UI with the signed-in user's information 구글 로그인 성공
+//                            UserinfoCheck();
                             Toast.makeText(LoginActivity.this, "Google Login 성공", Toast.LENGTH_SHORT).show();
-
                         }
                     }
                 });
@@ -177,9 +175,7 @@ public class LoginActivity extends AppCompatActivity {
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-
                             if (task.isSuccessful()) {
-
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
@@ -204,7 +200,6 @@ public class LoginActivity extends AppCompatActivity {
     public void UserinfoCheck(){
         // Firebase 회원정보
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("users").document(user.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -214,14 +209,12 @@ public class LoginActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if(document != null){
                         if (document.exists()) {
-
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(intent);
-
                         } else {
                             Log.d(TAG, "No such document");
-                            Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), UserJoinActivity.class);
                             startActivity(intent);
                         }
                     }
@@ -231,6 +224,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public void onBackPressed(){
         super.onBackPressed();

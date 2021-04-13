@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Community.ui.main.CommunityMain;
 import com.example.project2.Friend.FriendMainActivity;
 import com.example.project2.GoogleMap.MapsFragment;
@@ -107,7 +108,8 @@ public class HomeFragment extends Fragment {
                     new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Glide.with(getContext()).load(uri).into(petImage);
+                            Glide.with(getContext()).load(uri).apply(new RequestOptions().circleCrop()).into(petImage);
+//                            Glide.with(getContext()).load(uri).into(petImage);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override

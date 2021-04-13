@@ -15,14 +15,12 @@ public class User {
     }
 
     public User(String person_name, String petBrithday, String petName, String petAge, String petKind, String photoUrl){
-
         this.person_name = person_name;
         this.petBrithday = petBrithday;
         this.petName = petName;
         this.petAge = petAge;
         this.petKind = petKind;
         this.photoUrl = photoUrl;
-
     }
 
 

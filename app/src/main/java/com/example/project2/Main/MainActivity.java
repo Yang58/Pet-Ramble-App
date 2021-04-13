@@ -25,6 +25,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Camera.CameraActivity;
 import com.example.project2.Login_Membership.LoginActivity;
 import com.example.project2.Login_Membership.UserinfoActivity;
@@ -93,7 +94,9 @@ public class MainActivity extends AppCompatActivity {
                                         new OnSuccessListener<Uri>() {
                                             @Override
                                             public void onSuccess(Uri uri) {
-                                                Glide.with(getApplicationContext()).load(uri).into(imageView);
+                                                Glide.with(getApplicationContext()).load(uri).apply(new RequestOptions().circleCrop()).into(imageView);
+
+//                                                Glide.with(getApplicationContext()).load(uri).into(imageView);
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                     @Override

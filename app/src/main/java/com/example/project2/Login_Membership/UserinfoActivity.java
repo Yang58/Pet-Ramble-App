@@ -167,13 +167,19 @@ public class UserinfoActivity extends AppCompatActivity {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference photo = database.getReference("friend").child(user.getUid()).child("photo");
             DatabaseReference name = database.getReference("friend").child(user.getUid()).child("name");
+            DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
+            DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
 
             if (uri == null) {
                 User userinfo = new User(person_name, petBrithday, petName, petAge, petKind,null);
                 photo.setValue(null);
                 name.setValue(person_name);
+                pet.setValue(petKind);
+                age.setValue(petAge);
                 storeUploader(userinfo);
+
             } else {
+
                 try {
                     InputStream stream = new FileInputStream(new File(imageUrl));
                     UploadTask uploadTask = mountainImagesRef.putStream(stream);
@@ -193,6 +199,8 @@ public class UserinfoActivity extends AppCompatActivity {
 
                                 photo.setValue(downloadUri.toString());
                                 name.setValue(person_name);
+                                pet.setValue(petKind);
+                                age.setValue(petAge);
 
                                 User userinfo = new User(person_name, petBrithday, petName, petAge, petKind, downloadUri.toString());
                                 storeUploader(userinfo);

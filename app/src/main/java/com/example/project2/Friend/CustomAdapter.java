@@ -1,4 +1,4 @@
-package com.example.project2.friend;
+package com.example.project2.Friend;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -46,9 +46,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 .into(((CustomViewHolder)holder).friend_profile);
 
         ((CustomViewHolder)holder).friend_Nickname.setText(arrayList.get(position).getName());
-        ((CustomViewHolder)holder).edit_pet.setText(arrayList.get(position).getpetKind());
-        ((CustomViewHolder)holder).edit_age.setText(arrayList.get(position).getpetAge());
-
+        holder.edit_pet.setText(arrayList.get(position).getpetKind());
+        holder.edit_age.setText(arrayList.get(position).getpetAge());
 
     }
 

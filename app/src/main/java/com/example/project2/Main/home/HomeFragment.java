@@ -1,27 +1,33 @@
 package com.example.project2.Main.home;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
 import com.example.project2.Community.ui.main.CommunityMain;
+import com.example.project2.Friend.FriendMainActivity;
 import com.example.project2.GoogleMap.MapsFragment;
 import com.example.project2.Main.CustomAdapter;
 import com.example.project2.R;
-import com.example.project2.Setting.MyInfomationFragment;
-import com.example.project2.friend.FriendMainActivity;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -29,14 +35,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-
-import java.util.Stack;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import me.relex.circleindicator.CircleIndicator;
 
 
 public class HomeFragment extends Fragment {
 
+    ImageView petImage;
     TextView petname ;
     TextView petage ;
     TextView petkind ;
@@ -44,18 +51,12 @@ public class HomeFragment extends Fragment {
     Button btnCamera;
 
     FragmentManager FM;
-    FragmentTransaction fragmentTransaction;
 
-    CommunityMain fragment_Community;
-    MapsFragment fragmentMap;
-    MyInfomationFragment fragmentInfo;
-
-    public static Stack<Fragment> fragmentStack;
+    private CommunityMain fragment_Community;
+    private MapsFragment fragmentMap;
 
     ViewPager pager;
     CircleIndicator indicator;
-
-
 
     private HomeViewModel homeViewModel;
 
@@ -70,6 +71,7 @@ public class HomeFragment extends Fragment {
         petname = v.findViewById(R.id.MPN);
         petage = v.findViewById(R.id.MPA);
         petkind = v.findViewById(R.id.MPK);
+        petImage = v.findViewById(R.id.home_img);
 
         //ViewPager에 설정할 Adapter 객체 생성
         //ListView에서 사용하는 Adapter와 같은 역할.
@@ -85,62 +87,72 @@ public class HomeFragment extends Fragment {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
-        DocumentReference docRef = FBdb.collection("users").document(user.getUid());
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                petname.setText(value.getString("petName"));
-                petage.setText(value.getString("petAge"));
-                petkind.setText(value.getString("petKind"));
-            }
-        });
 
+        if (user == null){
+            Log.e("HomeFragment","회원 정보 없음");
+        }else{
+            DocumentReference docRef = FBdb.collection("users").document(user.getUid());
+            docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                    petname.setText(value.getString("petName"));
+                    petage.setText(value.getString("petAge"));
+                    petkind.setText(value.getString("petKind"));
+                }
+            });
+
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReference();
+            storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
+                    new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Glide.with(getContext()).load(uri).into(petImage);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }
 
         btnCamera = (Button)v.findViewById(R.id.action_camera);
         //프래그먼트는 뷰와 다르게 context를 매개변수로 넣어줄 필요가 없다.
         FM = getChildFragmentManager();
 
-//        fragmentTransaction = getChildFragmentManager().beginTransaction();
-        //지도
-        Button buttonMap = v.findViewById(R.id.btn_Map);
-        buttonMap.setOnClickListener(new View.OnClickListener() {
+        BottomNavigationView bottomNavigationView = v.findViewById(R.id.home_nav);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                if(fragmentMap == null){
-                    fragmentMap = new MapsFragment();
-                    FM.beginTransaction().add(R.id.container,fragmentMap).commit();
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case (R.id.action_maps):
+                        if (fragmentMap == null) {
+                            fragmentMap = new MapsFragment();
+                            FM.beginTransaction().add(R.id.container, fragmentMap).commit();
+                        }
+                        if (fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
+                        if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
+                        break;
+
+                    case R.id.action_comm:
+                        if (fragment_Community == null) {
+                            fragment_Community = new CommunityMain();
+                            FM.beginTransaction().add(R.id.container, fragment_Community).commit();
+                        }
+                        if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
+                        if (fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
+                        break;
+
+                    case R.id.action_friend:
+                        Intent intent = new Intent(getContext(), FriendMainActivity.class);
+                        startActivity(intent);
+                        break;
                 }
-                if(fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
-                if(fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
+
+                return false;
             }
         });
-
-//        //커뮤니티
-        Button community = v.findViewById(R.id.btn_community);
-        community.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(fragment_Community == null){
-                    fragment_Community = new CommunityMain();
-                    FM.beginTransaction().add(R.id.container,fragment_Community).commit();
-                }
-                if(fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                if(fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
-                if(fragmentInfo != null) FM.beginTransaction().hide(fragmentInfo).commit();
-            }
-        });
-
-        //친구 목록
-        Button btn_set = v.findViewById(R.id.btn_friend);
-        btn_set.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Intent intent = new Intent(getContext(),FriendMainActivity.class);
-                startActivity(intent);
-            }
-        });
-
 
         return v;
     }

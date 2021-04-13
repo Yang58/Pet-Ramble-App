@@ -46,7 +46,7 @@
 
         <EditText
             android:id="@+id/edit_Login_pw"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="18"
             android:inputType="numberPassword"

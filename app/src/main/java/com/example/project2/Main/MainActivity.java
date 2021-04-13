@@ -1,13 +1,18 @@
 package com.example.project2.Main;
 
 import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,11 +24,14 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
 import com.example.project2.Camera.CameraActivity;
 import com.example.project2.Login_Membership.LoginActivity;
 import com.example.project2.Login_Membership.UserinfoActivity;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +39,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
@@ -38,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     ImageView imageView;
-    Button button;
+    TextView textViewEmail;
 
     private long backKeyPressedTime = 0;
     final int GET_GALLERY_IMAGE = 200;
@@ -52,13 +62,19 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+
+        imageView = headerView.findViewById(R.id.Drawer_image);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference();
 
 //        getSupportActionBar().setTitle("🦮");
 //        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         // Firebase 회원정보
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) { // 회원 정보가 없을시 로그인 화면이동
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
@@ -72,6 +88,25 @@ public class MainActivity extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if (document != null) {
                             if (document.exists()) {
+
+                                storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
+                                        new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                Glide.with(getApplicationContext()).load(uri).into(imageView);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+
+                                    }
+                                });
+
+                                imageView.setBackground(new ShapeDrawable(new OvalShape()));
+                                if(Build.VERSION.SDK_INT >= 21) {
+                                    imageView.setClipToOutline(true);
+                                }
+
                                 Log.d(TAG, "" + document.getId() +
                                         " data: " + document.getData());
                             } else {

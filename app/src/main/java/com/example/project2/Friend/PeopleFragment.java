@@ -1,4 +1,4 @@
-package com.example.project2.friend;
+package com.example.project2.Friend;
 
 import android.os.Bundle;
 import android.util.Log;

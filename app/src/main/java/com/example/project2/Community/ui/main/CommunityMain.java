@@ -350,6 +350,7 @@ public class CommunityMain extends Fragment {
                                                                 public void onSuccess(Uri uri) {
                                                                     loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName, innerFileType);
                                                                     loadImage.execute();
+                                                                    tmpItem.addContentImage(getContext().getCacheDir().toString()+"/"+fileName+innerFileType);
                                                                 }
                                                             });
                                                         } else {

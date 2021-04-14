@@ -144,7 +144,7 @@ public class CommunityDetailWrite extends Fragment {
             public void onClick(View vv) {
                 if (tField.getText().toString().length() != 0) {
                     uploadData upData = new uploadData(tField.getText().toString(), new Timestamp(System.currentTimeMillis()));
-                    if(!imgURL.isEmpty()) {
+                    if (!(imgURL == null)) {
                         upData.addPhotoAddr(imgURL);
                     }
 
@@ -225,10 +225,10 @@ public class CommunityDetailWrite extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==REQ_CODE) {
+        if (requestCode == REQ_CODE) {
             ImageView dpcover = view.findViewById(R.id.cm_main_img_cover_picture);
             dpcover.setImageURI(data.getData());
-            imgURL = "users/" + user.getUid() + "/community/" + com.google.firebase.Timestamp.now().hashCode()+".jpg";
+            imgURL = "users/" + user.getUid() + "/community/" + com.google.firebase.Timestamp.now().hashCode() + ".jpg";
             FirebaseStorage fbStorage = FirebaseStorage.getInstance();
             StorageReference storageReference = fbStorage.getReference();
             storageReference.child(imgURL).putFile(data.getData());

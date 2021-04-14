@@ -17,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +26,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.Community.listView.recyclerAdapter;
 import com.example.project2.Community.listView.recyclerClass;
+import com.example.project2.Community.listView.recyclerOnItemClick;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -178,6 +180,13 @@ public class CommunityDetailView extends Fragment {
             }
         });
 
+        adt.setOnItemClickListener(new recyclerOnItemClick() {
+            @Override
+            public void onClick(int position) {
+                recyclerClass item = adt.getItem(position);
+                showDetail(item);
+            }
+        });
 
         //댓글 목록 초기화
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -328,7 +337,6 @@ public class CommunityDetailView extends Fragment {
                                 getList(i, addList(), new CommunityMain.completeCallback() {
                                     @Override
                                     public void onComplete() {
-                                        progressBar.setVisibility(View.GONE);
                                     }
                                 });
                             }
@@ -349,8 +357,25 @@ public class CommunityDetailView extends Fragment {
             @Override
             public void getRecyclerClass(recyclerClass getItem) {
                 adt.addItem(getItem);
-                adt.sortItems();
-                adt.notifyDataSetChanged();
+
+                getRelatedList(getItem.getUserUid(), getItem.getArticleUid(), new getListCallback() {
+                    @Override
+                    public void get(ArrayList<DocumentReference> list) {
+                        if (list.size()==0) {
+                            ProgressBar progressBar = view.findViewById(R.id.cm_detail_view_pg_circle);
+                            adt.sortItems();
+                            adt.notifyDataSetChanged();
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        for (DocumentReference i : list) {
+                            getList(i, addList(), new CommunityMain.completeCallback() {
+                                @Override
+                                public void onComplete() {
+                                }
+                            });
+                        }
+                    }
+                });
             }
         };
         return callback;
@@ -384,14 +409,15 @@ public class CommunityDetailView extends Fragment {
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
                                             DocumentSnapshot result = task.getResult();
-                                            Log.wtf("e", task.getResult().getString("content"));
-
-                                            recyclerClass tmpItem = new recyclerClass();
+                                            final recyclerClass tmpItem = new recyclerClass();
                                             tmpItem.setProfileImage(profileImage);
                                             tmpItem.setContext(result.getString("content"));
                                             tmpItem.setUpTime(result.getTimestamp("uptime"));
                                             tmpItem.setMyName(userName);
                                             tmpItem.setDogName("&" + dogName);
+                                            tmpItem.setUserUid(userUid);
+                                            tmpItem.setArticleUid(result.getId());
+                                            tmpItem.setLikeNum(result.getLong("likeNum").intValue());
                                             tmpItem.setPhotoAddr((ArrayList<String>) result.get("photoAddr"));
                                             tmpItem.setContentImage(new ArrayList<>());
 
@@ -432,7 +458,6 @@ public class CommunityDetailView extends Fragment {
                                             //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
                                             //여기서 addList함수의 getRecyclerClass가 실행됨
                                             inCall.getRecyclerClass(tmpItem);
-                                            tmpItem = null;
                                         }
                                         outCall.onComplete();
                                     }
@@ -441,5 +466,29 @@ public class CommunityDetailView extends Fragment {
                 });
 
         //refreshLayout.setRefreshing(false);
+    }
+
+    public void showDetail(recyclerClass item) {
+        FragmentManager fm = getParentFragmentManager();
+        Fragment currentFragment = fm.findFragmentById(R.id.container);
+        //다음 프래그먼트로 넘길 값 지정
+        Bundle bundle = new Bundle();
+        bundle.putString("profileImage", item.getProfileImage());
+        bundle.putString("dogName", item.getDogName());
+        bundle.putString("userName", item.getMyName());
+        bundle.putString("context", item.getContext());
+        bundle.putString("uptime", item.getUpTime().toString());
+        bundle.putString("userUid", item.getUserUid());
+        bundle.putString("articleUid", item.getArticleUid());
+        bundle.putStringArrayList("images", item.getContentImage());
+        bundle.putInt("likeNum", item.getLikeNum());
+        CommunityDetailView cdv = new CommunityDetailView();
+        //다음 프래그먼트에 값 붙이기
+        cdv.setArguments(bundle);
+        fm.beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.container, cdv)
+                .addToBackStack("frag_communityMain")
+                .commit();
     }
 }

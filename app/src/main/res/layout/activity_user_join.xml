@@ -4,22 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_gravity="center"
     tools:context=".Login_Membership.UserJoinActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="100dp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:text="회원가입"
-        android:textSize="30dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="300dp"
+        android:layout_gravity="center"
         android:orientation="vertical">
+
 
         <EditText
             android:id="@+id/edit_id"
@@ -51,21 +46,32 @@
             android:hint="비밀번호 확인"/>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_SignUp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="회원가입"
-        android:textStyle="bold"
-        android:layout_margin="5dp"/>
 
-    <Button
-        android:id="@+id/btn_UserLogin"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="로그인창으로 이동"
-        android:textStyle="bold"
-        android:layout_margin="5dp"/>
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_SignUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="가입 완료 "
+            android:textStyle="bold"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:id="@+id/btn_UserLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="로그인창으로 이동"
+            android:textStyle="bold"
+            android:layout_margin="5dp"/>
+
+
+    </LinearLayout>
+
 
 
 

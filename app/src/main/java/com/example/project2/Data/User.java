@@ -1,34 +1,28 @@
 package com.example.project2.Data;
 
-public class Userinfo {
+public class User {
 
-    private String person_name;
-    private String person_age; // 강아지 생일로 변경
-    private String petName;
-    private String petAge;
-    private String petKind;
-    private String photoUrl;
+    public String person_name;
+    public String petBrithday; // 강아지 생일로 변경
+    public String petName;
+    public String petAge;
+    public String petKind;
+    public String photoUrl;
+    public String ID;
 
-    public Userinfo(String person_name, String person_age, String petName, String petAge, String petKind, String photoUrl){
+    public User(){
+        
+    }
 
+    public User(String person_name, String petBrithday, String petName, String petAge, String petKind, String photoUrl){
         this.person_name = person_name;
-        this.person_age = person_age;
+        this.petBrithday = petBrithday;
         this.petName = petName;
         this.petAge = petAge;
         this.petKind = petKind;
         this.photoUrl = photoUrl;
-
     }
 
-    public Userinfo(String person_name, String person_age, String petName, String petAge, String petKind){
-
-        this.person_name = person_name;
-        this.person_age = person_age;
-        this.petName = petName;
-        this.petAge = petAge;
-        this.petKind = petKind;
-
-    }
 
     public String getName(){
         return this.person_name;
@@ -38,12 +32,12 @@ public class Userinfo {
         this.person_name = person_name;
     }
 
-    public String getPerson_age(){
-        return this.person_age;
+    public String getPetBrithday(){
+        return this.petBrithday;
     }
 
-    public void setPerson_age(String person_age){
-        this.person_age = person_age;
+    public void setPetBrithday(String petBrithday){
+        this.petBrithday = petBrithday;
     }
 
     public String getpetName(){

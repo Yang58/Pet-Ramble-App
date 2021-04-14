@@ -1,9 +1,6 @@
 package com.example.project2.GoogleMap;
 
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -18,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -51,8 +49,6 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
     private TextView PetKind;
 
     private ImageView profile;
-
-    private FirebaseUser user;
 
     public static final String TAG_EVENT_DIALOG = "dialog_event";
 
@@ -103,7 +99,9 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
                 new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        Glide.with(getContext()).load(uri).into(profile);
+                        Glide.with(getContext()).load(uri).apply(new RequestOptions().circleCrop()).into(profile);
+
+//                        Glide.with(getContext()).load(uri).into(profile);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -113,10 +111,10 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
         });
 
         // 이미지뷰 원 형태로 변경
-        profile.setBackground(new ShapeDrawable(new OvalShape()));
-        if(Build.VERSION.SDK_INT >= 21) {
-            profile.setClipToOutline(true);
-        }
+//        profile.setBackground(new ShapeDrawable(new OvalShape()));
+//        if(Build.VERSION.SDK_INT >= 21) {
+//            profile.setClipToOutline(true);
+//        }
 
         btnexit = (Button)v.findViewById(R.id.btn_exit);
         btnexit.setOnClickListener(this);

@@ -19,26 +19,29 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Main.InquiryActivity"></activity>
-        <activity android:name=".CalenderActivity" />
-        <activity android:name=".GoogleMap.WalkFinishPopup"
-                  android:theme="@android:style/Theme.Dialog" />
-        <activity android:name=".Camera.MediaScanner"
+        <activity android:name=".Friend.ChattingFragment"></activity>
+        <activity android:name=".Chatting.MessageActivity" />
+        <activity android:name=".Main.InquiryActivity" />
+        <activity android:name=".Main.CalenderActivity" />
+        <activity
+            android:name=".GoogleMap.WalkFinishPopup"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".Camera.MediaScanner"
             tools:ignore="Instantiatable" />
-        <activity android:name=".Setting.MyInfomationFragment"
+        <activity
+            android:name=".Setting.MyInfomationFragment"
             tools:ignore="Instantiatable" />
         <activity android:name=".Login_Membership.ResetpasswordActivity" />
-        <activity android:name=".Login_Membership.UserinfoActivity" />
         <activity android:name=".Login_Membership.UserJoinActivity" />
-        <activity android:name=".GoogleMap.MarkerClickPopup" />
         <activity android:name=".Login_Membership.LoginActivity" />
+        <activity android:name=".Friend.FriendMainActivity" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB8NAN4VfMVsaboxOc9qtECUiulJMrH5nI" />
 
-        <activity android:name=".Community.CommunityFragment" />
-        <activity android:name=".Search.SearchFragment" />
-        <activity android:name=".GoogleMap.MapsFragment" />
+        <activity android:name=".Login_Membership.UserinfoActivity" />
         <activity android:name=".Camera.CameraActivity" />
         <activity
             android:name=".Main.MainActivity"

@@ -22,12 +22,11 @@
         android:textStyle="bold" />
 
 
-
         <ImageView
             android:id="@+id/profile_imageView"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            app:srcCompat="@android:drawable/star_big_on" />
+            app:srcCompat="@drawable/baseline_group_24" />
 
         <TextView
             android:layout_width="match_parent"
@@ -41,7 +40,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:orientation="horizontal">
         <LinearLayout
             android:layout_width="wrap_content"
@@ -63,13 +62,13 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edit_Age"
+                android:id="@+id/edit_birthday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:ems="8"
                 android:gravity="center"
-                android:hint="생년월일"
+                android:hint="애완동물 생일"
                 android:inputType="number"
                 android:textStyle="bold" />
 
@@ -127,6 +126,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="bottom"
         android:orientation="vertical">
 
         <Button

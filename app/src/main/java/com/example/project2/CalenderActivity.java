@@ -33,7 +33,7 @@ public class CalenderActivity extends AppCompatActivity {
         save_Btn=findViewById(R.id.save_Btn);
         del_Btn=findViewById(R.id.del_Btn);
         cha_Btn=findViewById(R.id.cha_Btn);
-        textView2=findViewById(R.id.textView2);
+        textView2=findViewById(R.id.cm_detail_view_txt_like);
         textView3=findViewById(R.id.textView3);
         contextEditText=findViewById(R.id.contextEditText);
 

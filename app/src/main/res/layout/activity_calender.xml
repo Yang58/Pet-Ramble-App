@@ -54,7 +54,7 @@
     <TextView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/textView2"
+        android:id="@+id/cm_detail_view_txt_like"
         app:layout_constraintTop_toTopOf="@+id/contextEditText"
         app:layout_constraintBottom_toBottomOf="@+id/contextEditText"
         app:layout_constraintEnd_toEndOf="parent"

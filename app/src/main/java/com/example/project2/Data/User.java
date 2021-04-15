@@ -11,7 +11,7 @@ public class User {
     public String ID;
 
     public User(){
-        
+
     }
 
     public User(String person_name, String petBrithday, String petName, String petAge, String petKind, String photoUrl){

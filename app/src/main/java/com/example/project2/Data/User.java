@@ -1,67 +1,46 @@
 package com.example.project2.Data;
 
+import com.google.firebase.database.DatabaseReference;
+
 public class User {
-
-    public String person_name;
-    public String petBrithday; // 강아지 생일로 변경
-    public String petName;
-    public String petAge;
-    public String petKind;
+    public String email;
+    public String nickname;
     public String photoUrl;
-    public String ID;
+    public String userid;
 
-    public User(){
 
-    }
+    public User(String email, String nickname, String userid, String photoUrl){
 
-    public User(String person_name, String petBrithday, String petName, String petAge, String petKind, String photoUrl){
-        this.person_name = person_name;
-        this.petBrithday = petBrithday;
-        this.petName = petName;
-        this.petAge = petAge;
-        this.petKind = petKind;
+        this.email = email;
+        this.nickname = nickname;
+        this.userid = userid;
         this.photoUrl = photoUrl;
     }
 
 
-    public String getName(){
-        return this.person_name;
+
+    public String getEmail(){
+        return this.email;
     }
 
-    public void setName(String person_name){
-        this.person_name = person_name;
+    public void setEmail(String email){
+        this.email = email;
     }
 
-    public String getPetBrithday(){
-        return this.petBrithday;
+    public String getNickname(){
+        return this.nickname;
     }
 
-    public void setPetBrithday(String petBrithday){
-        this.petBrithday = petBrithday;
+    public void setNickname(String nickname){
+        this.email = nickname;
     }
 
-    public String getpetName(){
-        return this.petName;
+    public String getUserid(){
+        return this.userid;
     }
 
-    public void setpetName(String petName){
-        this.petName = petName;
-    }
-
-    public String getpetAge(){
-        return this.petAge;
-    }
-
-    public void setpetAge(String petAge){
-        this.petAge = petAge;
-    }
-
-    public String getpetKind(){
-        return this.petKind;
-    }
-
-    public void setpetKind(String petKind){
-        this.petKind = petKind;
+    public void setUserid(String userid){
+        this.email = userid;
     }
 
     public String getPhotoUrl(){

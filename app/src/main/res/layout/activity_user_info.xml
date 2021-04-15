@@ -62,7 +62,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edit_birthday"
+                android:id="@+id/edit_petBirthday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
@@ -95,13 +95,13 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edit_petAge"
+                android:id="@+id/edit_petWeight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:ems="10"
                 android:gravity="center"
-                android:hint="나이"
+                android:hint="애완동물 몸무게"
                 android:inputType="number"
                 android:textStyle="bold" />
 
@@ -113,7 +113,7 @@
                 android:layout_margin="5dp"
                 android:ems="10"
                 android:gravity="center"
-                android:hint="종류"
+                android:hint="애완동물 견종"
                 android:inputType="text"
                 android:textStyle="bold" />
 

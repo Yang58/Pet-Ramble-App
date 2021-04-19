@@ -7,11 +7,9 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.project2.Data.ChattingData;
 import com.example.project2.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -33,11 +31,6 @@ public class MessageActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChattingData chattingData = new ChattingData();
-                chattingData.uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                chattingData.destinationUid = destination;
-
-                FirebaseDatabase.getInstance().getReference().child("chatroom").push().setValue(chattingData);
 
             }
         });

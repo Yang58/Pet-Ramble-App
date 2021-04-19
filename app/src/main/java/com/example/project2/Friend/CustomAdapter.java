@@ -22,11 +22,14 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     private ArrayList<User> arrayList;
     private Context context;
 
+
     public CustomAdapter(ArrayList<User> arrayList, Context context){
 
-        this.arrayList = arrayList;
+        this.arrayList = arrayList; // 수정
         this.context = context;
+
     }
+
 
     @NonNull
     @Override
@@ -40,15 +43,14 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
 
-        Glide.with(holder.itemView.getContext())
+        Glide.with(holder.itemView.getContext().getApplicationContext())
                 .load(arrayList.get(position).getPhotoUrl())
                 .apply(new RequestOptions().circleCrop())
                 .into(((CustomViewHolder)holder).friend_profile);
 
-        ((CustomViewHolder)holder).friend_Nickname.setText(arrayList.get(position).getName());
+        holder.friend_Nickname.setText(arrayList.get(position).getpetName());
         holder.edit_pet.setText(arrayList.get(position).getpetKind());
         holder.edit_age.setText(arrayList.get(position).getpetAge());
-
     }
 
     @Override
@@ -65,10 +67,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
-            friend_profile = (ImageView)itemView.findViewById(R.id.friend_item_image);
-            friend_Nickname = (TextView)itemView.findViewById(R.id.friend_item_text);
-            edit_pet = (TextView)itemView.findViewById(R.id.item_pet);
-            edit_age = (TextView)itemView.findViewById(R.id.item_age);
+            friend_profile = itemView.findViewById(R.id.friend_item_image);
+            friend_Nickname = itemView.findViewById(R.id.friend_item_text);
+            edit_pet = itemView.findViewById(R.id.item_pet);
+            edit_age = itemView.findViewById(R.id.item_age);
         }
     }
 

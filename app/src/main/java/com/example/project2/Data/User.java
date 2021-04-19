@@ -8,13 +8,13 @@ public class User {
     public String petAge;
     public String petKind;
     public String photoUrl;
-    public String ID;
 
     public User(){
         
     }
 
     public User(String person_name, String petBrithday, String petName, String petAge, String petKind, String photoUrl){
+        
         this.person_name = person_name;
         this.petBrithday = petBrithday;
         this.petName = petName;

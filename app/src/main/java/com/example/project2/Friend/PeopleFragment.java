@@ -35,6 +35,7 @@ public class PeopleFragment extends Fragment {
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,18 +47,26 @@ public class PeopleFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         arrayList = new ArrayList<>(); // User 객체 담을 리스드 (어뎁터 쪽으로 보냄)
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         database = FirebaseDatabase.getInstance();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         databaseReference = database.getReference("friend");
+//        databaseReference = database.getReference(user.getUid()).child("profile");
+//        databaseReference = database.getReference("Login_user").child(user.getUid()).child("Info").child("profile");
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot datasnapshot) {
                 // 데이터 베이스에서 데이터 받아오는 부분
-
-                arrayList.clear();
+                arrayList.clear(); // 수정
                 for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                    User userinfo = snapshot.getValue(User.class);
-                    arrayList.add(userinfo);
+                    User user = snapshot.getValue(User.class);
+                    arrayList.add(user);
+                    Log.i("FriendList","log_test 아아아아"+ user.getPhotoUrl()+"아아아아"+user.getName()+"아아아아아"+user.getpetAge()+"아아아아아"+user.getpetKind());
+//                    User user = snapshot.getValue(User.class);
+//                    arrayList.add(user);
+//                    Log.i("FriendList","log_test아아아아"+ user.getPhotoUrl()+"아아아아"+user.getName()+"아아아아아"+user.getpetAge()+"아아아아아"+user.getpetName());
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -67,10 +76,20 @@ public class PeopleFragment extends Fragment {
             }
         });
 
-        adapter = new CustomAdapter(arrayList, getContext().getApplicationContext());
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        DocumentReference docRef = db.collection("Login_user").document(user.getUid()).collection("Info").document("profile");
+//        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+//
+//                UserProfileDB user = new UserProfileDB(value.getString("profile_Uri"),value.getString("profile_petName"),value.getString("profile_petKind"),value.getString("profile_petAge"));
+//                profileDB.add(user);
+//            }
+//        });
+
+
+        adapter = new CustomAdapter(arrayList, getContext().getApplicationContext()); // 수정
         recyclerView.setAdapter(adapter);
-
-
 
         return v;
     }

@@ -21,6 +21,19 @@
         app:fabSize="auto"
         app:maxImageSize="30dp" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/cameraButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="80dp"
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:clickable="true"
+        android:src="@android:drawable/ic_menu_camera"
+        app:fabSize="auto"
+        app:maxImageSize="30dp" />
+
     <LinearLayout
         android:id="@+id/cm_detail_write_container_layout"
         android:layout_width="match_parent"
@@ -82,44 +95,25 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <LinearLayout
+            <EditText
+                android:id="@+id/naeyongField"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="232dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/defaultBG"
+                android:ems="10"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:textAlignment="viewStart" />
 
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/naeyongField"
-                    android:layout_width="match_parent"
-                    android:layout_height="312dp"
-                    android:ems="10"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine" />
-            </LinearLayout>
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:gravity="right|center_vertical"
-                android:orientation="horizontal">
-
-                <Space
-                    android:layout_width="141dp"
-                    android:layout_height="11dp"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
+                android:text="TextView"
+                android:textAlignment="textEnd"
+                android:textSize="20dp" />
 
         </LinearLayout>
     </LinearLayout>

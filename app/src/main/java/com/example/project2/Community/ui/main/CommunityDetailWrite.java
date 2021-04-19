@@ -1,8 +1,12 @@
 package com.example.project2.Community.ui.main;
 
+import android.content.ContentResolver;
 import android.content.Context;
-import android.hardware.input.InputManager;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,17 +14,16 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompatSideChannelService;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.project2.Community.DB.uploadData;
 import com.example.project2.R;
@@ -36,12 +39,18 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +70,8 @@ public class CommunityDetailWrite extends Fragment {
     private DocumentReference communityDB;
     private DocumentReference usersDB;
     private View view;
+    static final int REQ_CODE = 1;
+    private String imgURL;
 
     private String mParam1;
     private String mParam2;
@@ -103,6 +114,7 @@ public class CommunityDetailWrite extends Fragment {
         final TextView dpName = view.findViewById(R.id.cm_main_txt_name);
         final ImageView dpCover = view.findViewById(R.id.cm_main_img_cover_picture);
         final FloatingActionButton sndBtn = view.findViewById(R.id.sendButton);
+        final FloatingActionButton imgUpBtn = view.findViewById(R.id.cameraButton);
         final TextView tField = view.findViewById(R.id.naeyongField);
         final LinearLayout layout = view.findViewById(R.id.cm_detail_write_container_layout);
         final InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -114,7 +126,7 @@ public class CommunityDetailWrite extends Fragment {
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inputManager.hideSoftInputFromWindow(tField.getWindowToken(),0);
+                inputManager.hideSoftInputFromWindow(tField.getWindowToken(), 0);
             }
         });
 
@@ -132,6 +144,10 @@ public class CommunityDetailWrite extends Fragment {
             public void onClick(View vv) {
                 if (tField.getText().toString().length() != 0) {
                     uploadData upData = new uploadData(tField.getText().toString(), new Timestamp(System.currentTimeMillis()));
+                    if (!(imgURL == null)) {
+                        upData.addPhotoAddr(imgURL);
+                    }
+
                     //mode가 1이면 댓글 모드, 0이면 일반 글 작성 모드
                     if (getArguments().getInt("mode") == 1) {
                         //부모 게시글의 유저id와 게시글id
@@ -152,12 +168,12 @@ public class CommunityDetailWrite extends Fragment {
                                 //글쓰기 창 초기화 이후 목록으로 돌아가기
                             }
                         });
-                    }else{
+                    } else {
                         uploadContent(user, upData, new getCallback() {
                             @Override
                             public void get(DocumentReference d) {
                                 //글이 업로드 된 이후
-                                Log.i("글쓰기 완료",d.toString());
+                                Log.i("글쓰기 완료", d.toString());
                             }
                         });
                     }
@@ -166,12 +182,22 @@ public class CommunityDetailWrite extends Fragment {
                     FragmentManager fm = getParentFragmentManager();
                     fm.popBackStack();
                     //키보드 내리기
-                    inputManager.hideSoftInputFromWindow(tField.getWindowToken(),0);
+                    inputManager.hideSoftInputFromWindow(tField.getWindowToken(), 0);
                 } else {
                     Animation shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
                     tField.startAnimation(shake);
                     Toast.makeText(c, "적어도 한글자 이상은 적어야해요!", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        //사진 선택
+        imgUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+                startActivityForResult(intent, REQ_CODE);
             }
         });
 
@@ -194,6 +220,19 @@ public class CommunityDetailWrite extends Fragment {
                         Log.wtf("경고", e.getMessage());
                     }
                 });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_CODE) {
+            ImageView dpcover = view.findViewById(R.id.cm_main_img_cover_picture);
+            dpcover.setImageURI(data.getData());
+            imgURL = "users/" + user.getUid() + "/community/" + com.google.firebase.Timestamp.now().hashCode() + ".jpg";
+            FirebaseStorage fbStorage = FirebaseStorage.getInstance();
+            StorageReference storageReference = fbStorage.getReference();
+            storageReference.child(imgURL).putFile(data.getData());
+        }
     }
 
     @Override

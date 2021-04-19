@@ -78,4 +78,8 @@ public class uploadData{
     public void setPhotoAddr(List<String> photoAddr) {
         this.photoAddr = photoAddr;
     }
+
+    public void addPhotoAddr(String photoAddr) {
+        this.photoAddr.add(photoAddr);
+    }
 }

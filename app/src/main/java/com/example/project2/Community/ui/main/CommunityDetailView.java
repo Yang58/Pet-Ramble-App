@@ -1,7 +1,6 @@
 package com.example.project2.Community.ui.main;
 
 import android.app.AlertDialog;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -12,13 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,21 +26,27 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.Community.listView.recyclerAdapter;
 import com.example.project2.Community.listView.recyclerClass;
+import com.example.project2.Community.listView.recyclerOnItemClick;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -97,9 +102,10 @@ public class CommunityDetailView extends Fragment {
         view = inflater.inflate(R.layout.fragment_community_detail_view, container, false);
 
         //사용할 뷰 초기화
-        TextView idV = view.findViewById(R.id.cm_detail_txt_id); //펫 이름
-        TextView contextV = view.findViewById(R.id.cm_detail_txt_context); //글 내용
-        TextView nameV = view.findViewById(R.id.cm_detail_txt_name); //사용자 이름
+        TextView idTxt = view.findViewById(R.id.cm_detail_txt_id); //펫 이름
+        TextView contentTxt = view.findViewById(R.id.cm_detail_txt_context); //글 내용
+        TextView nameTxt = view.findViewById(R.id.cm_detail_txt_name); //사용자 이름
+        TextView likeBtn = view.findViewById(R.id.cm_detail_view_txt_like); //좋아요 버튼
         ImageView profile_imgV = view.findViewById(R.id.cm_detail_img_coverPhoto); //프로필 사진
         FrameLayout gallary = view.findViewById(R.id.cm_detail_container_gallary); //게시글 사진
         RecyclerView listView = view.findViewById(R.id.cm_detail_write_container_recyclerView); //댓글 목록
@@ -110,15 +116,17 @@ public class CommunityDetailView extends Fragment {
         String userName = getArguments().getString("userName"); //사용자 이름
         String context_ = getArguments().getString("context"); //글 내용
         String profile_img = getArguments().getString("profileImage"); //프로필 사진 경로
+        final int[] likeNum = {getArguments().getInt("likeNum")};
 
         userUid = getArguments().getString("userUid"); //부모 게시글 유저 아이디
         articleUid = getArguments().getString("articleUid"); //부모 게시글 게시글 아이디
 
         //부모 게시글의 정보들을 초기화
-        idV.setText(dogName); //펫 이름
-        nameV.setText(userName); //사용자 이름
-        contextV.setText(context_); //글 내용
+        idTxt.setText(dogName); //펫 이름
+        nameTxt.setText(userName); //사용자 이름
+        contentTxt.setText(context_); //글 내용
 
+        //부모 게시글의 사진 표시
         getPhotoes(gallary, inflater);
 
         //부모 게시글의 프로필 사진을 표시
@@ -130,6 +138,55 @@ public class CommunityDetailView extends Fragment {
                 .thumbnail(0.1f) //실제 사진의 10%크기만
                 .placeholder(new ColorDrawable(Color.parseColor("#D1D1D1"))) //로딩중일 때에 표시되는 임시 이미지
                 .into(profile_imgV);
+
+        //좋아요 개수가 1 이상일때 숫자 초기화
+        if (likeNum[0] > 0) {
+            likeBtn.setText("♡ " + likeNum[0]);
+        }
+
+        //좋아요 버튼 눌렀을 시에 +1 증가 다시 누르면 -1 감소
+        likeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CollectionReference likeDB = db.collection("community").document(user.getUid()).collection("likedArticle");
+                likeDB.document(articleUid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task1) {
+                        communityDB = db.collection("community").document(userUid).collection("article").document(articleUid);
+                        DocumentSnapshot result = task1.getResult();
+                        Date likedDate = result.getDate("likedDate");
+                        try {
+                            likedDate.getTime();
+                            communityDB.update("likeNum", --likeNum[0]).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task2) {
+                                    likeDB.document(articleUid).update("likedDate", FieldValue.delete());
+                                    likeBtn.setText("♡ " + likeNum[0]);
+                                }
+                            });
+                        } catch (Exception e) {
+                            communityDB.update("likeNum", ++likeNum[0]).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task2) {
+                                    HashMap<String, Timestamp> likeData = new HashMap<>();
+                                    likeData.put("likedDate", Timestamp.now());
+                                    likeDB.document(articleUid).set(likeData);
+                                    likeBtn.setText("♥ " + likeNum[0]);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+        adt.setOnItemClickListener(new recyclerOnItemClick() {
+            @Override
+            public void onClick(int position) {
+                recyclerClass item = adt.getItem(position);
+                showDetail(item);
+            }
+        });
 
         //댓글 목록 초기화
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -280,7 +337,6 @@ public class CommunityDetailView extends Fragment {
                                 getList(i, addList(), new CommunityMain.completeCallback() {
                                     @Override
                                     public void onComplete() {
-                                        progressBar.setVisibility(View.GONE);
                                     }
                                 });
                             }
@@ -301,8 +357,25 @@ public class CommunityDetailView extends Fragment {
             @Override
             public void getRecyclerClass(recyclerClass getItem) {
                 adt.addItem(getItem);
-                adt.sortItems();
-                adt.notifyDataSetChanged();
+
+                getRelatedList(getItem.getUserUid(), getItem.getArticleUid(), new getListCallback() {
+                    @Override
+                    public void get(ArrayList<DocumentReference> list) {
+                        if (list.size()==0) {
+                            ProgressBar progressBar = view.findViewById(R.id.cm_detail_view_pg_circle);
+                            adt.sortItems();
+                            adt.notifyDataSetChanged();
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        for (DocumentReference i : list) {
+                            getList(i, addList(), new CommunityMain.completeCallback() {
+                                @Override
+                                public void onComplete() {
+                                }
+                            });
+                        }
+                    }
+                });
             }
         };
         return callback;
@@ -336,14 +409,15 @@ public class CommunityDetailView extends Fragment {
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()) {
                                             DocumentSnapshot result = task.getResult();
-                                            Log.wtf("e", task.getResult().getString("content"));
-
-                                            recyclerClass tmpItem = new recyclerClass();
+                                            final recyclerClass tmpItem = new recyclerClass();
                                             tmpItem.setProfileImage(profileImage);
                                             tmpItem.setContext(result.getString("content"));
                                             tmpItem.setUpTime(result.getTimestamp("uptime"));
                                             tmpItem.setMyName(userName);
                                             tmpItem.setDogName("&" + dogName);
+                                            tmpItem.setUserUid(userUid);
+                                            tmpItem.setArticleUid(result.getId());
+                                            tmpItem.setLikeNum(result.getLong("likeNum").intValue());
                                             tmpItem.setPhotoAddr((ArrayList<String>) result.get("photoAddr"));
                                             tmpItem.setContentImage(new ArrayList<>());
 
@@ -384,7 +458,6 @@ public class CommunityDetailView extends Fragment {
                                             //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
                                             //여기서 addList함수의 getRecyclerClass가 실행됨
                                             inCall.getRecyclerClass(tmpItem);
-                                            tmpItem = null;
                                         }
                                         outCall.onComplete();
                                     }
@@ -393,5 +466,29 @@ public class CommunityDetailView extends Fragment {
                 });
 
         //refreshLayout.setRefreshing(false);
+    }
+
+    public void showDetail(recyclerClass item) {
+        FragmentManager fm = getParentFragmentManager();
+        Fragment currentFragment = fm.findFragmentById(R.id.container);
+        //다음 프래그먼트로 넘길 값 지정
+        Bundle bundle = new Bundle();
+        bundle.putString("profileImage", item.getProfileImage());
+        bundle.putString("dogName", item.getDogName());
+        bundle.putString("userName", item.getMyName());
+        bundle.putString("context", item.getContext());
+        bundle.putString("uptime", item.getUpTime().toString());
+        bundle.putString("userUid", item.getUserUid());
+        bundle.putString("articleUid", item.getArticleUid());
+        bundle.putStringArrayList("images", item.getContentImage());
+        bundle.putInt("likeNum", item.getLikeNum());
+        CommunityDetailView cdv = new CommunityDetailView();
+        //다음 프래그먼트에 값 붙이기
+        cdv.setArguments(bundle);
+        fm.beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.container, cdv)
+                .addToBackStack("frag_communityMain")
+                .commit();
     }
 }

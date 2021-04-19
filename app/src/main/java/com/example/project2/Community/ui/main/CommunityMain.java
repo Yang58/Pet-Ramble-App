@@ -324,6 +324,7 @@ public class CommunityMain extends Fragment {
                                                 tmpItem.setDogName("&" + dogName);
                                                 tmpItem.setUserUid(uid);
                                                 tmpItem.setArticleUid(result.getId());
+                                                tmpItem.setLikeNum(result.getLong("likeNum").intValue());
                                                 tmpItem.setPhotoAddr((ArrayList<String>) result.get("photoAddr"));
                                                 tmpItem.setContentImage(new ArrayList<>());
 
@@ -349,6 +350,7 @@ public class CommunityMain extends Fragment {
                                                                 public void onSuccess(Uri uri) {
                                                                     loadImage loadImage = new loadImage(getContext().getCacheDir(), uri.toString(), fileName, innerFileType);
                                                                     loadImage.execute();
+                                                                    tmpItem.addContentImage(getContext().getCacheDir().toString()+"/"+fileName+innerFileType);
                                                                 }
                                                             });
                                                         } else {
@@ -411,6 +413,7 @@ public class CommunityMain extends Fragment {
         bundle.putString("userUid", item.getUserUid());
         bundle.putString("articleUid", item.getArticleUid());
         bundle.putStringArrayList("images", item.getContentImage());
+        bundle.putInt("likeNum", item.getLikeNum());
         CommunityDetailView cdv = new CommunityDetailView();
         //다음 프래그먼트에 값 붙이기
         cdv.setArguments(bundle);

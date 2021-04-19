@@ -29,9 +29,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -39,6 +42,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> implements recyclerOnItemClick {
@@ -106,6 +111,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
         private TextView dogNameTxt;
         private TextView contextTxt;
         private TextView uptimeTxt;
+        private TextView likeBtn;
         private FrameLayout gallary;
 
         public viewHolder(@NonNull View itemView, recyclerOnItemClick listener) {
@@ -117,6 +123,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
             dogNameTxt = (TextView) itemView.findViewById(R.id.id_txt);
             contextTxt = (TextView) itemView.findViewById(R.id.context_txt);
             uptimeTxt = (TextView) itemView.findViewById(R.id.uptime);
+            likeBtn = (TextView) itemView.findViewById(R.id.cm_main_txt_like);
             gallary = (FrameLayout) itemView.findViewById(R.id.item_gallary_container);
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -149,6 +156,7 @@ public class recyclerAdapter extends Adapter<recyclerAdapter.viewHolder> impleme
                 }
             });
 
+            //이미지 표시
             try {
                 ArrayList<ImageView> imageViews = new ArrayList<>();
                 int photoNum = item.getPhotoAddrSize();

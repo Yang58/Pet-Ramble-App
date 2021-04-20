@@ -190,7 +190,7 @@ public class UserinfoActivity extends AppCompatActivity {
             DatabaseReference weight = database.getReference("friend").child(user.getUid()).child("weight");
 
             if (uri == null) {
-                com.google.firebase.firestore.auth.User userinfo = new com.google.firebase.firestore.auth.User(useremail, usernickname,userid,null);
+                com.example.project2.Data.User userinfo = new com.example.project2.Data.User(useremail, usernickname, userid, null);
 
                 email.setValue(useremail);
                 nick.setValue(usernickname);
@@ -229,7 +229,7 @@ public class UserinfoActivity extends AppCompatActivity {
                                 email.setValue(useremail);
                                 nick.setValue(usernickname);
 
-                                com.google.firebase.firestore.auth.User userinfo = new com.google.firebase.firestore.auth.User(useremail, usernickname,userid,downloadUrl.toString());
+                                com.example.project2.Data.User userinfo = new com.example.project2.Data.User(useremail, usernickname,userid,downloadUrl.toString());
 
                                 petname.setValue(petName);
                                 birthday.setValue(petBirthday);
@@ -256,7 +256,7 @@ public class UserinfoActivity extends AppCompatActivity {
     }
 
 
-    private void storeUploader(User userinfo, Pet petinfo){
+    private void storeUploader(com.example.project2.Data.User userinfo, Pet petinfo){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("user-data").document(user.getUid()).set(userinfo)

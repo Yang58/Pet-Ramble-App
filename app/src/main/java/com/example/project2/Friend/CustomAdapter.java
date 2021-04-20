@@ -45,10 +45,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 .apply(new RequestOptions().circleCrop())
                 .into(((CustomViewHolder)holder).friend_profile);
 
-        ((CustomViewHolder)holder).friend_Nickname.setText(arrayList.get(position).getName());
-        holder.edit_pet.setText(arrayList.get(position).getpetKind());
-        holder.edit_age.setText(arrayList.get(position).getpetAge());
-
+        holder.friend_Nickname.setText(arrayList.get(position).getName());
+        holder.edit_pet.setText(arrayList.get(position).getPetKind());
+        holder.edit_age.setText("( "+String.valueOf(arrayList.get(position).getPetAge()));
     }
 
     @Override
@@ -71,5 +70,4 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
             edit_age = (TextView)itemView.findViewById(R.id.item_age);
         }
     }
-
 }

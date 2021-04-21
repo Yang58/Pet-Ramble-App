@@ -62,9 +62,6 @@ public class LoginActivity extends AppCompatActivity {
         id = (EditText) findViewById(R.id.edit_Login_id);
         pw  = (EditText) findViewById(R.id.edit_Login_pw);
 
-
-
-
         getSupportActionBar().setTitle("AppName");
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -105,7 +102,6 @@ public class LoginActivity extends AppCompatActivity {
         btn_User.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 // 회원가입 버튼 클릭시 회원가입 액티비티 이동 회원가입 종료시 로그인 화면으로 돌아와서 로그인 가능하게 해야함
                 Intent intent = new Intent(getApplicationContext(), UserJoinActivity.class);
                 startActivity(intent);
@@ -141,7 +137,6 @@ public class LoginActivity extends AppCompatActivity {
 
             } catch (ApiException e) {
 
-                // Google Sign In failed, update UI appropriately
             }
         }
     }
@@ -156,8 +151,8 @@ public class LoginActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Google Login 실패", Toast.LENGTH_SHORT).show();
                         } else {
+                            UserUpload();
                             // Sign in success, update UI with the signed-in user's information 구글 로그인 성공
-//                            UserinfoCheck();
                             Toast.makeText(LoginActivity.this, "Google Login 성공", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -197,11 +192,13 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void UserinfoCheck(){
+    public void UserUpload(){
         // Firebase 회원정보
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("users").document(user.getUid());
+
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -209,6 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if(document != null){
                         if (document.exists()) {
+
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(intent);

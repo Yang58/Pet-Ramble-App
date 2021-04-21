@@ -11,12 +11,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.project2.FirebaseDB.UserLoginDB;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class UserJoinActivity extends AppCompatActivity {
 
@@ -80,13 +83,20 @@ public class UserJoinActivity extends AppCompatActivity {
 
                                 if (task.isSuccessful()) {
                                     // 회원가입 성공 시
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    UserLoginDB userLoginDB  = new UserLoginDB(email, user.getUid(),password);
+                                    FirebaseFirestore dbs = FirebaseFirestore.getInstance();
+                                    dbs.collection("Login_user").document(user.getUid()).set(userLoginDB).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("UserJoin","LoginDataUploadSuccess");
+                                        }
+                                    });
                                     Log.d(TAG, "CreateUser With Email : success");
                                     Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
                                     Toast.makeText(UserJoinActivity.this,"회원가입 성공 ",Toast.LENGTH_SHORT).show();
-                                    FirebaseUser user = mAuth.getCurrentUser();
                                     startActivity(intent);
                                 } else { // 회원가입 실패 시
-
                                     if(task.getException() != null){
                                         Log.d(TAG, "CreateUser With Email : failure", task.getException());
                                         Toast.makeText(UserJoinActivity.this,"회원가입 실패 ",Toast.LENGTH_SHORT).show();

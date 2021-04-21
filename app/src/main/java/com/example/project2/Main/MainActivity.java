@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -39,7 +40,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView imageView;
     TextView textViewEmail;
+    TextView textViewName;
 
     private long backKeyPressedTime = 0;
     final int GET_GALLERY_IMAGE = 200;
@@ -63,9 +67,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-        View headerView = navigationView.getHeaderView(0);
-
-        imageView = headerView.findViewById(R.id.Drawer_image);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -81,22 +82,50 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             FirebaseFirestore fbdb = FirebaseFirestore.getInstance();
-            DocumentReference docRef = fbdb.collection("users").document(user.getUid());
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+
+
+
+            DocumentReference docRef = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
+            // 변경 DB변경 완료 후 펫 정보로 변경
+
+
+
+            View headerView = navigationView.getHeaderView(0);
+            imageView = headerView.findViewById(R.id.Drawer_image);
+            textViewName = headerView.findViewById(R.id.Drawer_name);
+            textViewEmail = headerView.findViewById(R.id.Drawer_Email);
+
+            DocumentReference documentReference = fbdb.collection("Login_user").document(user.getUid());
+            documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                    textViewEmail.setText(value.getString("user_ID"));
+                    Log.d("MainActivity","User_ID : " + textViewEmail);
+                }
+            });
+
+            DocumentReference UserInfo = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+            UserInfo.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                    textViewName.setText(value.getString("user_name")+"님 안녕하세요");
+                    Log.d("MainActivity","User_ID : " + textViewEmail);
+                }
+            });
+
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() { // 유저 uid에 애견정보가 있다면 정보 출력
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document != null) {
                             if (document.exists()) {
-
                                 storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
                                         new OnSuccessListener<Uri>() {
                                             @Override
                                             public void onSuccess(Uri uri) {
                                                 Glide.with(getApplicationContext()).load(uri).apply(new RequestOptions().circleCrop()).into(imageView);
-
-//                                                Glide.with(getApplicationContext()).load(uri).into(imageView);
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                     @Override
@@ -113,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d(TAG, "" + document.getId() +
                                         " data: " + document.getData());
                             } else {
-//                                 유저 uid에 정보가 없다면 정보 입력창 이동
+//                                 유저 uid에 애견정보가 없다면 정보 입력창 이동
                                 Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
                                 startActivity(intent);
                                 Log.d(TAG, "No such document");

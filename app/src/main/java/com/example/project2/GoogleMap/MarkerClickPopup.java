@@ -81,9 +81,9 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 NickName.setText(value.getString("name"));
-               PetName.setText(value.getString("petName"));
-               PetAge.setText(value.getString("petAge"));
-               PetKind.setText(value.getString("petKind"));
+                PetName.setText(value.getString("petName"));
+                PetAge.setText(value.getString("petAge"));
+                PetKind.setText(value.getString("petKind"));
             }
         });
 

@@ -18,9 +18,9 @@ import androidx.loader.content.CursorLoader;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.project2.Data.DBHelper;
-import com.example.project2.Data.User;
-import com.example.project2.Data.Pet;
+import com.example.project2.FirebaseDB.MyPetDB;
+import com.example.project2.FirebaseDB.User;
+import com.example.project2.FirebaseDB.UserInfoDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
 import com.google.android.gms.tasks.Continuation;
@@ -33,7 +33,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -69,8 +68,6 @@ public class UserinfoActivity extends AppCompatActivity {
     Uri uri;
     private String imageUrl;
 
-    DBHelper dbHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -78,9 +75,9 @@ public class UserinfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_info);
 
         user_profile = findViewById(R.id.profile_imageView);
-        Edit_name = (EditText)findViewById(R.id.edit_Name);
+        Edit_name = (EditText)findViewById(R.id.edit_name);
 
-        petBirthday = (EditText)findViewById(R.id.edit_petBirthday);
+        petBirthday = (EditText)findViewById(R.id.edit_birthday);
         petWeight = (EditText) findViewById(R.id.edit_petWeight);
         petName = (EditText)findViewById(R.id.edit_petName);
         petKind = (EditText) findViewById(R.id.edit_petKind);
@@ -157,58 +154,47 @@ public class UserinfoActivity extends AppCompatActivity {
     }
 
     private void profileUpdate() {
-        String usernickname = ((EditText) findViewById(R.id.edit_Name)).getText().toString();
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String useremail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        String userName =  ((EditText) findViewById(R.id.edit_name)).getText().toString();
+        String userNickname = ((EditText) findViewById(R.id.edit_Nickname)).getText().toString();
+        String userPhoneNumber =((EditText)findViewById(R.id.edit_phoneNum)).getText().toString();
 
-        String petBirthday = ((EditText) findViewById(R.id.edit_petBirthday)).getText().toString();
         String petName = ((EditText) findViewById(R.id.edit_petName)).getText().toString();
+        String petBrithday = ((EditText) findViewById(R.id.edit_birthday)).getText().toString();
+        String petAge = ((EditText) findViewById(R.id.edit_petAge)).getText().toString();
         String petKind = ((EditText) findViewById(R.id.edit_petKind)).getText().toString();
-        String petWeight = ((EditText) findViewById(R.id.edit_petWeight)).getText().toString();
+        String petWeight = ((EditText)findViewById(R.id.edit_petWeight)).getText().toString();
 
-
-        Log.d("로그", userid);
-        Log.d("로그", useremail);
-
-        if (usernickname.length() > 0 && petBirthday.length() > 0) {
+        if (userNickname.length() > 0 && petBrithday.length() > 0) {
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
             user = FirebaseAuth.getInstance().getCurrentUser();
 
-            StorageReference mountainImagesRef = storageRef.child("user-data/" + user.getUid() + "/profileImage.jpg");
+            StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-            DatabaseReference nick = database.getReference("friend").child(user.getUid()).child("nickname");
-            DatabaseReference email = database.getReference("friend").child(user.getUid()).child("email");
-            DatabaseReference uid = database.getReference("friend").child(user.getUid()).child("userid");
             DatabaseReference photo = database.getReference("friend").child(user.getUid()).child("photo");
+            DatabaseReference name = database.getReference("friend").child(user.getUid()).child("name");
+            DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
+            DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
 
-            DatabaseReference petname = database.getReference("friend").child(user.getUid()).child("petname");
-            DatabaseReference birthday = database.getReference("friend").child(user.getUid()).child("birthday");
-            DatabaseReference kind = database.getReference("friend").child(user.getUid()).child("kind");
-            DatabaseReference weight = database.getReference("friend").child(user.getUid()).child("weight");
+            MyPetDB myPetDB = new MyPetDB(petName,petBrithday,petAge,petKind,petWeight);
 
             if (uri == null) {
-                User userinfo = new User(useremail, usernickname,userid,null);
+                User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind,null);
+                UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,null,userPhoneNumber);
 
-                email.setValue(useremail);
-                nick.setValue(usernickname);
-                uid.setValue(userid);
                 photo.setValue(null);
+                name.setValue(userNickname);
+                pet.setValue(petKind);
+                age.setValue(petAge);
 
-                Pet petinfo = new Pet(petName,petBirthday,petKind,petWeight);
+                Petinfouploader(myPetDB);
+                UserinfoUploader(userInfoDB);
 
-                petname.setValue(petName);
-                birthday.setValue(petBirthday);
-                kind.setValue(petKind);
-                weight.setValue(petWeight);
-
-                storeUploader(userinfo,petinfo);
+                UserProfileUploader(userinfo);
 
             } else {
-
                 try {
                     InputStream stream = new FileInputStream(new File(imageUrl));
                     UploadTask uploadTask = mountainImagesRef.putStream(stream);
@@ -224,26 +210,22 @@ public class UserinfoActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Uri> task) {
                             if (task.isSuccessful()) {
-                                Uri downloadUrl = task.getResult();
+                                Uri downloadUri = task.getResult();
 
-                                photo.setValue(downloadUrl.toString());
-                                email.setValue(useremail);
-                                nick.setValue(usernickname);
+                                photo.setValue(downloadUri.toString());
+                                name.setValue(userNickname);
+                                pet.setValue(petKind);
+                                age.setValue(petAge);
 
-                                User userinfo = new User(useremail, usernickname,userid,downloadUrl.toString());
+                                UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,downloadUri.toString(),userPhoneNumber);
+                                User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind, downloadUri.toString());
+                                MyPetDB myPetDB = new MyPetDB(petName,petBrithday,petAge,petKind,petWeight);
 
-                                petname.setValue(petName);
-                                birthday.setValue(petBirthday);
-                                kind.setValue(petKind);
-                                weight.setValue(petWeight);
-
-                                Pet petinfo = new Pet(petName,petBirthday,petKind,petWeight);
-                                
-                                storeUploader(userinfo,petinfo);
-
+                                UserinfoUploader(userInfoDB);
+                                Petinfouploader(myPetDB);
+                                UserProfileUploader(userinfo);
                             } else {
                                 Toast.makeText(UserinfoActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
-
                             }
                         }
                     });
@@ -256,14 +238,14 @@ public class UserinfoActivity extends AppCompatActivity {
         }
     }
 
-
-    private void storeUploader(User userinfo, Pet petinfo){
+    private  void UserinfoUploader(UserInfoDB userDB){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("user-data").document(user.getUid()).set(userinfo)
+        db.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo").set(userDB)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "User Info Success");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -273,7 +255,30 @@ public class UserinfoActivity extends AppCompatActivity {
                         Log.w(TAG, "Error",e);
                     }
                 });
-        db.collection("user-data").document(user.getUid()).collection("pet").document(user.getUid()).set(petinfo)
+    }
+
+    private void Petinfouploader(MyPetDB myPetDB){
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").set(myPetDB)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Pet info Success");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(UserinfoActivity.this, "회원 정보 등록실패 (다시 시도해주세요!!) ", Toast.LENGTH_LONG).show();
+                        Log.w(TAG, "Error",e);
+                    }
+                });
+    }
+    private  void UserProfileUploader(User userprofile){
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(user.getUid()).set(userprofile)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

@@ -18,7 +18,6 @@ import androidx.loader.content.CursorLoader;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.project2.FirebaseDB.DBHelper;
 import com.example.project2.FirebaseDB.MyPetDB;
 import com.example.project2.FirebaseDB.User;
 import com.example.project2.FirebaseDB.UserInfoDB;
@@ -43,29 +42,31 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-public class UserinfoActivity extends AppCompatActivity {
+/* TO-DO list
+    1.petBirthday date형식으로 바꾸기.
+    2.적절한 주석 추가.
+    3.더 필요한 데이터 추가해야 할지도 모름.
+    4.데이터 많아지면 유저&애완동물 페이지를 분리해야할 가능성도 있음.
+ */
 
+public class UserinfoActivity extends AppCompatActivity {
     private static final String TAG = "UserinfoActivity";
 
     private Button Check;
-
     ImageView user_profile;
 
     private FirebaseUser user;
 
-    private EditText UserName;
-    private EditText petAge;
+    private EditText Edit_name;
+
+    private EditText petBirthday;
+    private EditText petWeight;
     private EditText petKind;
     private EditText petName;
-    private EditText Edit_name;
-    private EditText Edit_birthday;
 
     private int GALLEY_CODE = 10;
     Uri uri;
     private String imageUrl;
-
-
-    DBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +75,11 @@ public class UserinfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_info);
 
         user_profile = findViewById(R.id.profile_imageView);
+        Edit_name = (EditText)findViewById(R.id.edit_name);
 
-        UserName = (EditText)findViewById(R.id.edit_name);
-        Edit_name = (EditText)findViewById(R.id.edit_Nickname);
-        Edit_birthday = (EditText)findViewById(R.id.edit_birthday);
+        petBirthday = (EditText)findViewById(R.id.edit_birthday);
+        petWeight = (EditText) findViewById(R.id.edit_petWeight);
         petName = (EditText)findViewById(R.id.edit_petName);
-        petAge = (EditText)findViewById(R.id.edit_petAge);
         petKind = (EditText) findViewById(R.id.edit_petKind);
 
         user_profile.setOnClickListener(new View.OnClickListener() {
@@ -102,8 +102,8 @@ public class UserinfoActivity extends AppCompatActivity {
         Check.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                if(Edit_name.length() > 0 && Edit_birthday.length() > 0){ // 회원 정보 입력
-                    if(petAge.length() > 0 && petName.length() > 0 && petKind != null ){
+                if(Edit_name.length() > 0 ){ // 회원 정보 입력
+                    if(petBirthday.length() > 0 && petName.length() > 0 && petKind != null && petWeight.length() > 0){
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
                         profileUpdate();
@@ -112,11 +112,12 @@ public class UserinfoActivity extends AppCompatActivity {
                         Toast.makeText(UserinfoActivity.this,"애완동물 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    Toast.makeText(UserinfoActivity.this,"회원 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserinfoActivity.this,"별명을 입력해주세요.",Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
+
     //갤러리에서 넘어온 사진의 절대경로를 구한다.
     private String getRealPathFromUri(Uri uri)
     {
@@ -188,10 +189,9 @@ public class UserinfoActivity extends AppCompatActivity {
                 pet.setValue(petKind);
                 age.setValue(petAge);
 
-                Toast.makeText(this,"프로필 사진이 없습니다. ",Toast.LENGTH_SHORT).show();
-
                 Petinfouploader(myPetDB);
                 UserinfoUploader(userInfoDB);
+
                 UserProfileUploader(userinfo);
 
             } else {
@@ -296,3 +296,4 @@ public class UserinfoActivity extends AppCompatActivity {
     }
 
 }
+

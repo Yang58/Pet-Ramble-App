@@ -19,7 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Friend.ChattingFragment"></activity>
+        <activity android:name=".Friend.ChattingFragment"
+            tools:ignore="Instantiatable" />
         <activity android:name=".Chatting.MessageActivity" />
         <activity android:name=".Main.InquiryActivity" />
         <activity android:name=".Main.CalenderActivity" />
@@ -36,12 +37,10 @@
         <activity android:name=".Login_Membership.UserJoinActivity" />
         <activity android:name=".Login_Membership.LoginActivity" />
         <activity android:name=".Friend.FriendMainActivity" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB8NAN4VfMVsaboxOc9qtECUiulJMrH5nI" />
 
-        <activity android:name=".Login_Membership.UserinfoActivity" />
         <activity android:name=".Camera.CameraActivity" />
         <activity
             android:name=".Main.MainActivity"
@@ -49,11 +48,10 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".Login_Membership.UserinfoActivity" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.project2"

@@ -45,10 +45,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 .apply(new RequestOptions().circleCrop())
                 .into(((CustomViewHolder)holder).friend_profile);
 
-        ((CustomViewHolder)holder).friend_Nickname.setText(arrayList.get(position).getName());
-        holder.edit_pet.setText(arrayList.get(position).getpetKind());
+        ((CustomViewHolder)holder).friend_Nickname.setText(arrayList.get(position).getNickname());
+        /* 이거 무슨 역할을 하는건지 모르겠어서 일단 주석처리함.
+        holder.edit_pet.setText(arrayList.get(position).getpetKind();
         holder.edit_age.setText(arrayList.get(position).getpetAge());
-
+        */
     }
 
     @Override

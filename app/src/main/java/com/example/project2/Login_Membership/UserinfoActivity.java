@@ -19,6 +19,7 @@ import androidx.loader.content.CursorLoader;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Data.DBHelper;
+import com.example.project2.Data.User;
 import com.example.project2.Data.Pet;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
@@ -32,7 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -190,7 +191,7 @@ public class UserinfoActivity extends AppCompatActivity {
             DatabaseReference weight = database.getReference("friend").child(user.getUid()).child("weight");
 
             if (uri == null) {
-                com.google.firebase.firestore.auth.User userinfo = new com.google.firebase.firestore.auth.User(useremail, usernickname,userid,null);
+                User userinfo = new User(useremail, usernickname,userid,null);
 
                 email.setValue(useremail);
                 nick.setValue(usernickname);
@@ -229,7 +230,7 @@ public class UserinfoActivity extends AppCompatActivity {
                                 email.setValue(useremail);
                                 nick.setValue(usernickname);
 
-                                com.google.firebase.firestore.auth.User userinfo = new com.google.firebase.firestore.auth.User(useremail, usernickname,userid,downloadUrl.toString());
+                                User userinfo = new User(useremail, usernickname,userid,downloadUrl.toString());
 
                                 petname.setValue(petName);
                                 birthday.setValue(petBirthday);

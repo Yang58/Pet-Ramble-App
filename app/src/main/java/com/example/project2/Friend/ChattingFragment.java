@@ -14,7 +14,7 @@ import com.example.project2.R;
 public class ChattingFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.activity_chatting,container,false);
+        View v = inflater.inflate(R.layout.activity_start,container,false);
 
         return v;
     }

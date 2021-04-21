@@ -1,6 +1,5 @@
 package com.example.project2.Data;
 
-import com.google.firebase.database.DatabaseReference;
 
 public class User {
     public String email;
@@ -15,6 +14,10 @@ public class User {
         this.nickname = nickname;
         this.userid = userid;
         this.photoUrl = photoUrl;
+    }
+
+    public User(){
+
     }
 
 

@@ -13,6 +13,10 @@ public class Pet {
         this.petWeight = petWeight;
     }
 
+    public Pet(){
+
+    }
+
     public String getPetBirthday(){
         return this.petBirthday;
     }

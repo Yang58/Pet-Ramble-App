@@ -37,7 +37,7 @@ public class FriendMainActivity extends AppCompatActivity {
                         peopleFragment = new PeopleFragment();
                         FM.beginTransaction().replace(R.id.friend_frameLayout,peopleFragment).commit();
                         break;
-                    case R.id.action_chat:
+                    case (R.id.action_chat):
                         chattingFragment = new ChattingFragment();
                         FM.beginTransaction().replace(R.id.friend_frameLayout, chattingFragment).commit();
                         break;

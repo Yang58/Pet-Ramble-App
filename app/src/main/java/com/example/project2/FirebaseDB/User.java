@@ -1,4 +1,4 @@
-package com.example.project2.Data;
+package com.example.project2.FirebaseDB;
 
 public class User {
 
@@ -9,9 +9,7 @@ public class User {
     public String petKind;
     public String photoUrl;
 
-    public User(){
-        
-    }
+    public User(){}
 
     public User(String person_name, String petBrithday, String petName, String petAge, String petKind, String photoUrl){
         

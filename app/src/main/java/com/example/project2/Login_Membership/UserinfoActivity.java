@@ -18,10 +18,10 @@ import androidx.loader.content.CursorLoader;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.project2.Data.DBHelper;
-import com.example.project2.Data.MyPetDB;
-import com.example.project2.Data.User;
-import com.example.project2.Data.UserInfoDB;
+import com.example.project2.FirebaseDB.DBHelper;
+import com.example.project2.FirebaseDB.MyPetDB;
+import com.example.project2.FirebaseDB.User;
+import com.example.project2.FirebaseDB.UserInfoDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
 import com.google.android.gms.tasks.Continuation;
@@ -188,9 +188,10 @@ public class UserinfoActivity extends AppCompatActivity {
                 pet.setValue(petKind);
                 age.setValue(petAge);
 
+                Toast.makeText(this,"프로필 사진이 없습니다. ",Toast.LENGTH_SHORT).show();
+
                 Petinfouploader(myPetDB);
                 UserinfoUploader(userInfoDB);
-
                 UserProfileUploader(userinfo);
 
             } else {

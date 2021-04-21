@@ -1,4 +1,4 @@
-package com.example.project2.Data;
+package com.example.project2.FirebaseDB;
 
 public class MyPetDB {
     public String petBrithday;

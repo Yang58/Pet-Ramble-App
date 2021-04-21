@@ -1,4 +1,4 @@
-package com.example.project2.Data;
+package com.example.project2.FirebaseDB;
 
 public class Pet {
     public String petBirthday; // 강아지 생일로 변경

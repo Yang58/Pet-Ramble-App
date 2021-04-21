@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.project2.Data.User;
+import com.example.project2.FirebaseDB.User;
 import com.example.project2.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -49,9 +49,8 @@ public class PeopleFragment extends Fragment {
 
 
         database = FirebaseDatabase.getInstance();
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        databaseReference = database.getReference("friend");
+        FirebaseUser  user = FirebaseAuth.getInstance().getCurrentUser();
+        databaseReference = database.getReference(user.getUid());
 //        databaseReference = database.getReference(user.getUid()).child("profile");
 //        databaseReference = database.getReference("Login_user").child(user.getUid()).child("Info").child("profile");
 
@@ -63,6 +62,7 @@ public class PeopleFragment extends Fragment {
                 for(DataSnapshot snapshot : datasnapshot.getChildren()){
                     User user = snapshot.getValue(User.class);
                     arrayList.add(user);
+
                     Log.i("FriendList","log_test 아아아아"+ user.getPhotoUrl()+"아아아아"+user.getName()+"아아아아아"+user.getpetAge()+"아아아아아"+user.getpetKind());
 //                    User user = snapshot.getValue(User.class);
 //                    arrayList.add(user);

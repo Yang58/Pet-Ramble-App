@@ -1,4 +1,4 @@
-package com.example.project2.Data;
+package com.example.project2.FirebaseDB;
 
 public class UserInfoDB {
     public String user_name;

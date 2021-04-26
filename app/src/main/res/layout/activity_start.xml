@@ -27,22 +27,21 @@
                 android:text="채팅방 입장 또는 새로 만들기"
                 android:layout_marginBottom="20dp"
                 android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/welcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"/>
+
             <EditText
                 android:id="@+id/user_chat"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:hint="CHAT NAME"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_marginBottom="20dp"/>
-
-            <EditText
-                android:id="@+id/user_edit"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="USER NAME"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:layout_marginBottom="20dp"/>

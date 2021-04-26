@@ -22,6 +22,8 @@
         <activity android:name=".Friend.ChattingFragment"
             tools:ignore="Instantiatable" />
         <activity android:name=".Chatting.MessageActivity" />
+        <activity android:name=".Chatting.StartActivity" />
+        <activity android:name=".Chatting.ChatActivity" />
         <activity android:name=".Main.InquiryActivity" />
         <activity android:name=".Main.CalenderActivity" />
         <activity

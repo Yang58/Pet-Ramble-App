@@ -12,10 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.project2.Data.User;
+import com.example.project2.FirebaseDB.User;
 import com.example.project2.R;
 
 import java.util.ArrayList;
+
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomViewHolder> {
 
@@ -45,7 +46,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 .apply(new RequestOptions().circleCrop())
                 .into(((CustomViewHolder)holder).friend_profile);
 
-        ((CustomViewHolder)holder).friend_Nickname.setText(arrayList.get(position).getNickname());
+        ((CustomViewHolder)holder).friend_Nickname.setText(arrayList.get(position).getName());
         /* 이거 무슨 역할을 하는건지 모르겠어서 일단 주석처리함.
         holder.edit_pet.setText(arrayList.get(position).getpetKind();
         holder.edit_age.setText(arrayList.get(position).getpetAge());

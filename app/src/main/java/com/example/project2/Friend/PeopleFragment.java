@@ -61,6 +61,7 @@ public class PeopleFragment extends Fragment {
                 arrayList.clear(); // 수정
                 for(DataSnapshot snapshot : datasnapshot.getChildren()){
                     User user = snapshot.getValue(User.class);
+                    Log.wtf("asdf",snapshot.getValue(User.class).person_name);
                     arrayList.add(user);
 
                     Log.i("FriendList","log_test 아아아아"+ user.getPhotoUrl()+"아아아아"+user.getName()+"아아아아아"+user.getpetAge()+"아아아아아"+user.getpetKind());

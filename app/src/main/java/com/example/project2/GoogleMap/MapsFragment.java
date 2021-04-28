@@ -232,6 +232,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mChr.start();
             //위치정보 업데이트 시작
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, loListener);
+            //백그라운드 서비스 시작
+            Intent bgService = new Intent(mContext, LocationBackground.class);
+            mContext.startService(bgService);
         } else {
             ct.setVisibility(View.GONE); // 안보이기
             st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
@@ -247,6 +250,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mChr.stop();
             //위치정보 업데이트 중단
             lm.removeUpdates(loListener);
+            Intent bgService = new Intent(mContext, LocationBackground.class);
+            mContext.stopService(bgService);
 
             Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
             intent.putExtra("sec", String.valueOf(sec));
@@ -503,8 +508,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         super.onStop();
         mapView.onStop();
         if (mFusedLocationProviderClient != null) {
-            Log.d(TAG, "onStop : removeLocationUpdates");
-            mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
+            //Log.d(TAG, "onStop : removeLocationUpdates");
+            //mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
         }
     }
 

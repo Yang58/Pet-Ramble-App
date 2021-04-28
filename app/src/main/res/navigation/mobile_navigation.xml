@@ -11,4 +11,10 @@
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
+    <fragment
+        android:id="@+id/nav_Setting"
+        android:name="com.example.project2.Main.Setting.SettingFragment"
+        android:label="@string/menu_setting"
+        tools:layout="@layout/fragment_Setting" />
+
 </navigation>

@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -178,7 +180,19 @@ public class UserinfoActivity extends AppCompatActivity {
             DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
             DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
 
-            MyPetDB myPetDB = new MyPetDB(petName,petBrithday,petAge,petKind,petWeight);
+            RadioGroup genderGroup = findViewById(R.id.genderGroup);
+            RadioGroup NeutralizationGroup = findViewById(R.id.NeutralizationGroup);
+            RadioGroup VaccinationGroup = findViewById(R.id.VaccinationGroup);
+
+            int Gender = genderGroup.getCheckedRadioButtonId();
+            int Neutralization = NeutralizationGroup.getCheckedRadioButtonId();
+            int Vaccination = VaccinationGroup.getCheckedRadioButtonId();
+
+            RadioButton GenderCheck = findViewById(Gender);
+            RadioButton NeutralizationCheck = findViewById(Neutralization);
+            RadioButton VaccinationCheck = findViewById(Vaccination);
+
+            MyPetDB myPetDB = new MyPetDB(petName,petBrithday,petAge,petKind,petWeight,GenderCheck.getText().toString(),NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
 
             if (uri == null) {
                 User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind,null);
@@ -191,7 +205,6 @@ public class UserinfoActivity extends AppCompatActivity {
 
                 Petinfouploader(myPetDB);
                 UserinfoUploader(userInfoDB);
-
                 UserProfileUploader(userinfo);
 
             } else {
@@ -219,7 +232,6 @@ public class UserinfoActivity extends AppCompatActivity {
 
                                 UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,downloadUri.toString(),userPhoneNumber);
                                 User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind, downloadUri.toString());
-                                MyPetDB myPetDB = new MyPetDB(petName,petBrithday,petAge,petKind,petWeight);
 
                                 UserinfoUploader(userInfoDB);
                                 Petinfouploader(myPetDB);
@@ -258,7 +270,6 @@ public class UserinfoActivity extends AppCompatActivity {
     }
 
     private void Petinfouploader(MyPetDB myPetDB){
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").set(myPetDB)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

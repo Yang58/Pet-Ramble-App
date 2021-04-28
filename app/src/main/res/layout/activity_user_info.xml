@@ -228,6 +228,7 @@
                   </RelativeLayout>
 
                   <RadioGroup
+                      android:id="@+id/genderGroup"
                       android:layout_width="0dp"
                       android:layout_weight="2"
                       android:layout_height="wrap_content"
@@ -235,14 +236,14 @@
                       android:orientation="horizontal">
 
                       <RadioButton
-                          android:id="@+id/RB_Gtrue"
+                          android:id="@+id/gender1"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_centerInParent="true"
                           android:text="남아"/>
 
                       <RadioButton
-                          android:id="@+id/RB_Gfalse"
+                          android:id="@+id/gender2"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_toRightOf="@+id/RB_Gtrue"
@@ -275,6 +276,7 @@
                     </RelativeLayout>
 
                     <RadioGroup
+                        android:id="@+id/NeutralizationGroup"
                         android:layout_width="0dp"
                         android:layout_weight="2"
                         android:layout_height="wrap_content"
@@ -282,14 +284,14 @@
                         android:orientation="horizontal">
 
                         <RadioButton
-                            android:id="@+id/RB_Ntrue"
+                            android:id="@+id/NeutralizationGroup1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:text="예"/>
 
                         <RadioButton
-                            android:id="@+id/RB_Nfalse"
+                            android:id="@+id/NeutralizationGroup2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toRightOf="@+id/RB_Ntrue"
@@ -322,6 +324,7 @@
                     </RelativeLayout>
 
                     <RadioGroup
+                        android:id="@+id/VaccinationGroup"
                         android:layout_width="0dp"
                         android:layout_weight="2"
                         android:layout_height="wrap_content"
@@ -329,14 +332,14 @@
                         android:orientation="horizontal">
 
                         <RadioButton
-                            android:id="@+id/RB_Vtrue"
+                            android:id="@+id/VaccinationGroup1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:text="예"/>
 
                         <RadioButton
-                            android:id="@+id/RB_Vfalse"
+                            android:id="@+id/VaccinationGroup2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toRightOf="@+id/RB_Vtrue"

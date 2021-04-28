@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Toast;
 
@@ -49,10 +48,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -123,8 +128,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
         final View layout = inflater.inflate(R.layout.activity_maps_fragment, container, false);
 
-        final Button st = (Button) layout.findViewById(R.id.btn_start); //시작
-        final Button fi = (Button) layout.findViewById(R.id.btn_finish); //종료
+        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton)layout.findViewById(R.id.btn_start); //시작
+        final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) layout.findViewById(R.id.btn_finish); //종료
 
         mChr = (Chronometer) layout.findViewById(R.id.chronometer);
 
@@ -199,8 +204,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         final CardView ct = view.findViewById(R.id.cardtest);
-        final Button st = (Button) view.findViewById(R.id.btn_start); //시작
-        final Button fi = (Button) view.findViewById(R.id.btn_finish); //종료
+        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) view.findViewById(R.id.btn_start); //시작
+        final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) view.findViewById(R.id.btn_finish); //종료
 
         isWalkStart = b;
 
@@ -387,16 +392,30 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 LatLng currentPosition
                         = new LatLng(location.getLatitude(), location.getLongitude());
 
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
+                DocumentReference docRef = FBdb.collection("users").document(user.getUid());
+                docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                String markerTitle = getCurrentAddress(currentPosition);
-                String markerSnippet = "위도:" + String.valueOf(location.getLatitude())
-                        + " 경도:" + String.valueOf(location.getLongitude());
+                        String markerSnippet = "애견 이름 : " + value.getString("petName")
+                                + "    견종 : " + value.getString("petKind")+ "    나 이 : " + value.getString("petAge") + " 살 ";
+                        String markerTitle = getCurrentAddress(currentPosition);
 
-                Log.d(TAG, "Time :" + CurrentTime() + " onLocationResult : " + markerSnippet);
+                        Log.d(TAG, "Time :" + CurrentTime() + " onLocationResult : " + markerSnippet);
 
-                //현재 위치에 마커 생성하고 이동
-                setCurrentLocation(location, markerTitle, markerSnippet);
-                mCurrentLocatiion = location;
+                        //현재 위치에 마커 생성하고 이동
+                        setCurrentLocation(location, markerTitle, markerSnippet);
+                        mCurrentLocatiion = location;
+
+                    }
+                });
+
+//                String markerSnippet = "위도 : " + String.valueOf(location.getLatitude())
+//                        + " 경도:" + String.valueOf(location.getLongitude());
+
+
             }
         }
 

@@ -47,12 +47,18 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -60,8 +66,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.io.IOException;
+import java.nio.file.attribute.AclEntryPermission;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -95,6 +105,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
     private LatLng startPoint = null;
     private LatLng endPoint = null;
+
+    //다른 사람 위치 표시
+    private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
+    private static ArrayList<Polyline> otherLinesSaved = new ArrayList<>();
 
     Chronometer mChr;
 
@@ -156,14 +170,60 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         return layout;
     }
 
+    //타 사용자 위치 표시
+    public void showOtherLocation(){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference ref = database.getReference().child("mapData");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot d : snapshot.getChildren()){
+                    //다른 사람의 UID
+                    String otherUID = d.getKey();
+                    //나를 제외한 다른 사람의 위치 변경이 감지되었을 경우
+                    if(otherUID.equals(user.getUid())) continue;
+                    //데이터를 가져온다
+                    HashMap<String, HashMap<String, Object>> value = (HashMap<String, HashMap<String, Object>>) d.getValue();
+                    //시작 좌표
+                    float startLat = Float.valueOf(value.get("start").get("latitude").toString());
+                    float startLng = Float.valueOf(value.get("start").get("longitude").toString());
+                    LatLng startPos = new LatLng(startLat, startLng);
+                    //도착 좌표
+                    float endLat = Float.valueOf(value.get("end").get("latitude").toString());
+                    float endLng = Float.valueOf(value.get("end").get("longitude").toString());
+                    LatLng endPos = new LatLng(endLat, endLng);
+
+                    //선 추가
+                    PolylineOptions line = new PolylineOptions().add(startPos,endPos).clickable(true).color(Color.RED).width(20);
+                    try {
+                        otherLines.get(otherUID).add(line);
+                    }catch (NullPointerException e){
+                        otherLines.put(otherUID, new ArrayList<>());
+                        otherLines.get(otherUID).add(line);
+                    }
+                    for(PolylineOptions l : otherLines.get(otherUID)){
+                        otherLinesSaved.add(mMap.addPolyline(l));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     //위치정보 업데이트 처리 객체
     public LocationListener loListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            DatabaseReference startRef = database.getReference().child(user.getUid()).child("mapData").child("start");
-            DatabaseReference endRef = database.getReference().child(user.getUid()).child("mapData").child("end");
+            DatabaseReference startRef = database.getReference().child("mapData").child(user.getUid()).child("start");
+            DatabaseReference endRef = database.getReference().child("mapData").child(user.getUid()).child("end");
 
             startPoint = new LatLng(location.getLatitude(), location.getLongitude());
             if (endPoint == null)
@@ -172,13 +232,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             startRef.setValue(startPoint);
             endRef.setValue(endPoint);
             //선 그리기
-            PolylineOptions line = new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN);
+            PolylineOptions line = new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN).width(20);
             //움직이는동안 마커 일단 지우기
             currentMarker.remove();
             //카메라 부드럽게 중앙으로 이동
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(endPoint, 18));
             mMap.addPolyline(line);
             endPoint = startPoint;
+            //다른사람 위치 표시
+            showOtherLocation();
 
             Log.wtf("위치", startPoint.toString() + "+" + endPoint.toString());
         }
@@ -234,7 +296,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, loListener);
             //백그라운드 서비스 시작
             Intent bgService = new Intent(mContext, LocationBackground.class);
-            mContext.startService(bgService);
+//            mContext.startService(bgService);
         } else {
             ct.setVisibility(View.GONE); // 안보이기
             st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
@@ -252,6 +314,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             lm.removeUpdates(loListener);
             Intent bgService = new Intent(mContext, LocationBackground.class);
             mContext.stopService(bgService);
+            //다른 사람 선 다 지우기
+            for(Polyline p : otherLinesSaved){
+                p.remove();
+            }
 
             Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
             intent.putExtra("sec", String.valueOf(sec));

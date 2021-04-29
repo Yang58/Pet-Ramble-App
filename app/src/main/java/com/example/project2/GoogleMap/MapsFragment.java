@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -42,6 +43,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -109,6 +111,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
     private static ArrayList<Polyline> otherLinesSaved = new ArrayList<>();
+    private static HashMap<String, Marker> otherMarker = new HashMap<>();
 
     Chronometer mChr;
 
@@ -203,8 +206,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                         otherLines.put(otherUID, new ArrayList<>());
                         otherLines.get(otherUID).add(line);
                     }
-                    for(PolylineOptions l : otherLines.get(otherUID)){
-                        otherLinesSaved.add(mMap.addPolyline(l));
+                    otherLinesSaved.add(mMap.addPolyline(otherLines.get(otherUID).get(otherLines.get(otherUID).size()-1)));
+
+                    //마커 추가
+                    MarkerOptions marker = new MarkerOptions();
+                    marker.position(endPos);
+                    marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.loading3));
+                    try {
+                        otherMarker.get(otherUID).remove();
+                        otherMarker.put(otherUID, mMap.addMarker(marker));
+                    }catch(NullPointerException e) {
+                        otherMarker.put(otherUID, mMap.addMarker(marker));
                     }
                 }
             }
@@ -224,6 +236,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             DatabaseReference startRef = database.getReference().child("mapData").child(user.getUid()).child("start");
             DatabaseReference endRef = database.getReference().child("mapData").child(user.getUid()).child("end");
+//            DatabaseReference startRef = database.getReference().child("mapData").child("asaldfhulaw12u31312").child("start");
+//            DatabaseReference endRef = database.getReference().child("mapData").child("asaldfhulaw12u31312").child("end");
 
             startPoint = new LatLng(location.getLatitude(), location.getLongitude());
             if (endPoint == null)

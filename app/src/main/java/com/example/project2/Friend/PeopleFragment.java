@@ -5,93 +5,196 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.project2.FirebaseDB.User;
 import com.example.project2.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
+
+/*To-Do
+1.커뮤니티에서 친구추가 가능하게.
+2.친구화면에서 프로필 사진 출력가능.
+3.이메일 클릭으로 이메일외 정보 참조.
+ */
 
 public class PeopleFragment extends Fragment {
 
     private static String TAG = "PeopleFragment";
 
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<User> arrayList;
-    private FirebaseDatabase database;
-    private DatabaseReference databaseReference;
-
+    private ArrayList<User> arrayList = new ArrayList<>(); // User 객체 담을 리스드 (어뎁터 쪽으로 보냄);
+    private List<String> friendgroup;
+    private ListView friend_list;
+    private EditText friend_mail;
+    private Button add_friend;
+    private String F_IDArray[];
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_people,container,false);
+        View v = inflater.inflate(R.layout.fragment_people, container, false);
+        friend_mail = (EditText) v.findViewById(R.id.friend_mail);
+        add_friend = (Button) v.findViewById(R.id.add_friend);
+        friend_list = (ListView) v.findViewById((R.id.friend_list));
 
-        recyclerView = v.findViewById(R.id.recycleView);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        arrayList = new ArrayList<>(); // User 객체 담을 리스드 (어뎁터 쪽으로 보냄)
+        Log.d("Debug", "Running PeopleFragment");
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference emailRef = db.collection("Login_user");
+        Query query = emailRef.whereEqualTo("user_ID", true);
+
+        db.collection("community").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+                        friendgroup = (List<String>) document.get("friend_mail");
+                        F_IDArray = friendgroup.toArray(new String[friendgroup.size()]);
+
+                        Log.d("Debug",String.valueOf(friendgroup.size()));
+                        Log.d("Debug", "친구 배열: " + String.valueOf(friendgroup));
+
+                        if(F_IDArray[0]!=null){
+                            ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1,F_IDArray);
+                            friend_list.setAdapter(adapter);
+
+                            Log.d("Debug", "Summon array");
 
 
-        database = FirebaseDatabase.getInstance();
-        FirebaseUser  user = FirebaseAuth.getInstance().getCurrentUser();
-        databaseReference = database.getReference(user.getUid());
-//        databaseReference = database.getReference(user.getUid()).child("profile");
-//        databaseReference = database.getReference("Login_user").child(user.getUid()).child("Info").child("profile");
+                        }
+                    }
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                });
+
+        friend_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-                // 데이터 베이스에서 데이터 받아오는 부분
-                arrayList.clear(); // 수정
-                for(DataSnapshot snapshot : datasnapshot.getChildren()){
-                    User user = snapshot.getValue(User.class);
-                    Log.wtf("asdf",snapshot.getValue(User.class).person_name);
-                    arrayList.add(user);
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d("Debug",F_IDArray[i]);
 
-                    Log.i("FriendList","log_test 아아아아"+ user.getPhotoUrl()+"아아아아"+user.getName()+"아아아아아"+user.getpetAge()+"아아아아아"+user.getpetKind());
-//                    User user = snapshot.getValue(User.class);
-//                    arrayList.add(user);
-//                    Log.i("FriendList","log_test아아아아"+ user.getPhotoUrl()+"아아아아"+user.getName()+"아아아아아"+user.getpetAge()+"아아아아아"+user.getpetName());
-                }
-                adapter.notifyDataSetChanged();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("PeopleFragment", String.valueOf(error.toException()));
             }
         });
 
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        DocumentReference docRef = db.collection("Login_user").document(user.getUid()).collection("Info").document("profile");
-//        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-//
-//                UserProfileDB user = new UserProfileDB(value.getString("profile_Uri"),value.getString("profile_petName"),value.getString("profile_petKind"),value.getString("profile_petAge"));
-//                profileDB.add(user);
-//            }
-//        });
+        //DocumentReference emailReference =  db.collection("Login_user").document("user_ID");
 
+        add_friend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Debug", friend_mail.getText().toString());
+                db.collection("Login_user").whereEqualTo("user_ID", friend_mail.getText().toString()).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d("Debug", document.getId() + " => " + document.getData());
+                                        Log.d("Debug", document.getId() + " => " + document.get("user_UID"));
+                                        Log.d("Debug", document.getId() + " => " + document.get("user_ID"));
+                                        String newfriend =
+                                                document.get("user_UID").toString();
+                                        String newfriend_mail =
+                                                document.get("user_ID").toString();
+                                        Toast.makeText(getActivity(), "친구 등록중...", Toast.LENGTH_SHORT).show();
+                                        db.collection("community").document(user.getUid())
+                                                .update("friend", FieldValue.arrayUnion(newfriend))
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "성공");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error", e);
+                                                    }
+                                                });
+                                        db.collection("community").document(user.getUid())
+                                                .update("friend_mail", FieldValue.arrayUnion(newfriend_mail))
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "성공");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error", e);
+                                                    }
+                                                });
+                                    }
+                                } else {
+                                    Log.d("Debug", "Error Getting documents: ", task.getException());
+                                }
+                            }
+                        });
+            }
 
+        });
+
+        /*
+                DocumentReference UserInfo = firestoreDatabase.collection("Login_user").document("2jXnAr0uCiag40q1jv1TjCmHK9o2");
+        UserInfo.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                friend_id = value.getString("user_ID");
+                Log.d("Debug", friend_id);
+                friend_pw = value.getString("user_PW");
+                Log.d("Debug", friend_pw);
+                friend_uid = value.getString("user_UID");
+                Log.d("Debug", friend_uid);
+            }
+        });
+
+         */
+
+        /*
         adapter = new CustomAdapter(arrayList, getContext().getApplicationContext()); // 수정
         recyclerView.setAdapter(adapter);
+        */
 
+         /*
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                            Snapshot document = task.getResult();
+                                            if (task.isSuccessful()) {
+                                                Log.d("Debug", document.getId() + " => " + document.getData());
+
+                                                F_IDArray[finalI] = (String) document.get("user_ID");
+                                                Log.d("Debug","F_ID=" + F_IDArray[finalI]);
+                                                Log.d("Debug","F_UID=" + F_UIDArray[finalI]);
+                                            } else {
+                                                Log.d("Debug", "Error Getting documents: ", task.getException());
+                                            }
+
+                                        }
+                                        */
         return v;
     }
 }
+

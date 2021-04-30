@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.project2.FirebaseDB.User;
 import com.example.project2.R;
@@ -35,16 +36,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-/*To-Do
-1.커뮤니티에서 친구추가 가능하게.
-2.친구화면에서 프로필 사진 출력가능.
-3.이메일 클릭으로 이메일외 정보 참조.
- */
-
 public class PeopleFragment extends Fragment {
 
     private static String TAG = "PeopleFragment";
-
+    /*
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    */
     private ArrayList<User> arrayList = new ArrayList<>(); // User 객체 담을 리스드 (어뎁터 쪽으로 보냄);
     private List<String> friendgroup;
     private ListView friend_list;
@@ -61,8 +60,17 @@ public class PeopleFragment extends Fragment {
         friend_list = (ListView) v.findViewById((R.id.friend_list));
 
         Log.d("Debug", "Running PeopleFragment");
-
+        /*
+        recyclerView = v.findViewById(R.id.recycleView);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        */
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+//        databaseReference = database.getReference(user.getUid()).child("profile");
+//        databaseReference = database.getReference("Login_user").child(user.getUid()).child("Info").child("profile");
+//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference emailRef = db.collection("Login_user");
@@ -74,18 +82,17 @@ public class PeopleFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         DocumentSnapshot document = task.getResult();
                         friendgroup = (List<String>) document.get("friend_mail");
-                        F_IDArray = friendgroup.toArray(new String[friendgroup.size()]);
+                        if(friendgroup!=null) {
+                            F_IDArray = friendgroup.toArray(new String[friendgroup.size()]);
+                            Log.d("Debug",String.valueOf(friendgroup.size()));
+                            Log.d("Debug", "친구 배열: " + String.valueOf(friendgroup));
+                        }
 
-                        Log.d("Debug",String.valueOf(friendgroup.size()));
-                        Log.d("Debug", "친구 배열: " + String.valueOf(friendgroup));
-
-                        if(F_IDArray[0]!=null){
+                        if(F_IDArray!=null){
                             ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1,F_IDArray);
                             friend_list.setAdapter(adapter);
 
                             Log.d("Debug", "Summon array");
-
-
                         }
                     }
 
@@ -94,7 +101,17 @@ public class PeopleFragment extends Fragment {
         friend_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d("Debug",F_IDArray[i]);
+                String ID = F_IDArray[i];
+                Log.d("Debug","Clicked_id=" + ID);
+
+                Bundle bundle = new Bundle();
+                bundle.putString("ID_Clicked", ID);
+                getParentFragmentManager().setFragmentResult("key",bundle);
+
+                ProfileFragment profileFragment = new ProfileFragment();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.friend_frameLayout, profileFragment).commit();
+
 
             }
         });
@@ -114,11 +131,11 @@ public class PeopleFragment extends Fragment {
                                         Log.d("Debug", document.getId() + " => " + document.getData());
                                         Log.d("Debug", document.getId() + " => " + document.get("user_UID"));
                                         Log.d("Debug", document.getId() + " => " + document.get("user_ID"));
+                                        Toast.makeText(getActivity(), "회원 정보 저장중... ", Toast.LENGTH_SHORT).show();
                                         String newfriend =
                                                 document.get("user_UID").toString();
                                         String newfriend_mail =
                                                 document.get("user_ID").toString();
-                                        Toast.makeText(getActivity(), "친구 등록중...", Toast.LENGTH_SHORT).show();
                                         db.collection("community").document(user.getUid())
                                                 .update("friend", FieldValue.arrayUnion(newfriend))
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -195,6 +212,7 @@ public class PeopleFragment extends Fragment {
                                         }
                                         */
         return v;
+
     }
 }
 

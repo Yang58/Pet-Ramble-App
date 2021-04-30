@@ -28,6 +28,7 @@ public class FriendMainActivity extends AppCompatActivity {
 
         FM.beginTransaction().replace(R.id.friend_frameLayout,peopleFragment).commit();
 
+
         getSupportActionBar().hide();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomnav);

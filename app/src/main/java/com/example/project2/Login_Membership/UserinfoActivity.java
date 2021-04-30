@@ -20,6 +20,7 @@ import androidx.loader.content.CursorLoader;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.project2.FirebaseDB.Friend;
 import com.example.project2.FirebaseDB.MyPetDB;
 import com.example.project2.FirebaseDB.User;
 import com.example.project2.FirebaseDB.UserInfoDB;
@@ -43,6 +44,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 /* TO-DO list
     1.petBirthday date형식으로 바꾸기.
@@ -69,6 +71,8 @@ public class UserinfoActivity extends AppCompatActivity {
     private int GALLEY_CODE = 10;
     Uri uri;
     private String imageUrl;
+    private List<String> friend;
+    private List<String> friend_mail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +87,8 @@ public class UserinfoActivity extends AppCompatActivity {
         petWeight = (EditText) findViewById(R.id.edit_petWeight);
         petName = (EditText)findViewById(R.id.edit_petName);
         petKind = (EditText) findViewById(R.id.edit_petKind);
+
+
 
         user_profile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,6 +172,8 @@ public class UserinfoActivity extends AppCompatActivity {
         String petKind = ((EditText) findViewById(R.id.edit_petKind)).getText().toString();
         String petWeight = ((EditText)findViewById(R.id.edit_petWeight)).getText().toString();
 
+
+
         if (userNickname.length() > 0 && petBrithday.length() > 0) {
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -197,6 +205,9 @@ public class UserinfoActivity extends AppCompatActivity {
             if (uri == null) {
                 User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind,null);
                 UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,null,userPhoneNumber);
+                Friend f_list = new Friend(friend,friend_mail);
+
+
 
                 photo.setValue(null);
                 name.setValue(userNickname);
@@ -206,6 +217,9 @@ public class UserinfoActivity extends AppCompatActivity {
                 Petinfouploader(myPetDB);
                 UserinfoUploader(userInfoDB);
                 UserProfileUploader(userinfo);
+                EmptyFriendlistUploader(f_list);
+
+
 
             } else {
                 try {
@@ -232,10 +246,11 @@ public class UserinfoActivity extends AppCompatActivity {
 
                                 UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,downloadUri.toString(),userPhoneNumber);
                                 User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind, downloadUri.toString());
-
+                                Friend f_list = new Friend(friend,friend_mail);
                                 UserinfoUploader(userInfoDB);
                                 Petinfouploader(myPetDB);
                                 UserProfileUploader(userinfo);
+                                EmptyFriendlistUploader(f_list);
                             } else {
                                 Toast.makeText(UserinfoActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
                             }
@@ -250,7 +265,7 @@ public class UserinfoActivity extends AppCompatActivity {
         }
     }
 
-    private  void UserinfoUploader(UserInfoDB userDB){
+    private void UserinfoUploader(UserInfoDB userDB){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo").set(userDB)
@@ -305,6 +320,29 @@ public class UserinfoActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private void EmptyFriendlistUploader(Friend FList){
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("community").document(user.getUid()).set(FList)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(UserinfoActivity.this, "회원 정보 등록완료 ", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(UserinfoActivity.this, "회원 정보 등록실패 (다시 시도해주세요!!) ", Toast.LENGTH_LONG).show();
+                        Log.w(TAG, "Error",e);
+                    }
+                });
+    }
+
+
+
 
 }
 

@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -107,6 +108,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
     private LatLng startPoint = null;
     private LatLng endPoint = null;
+    private static int walkDistance = 0;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
@@ -254,7 +256,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mMap.addPolyline(line);
             endPoint = startPoint;
             //다른사람 위치 표시
-            showOtherLocation();
+            //TODO: 시작시 지난 기록 기준으로 모든 유저의 마커와 라인이 생기는거 고치기
+            //showOtherLocation();
+            //걸은 거리 갱신(미터 단위)
+            walkDistance += 1;
+            //임시로 걸은 거리 칼로리 칸에 표시
+            TextView tv = mContext.findViewById(R.id.map_txt_calorie);
+            tv.setText(String.valueOf(walkDistance));
 
             Log.wtf("위치", startPoint.toString() + "+" + endPoint.toString());
         }
@@ -307,7 +315,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
             mChr.start();
             //위치정보 업데이트 시작
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, loListener);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, loListener);
             //백그라운드 서비스 시작
             Intent bgService = new Intent(mContext, LocationBackground.class);
 //            mContext.startService(bgService);

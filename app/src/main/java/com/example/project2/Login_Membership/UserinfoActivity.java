@@ -207,8 +207,6 @@ public class UserinfoActivity extends AppCompatActivity {
                 UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,null,userPhoneNumber);
                 Friend f_list = new Friend(friend,friend_mail);
 
-
-
                 photo.setValue(null);
                 name.setValue(userNickname);
                 pet.setValue(petKind);
@@ -218,8 +216,6 @@ public class UserinfoActivity extends AppCompatActivity {
                 UserinfoUploader(userInfoDB);
                 UserProfileUploader(userinfo);
                 EmptyFriendlistUploader(f_list);
-
-
 
             } else {
                 try {

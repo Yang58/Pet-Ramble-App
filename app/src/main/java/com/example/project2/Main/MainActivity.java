@@ -89,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
             DocumentReference docRef = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
             // 변경 DB변경 완료 후 펫 정보로 변경
 
-
-
             View headerView = navigationView.getHeaderView(0);
             imageView = headerView.findViewById(R.id.Drawer_image);
             textViewName = headerView.findViewById(R.id.Drawer_name);

@@ -1,22 +1,26 @@
 package com.example.project2.Friend;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.example.project2.FirebaseDB.User;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,6 +36,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +52,13 @@ public class PeopleFragment extends Fragment {
     */
     private ArrayList<User> arrayList = new ArrayList<>(); // User 객체 담을 리스드 (어뎁터 쪽으로 보냄);
     private List<String> friendgroup;
+    private List<String> friendgroup_mail;
     private ListView friend_list;
     private EditText friend_mail;
     private Button add_friend;
+    private ImageView friend_image;
+    private TextView friend_text;
+    private String F_UIDArray[];
     private String F_IDArray[];
 
     @Nullable
@@ -57,7 +67,10 @@ public class PeopleFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_people, container, false);
         friend_mail = (EditText) v.findViewById(R.id.friend_mail);
         add_friend = (Button) v.findViewById(R.id.add_friend);
-        friend_list = (ListView) v.findViewById((R.id.friend_list));
+        friend_list = (ListView) v.findViewById(R.id.listview_people);
+        friend_image = (ImageView) v.findViewById(R.id.friend_image);
+        friend_text = (TextView) v.findViewById(R.id.friend_text);
+
 
         Log.d("Debug", "Running PeopleFragment");
         /*
@@ -81,21 +94,78 @@ public class PeopleFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         DocumentSnapshot document = task.getResult();
-                        friendgroup = (List<String>) document.get("friend_mail");
-                        if(friendgroup!=null) {
-                            F_IDArray = friendgroup.toArray(new String[friendgroup.size()]);
+                        friendgroup = (List<String>) document.get("friend");
+                        friendgroup_mail = (List<String>) document.get("friend_mail");
+
+                        if(friendgroup !=null) {
+                            F_UIDArray = friendgroup.toArray(new String[friendgroup.size()]);
                             Log.d("Debug",String.valueOf(friendgroup.size()));
-                            Log.d("Debug", "친구 배열: " + String.valueOf(friendgroup));
+                            Log.d("Debug", "친구uid 배열: " + String.valueOf(friendgroup));
+                        }
+
+                        if(friendgroup_mail !=null) {
+                            F_IDArray = friendgroup_mail.toArray(new String[friendgroup_mail.size()]);
+                            Log.d("Debug",String.valueOf(friendgroup_mail.size()));
+                            Log.d("Debug", "친구id 배열: " + String.valueOf(friendgroup_mail));
                         }
 
                         if(F_IDArray!=null){
-                            ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1,F_IDArray);
+
+                            ListView listview ;
+                            FriendListAdapter adapter;
+
+                            // Adapter 생성
+                            adapter = new FriendListAdapter() ;
+
+                            // 리스트뷰 참조 및 Adapter달기
+                            listview = (ListView) v.findViewById(R.id.listview_people);
+                            listview.setAdapter(adapter);
+
+                            FirebaseStorage storage = FirebaseStorage.getInstance();
+                            StorageReference storageRef = storage.getReference();
+
+                            for(int i=0; i<F_IDArray.length;i++) {
+                                Log.d("Debug", "users/" + F_UIDArray[i] + "/profileImage.jpg");
+                                storageRef.child("users/" + F_UIDArray[i] + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
+                                        new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                ImageView friend_image = (ImageView) v.findViewById(R.id.friend_image);
+                                                Glide.with(getActivity()).load(uri).into(friend_image);
+                                            }
+                                        });
+                                adapter.addItem(friend_image, F_IDArray[i]);
+                            }
+
+                            /*
+                            for(int i=0; i<F_IDArray.length;i++) {
+                                int finalI = i;
+
+                                if(F_UIDArray[i]!=null) {
+                                    Log.d("Debug", "users/" + F_UIDArray[i] + "/profileImage.jpg");
+                                    storageRef.child("users/" + F_UIDArray[i] + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
+                                            new OnSuccessListener<Uri>() {
+                                                @Override
+                                                public void onSuccess(Uri uri) {
+                                                    Glide.with(getActivity())
+                                                            .load(uri)
+                                                            .into(friend_image);
+                                                }
+                                            });
+                                }
+                                adapter.addItem(friend_image, F_IDArray[finalI]);
+                            }
+
+                             */
+
+                            /*
+                            ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.listview_people,F_IDArray);
                             friend_list.setAdapter(adapter);
 
                             Log.d("Debug", "Summon array");
+                             */
                         }
                     }
-
                 });
 
         friend_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -115,9 +185,7 @@ public class PeopleFragment extends Fragment {
 
             }
         });
-
         //DocumentReference emailReference =  db.collection("Login_user").document("user_ID");
-
         add_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,8 +197,6 @@ public class PeopleFragment extends Fragment {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d("Debug", document.getId() + " => " + document.getData());
-                                        Log.d("Debug", document.getId() + " => " + document.get("user_UID"));
-                                        Log.d("Debug", document.getId() + " => " + document.get("user_ID"));
                                         Toast.makeText(getActivity(), "회원 정보 저장중... ", Toast.LENGTH_SHORT).show();
                                         String newfriend =
                                                 document.get("user_UID").toString();
@@ -171,7 +237,6 @@ public class PeopleFragment extends Fragment {
                             }
                         });
             }
-
         });
 
         /*
@@ -187,14 +252,11 @@ public class PeopleFragment extends Fragment {
                 Log.d("Debug", friend_uid);
             }
         });
-
          */
-
         /*
         adapter = new CustomAdapter(arrayList, getContext().getApplicationContext()); // 수정
         recyclerView.setAdapter(adapter);
         */
-
          /*
                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
@@ -208,11 +270,9 @@ public class PeopleFragment extends Fragment {
                                             } else {
                                                 Log.d("Debug", "Error Getting documents: ", task.getException());
                                             }
-
                                         }
                                         */
         return v;
-
     }
 }
 

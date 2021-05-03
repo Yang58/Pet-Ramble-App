@@ -1,15 +1,22 @@
-package com.example.project2.Data;
+package com.example.project2.FirebaseDB;
+
+
+import java.util.Date;
 
 public class ChatDTO {
-
     private String userName;
     private String message;
+    private Long timestamp;
 
-    public ChatDTO() {}
-    public ChatDTO(String userName, String message) {
+    public ChatDTO(String userName, String message,Long timestamp) {
         this.userName = userName;
         this.message = message;
+        this.timestamp = timestamp;
+
     }
+    public ChatDTO() {
+    }
+
 
     public void setUserName(String userName) {
         this.userName = userName;
@@ -19,6 +26,10 @@ public class ChatDTO {
         this.message = message;
     }
 
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public String getUserName() {
         return userName;
     }
@@ -26,4 +37,10 @@ public class ChatDTO {
     public String getMessage() {
         return message;
     }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+
 }

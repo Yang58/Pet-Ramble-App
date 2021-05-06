@@ -138,7 +138,6 @@ public class UserinfoActivity extends AppCompatActivity {
         String url = cursor.getString(columnIndex);
         cursor.close();
         return  url;
-
     }
 
     @Override
@@ -154,7 +153,6 @@ public class UserinfoActivity extends AppCompatActivity {
                         .load(imageUrl)
                         .apply(cropOptions.optionalCircleCrop())
                         .into(user_profile);
-
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -178,7 +176,7 @@ public class UserinfoActivity extends AppCompatActivity {
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
-            user = FirebaseAuth.getInstance().getCurrentUser();
+            user  = FirebaseAuth.getInstance().getCurrentUser();
 
             StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
 

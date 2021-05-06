@@ -16,7 +16,7 @@ public class ChattingFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("Debug", "Running ChattingFragment");
-        View v = inflater.inflate(R.layout.activity_start,container,false);
+        View v = inflater.inflate(R.layout.fragment_publicchatstart,container,false);
 
         return v;
 

@@ -8,14 +8,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.project2.Chatting.StartActivity;
+import com.example.project2.Chatting.PublicChatStartFragment;
+import com.example.project2.Chatting.PublicChattingFragment;
 import com.example.project2.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class FriendMainActivity extends AppCompatActivity {
 
     PeopleFragment peopleFragment;
-    ChattingFragment chattingFragment;
+    PublicChatStartFragment publicChatStartFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +25,7 @@ public class FriendMainActivity extends AppCompatActivity {
         FragmentManager FM = getSupportFragmentManager();
 
         peopleFragment = new PeopleFragment();
-        chattingFragment = new ChattingFragment();
+        publicChatStartFragment = new PublicChatStartFragment();
 
         FM.beginTransaction().replace(R.id.friend_frameLayout,peopleFragment).commit();
 
@@ -41,12 +42,12 @@ public class FriendMainActivity extends AppCompatActivity {
                         FM.beginTransaction().replace(R.id.friend_frameLayout,peopleFragment).commit();
                         break;
                     case (R.id.action_chat):
+                        publicChatStartFragment = new PublicChatStartFragment();
+                        FM.beginTransaction().replace(R.id.friend_frameLayout, publicChatStartFragment).commit();
                         /*
-                        chattingFragment = new ChattingFragment();
-                        FM.beginTransaction().replace(R.id.friend_frameLayout, chattingFragment).commit();
-                        */
-                        Intent intent = new Intent(getApplicationContext(), StartActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), PublicChatStartFragment.class);
                         startActivity(intent);
+                        */
                         break;
                 }
                 return false;

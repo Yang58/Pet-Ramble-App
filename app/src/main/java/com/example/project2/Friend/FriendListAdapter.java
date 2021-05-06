@@ -71,7 +71,6 @@ public class FriendListAdapter extends BaseAdapter {
     // 아이템 데이터 추가를 위한 함수. 개발자가 원하는대로 작성 가능.
     public void addItem(ImageView icon, String title) {
         FriendListItem item = new FriendListItem();
-
         item.setIcon(icon);
         item.setTitle(title);
 

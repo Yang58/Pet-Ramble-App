@@ -166,6 +166,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_gravity="bottom">
                                 <TextView
+                                    android:id="@+id/info_edit"
                                     android:textSize="12dp"
                                     android:hint="수정하기"
                                     android:layout_margin="10dp"

@@ -110,7 +110,6 @@ public class PeopleFragment extends Fragment {
                         }
 
                         if(F_IDArray!=null){
-
                             ListView listview ;
                             FriendListAdapter adapter;
 
@@ -181,10 +180,9 @@ public class PeopleFragment extends Fragment {
                 ProfileFragment profileFragment = new ProfileFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.friend_frameLayout, profileFragment).commit();
-
-
             }
         });
+
         //DocumentReference emailReference =  db.collection("Login_user").document("user_ID");
         add_friend.setOnClickListener(new View.OnClickListener() {
             @Override

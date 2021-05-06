@@ -24,6 +24,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Community.ui.main.CommunityMain;
 import com.example.project2.Friend.FriendMainActivity;
 import com.example.project2.GoogleMap.MapsFragment;
+import com.example.project2.Login_Membership.InfoEditActivity;
 import com.example.project2.Main.CustomAdapter;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -48,6 +49,7 @@ public class HomeFragment extends Fragment {
     TextView petname ;
     TextView petage ;
     TextView petkind ;
+    TextView infoedit;
 
     Button btnCamera;
 
@@ -73,7 +75,7 @@ public class HomeFragment extends Fragment {
         petage = v.findViewById(R.id.MPA);
         petkind = v.findViewById(R.id.MPK);
         petImage = v.findViewById(R.id.home_img);
-
+        infoedit = v.findViewById(R.id.info_edit);
         //ViewPager에 설정할 Adapter 객체 생성
         //ListView에서 사용하는 Adapter와 같은 역할.
         //다만. ViewPager로 스크롤 될 수 있도록 되어 있다는 것이 다름
@@ -153,6 +155,14 @@ public class HomeFragment extends Fragment {
                 }
 
                 return false;
+            }
+        });
+
+        infoedit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), InfoEditActivity.class);
+                startActivity(intent);
             }
         });
 

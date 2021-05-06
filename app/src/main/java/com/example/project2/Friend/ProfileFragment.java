@@ -162,7 +162,6 @@ public class ProfileFragment extends Fragment {
                 Log.d("Debug","sending " + result);
 
 
-
             }
         });
 

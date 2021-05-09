@@ -25,11 +25,20 @@ android {
         sourceCompatibility "1.8"
     }
 
+    //텐서플로우 모델에 한해 메모리 압축을 방지
+    aaptOptions {
+        noCompress "tflite"
+    }
+
 }
 
 dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    //텐서플로우 라이트
+    implementation 'org.tensorflow:tensorflow-lite:+'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly-SNAPSHOT'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'

@@ -29,6 +29,7 @@ import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.Community.listView.recyclerOnItemClick;
 import com.example.project2.R;
 import com.example.project2.Community.listView.listViewAdapter;
+import com.example.project2.tensorflowTest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -190,14 +191,12 @@ public class CommunityMain extends Fragment {
         floatBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
-                    if(!user.getUid().equals("djSTIBJogDTVDv8ZZJIla2yanSI2"))
-                        communityDB.update("friend", FieldValue.arrayUnion("djSTIBJogDTVDv8ZZJIla2yanSI2"));
-                }catch (NullPointerException e){
-                    Map<String, ArrayList<String>> data = null;
-                    data.put("friend",new ArrayList<String>());
-                    communityDB.set(data);
-                }
+                FragmentManager fm = getParentFragmentManager();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_bottom,R.anim.slide_out_bottom,R.anim.slide_in_top,R.anim.slide_out_top)
+                        .add(R.id.container, new tensorflowTest())
+                        .addToBackStack("frag_communityWrite")
+                        .commit();
             }
         });
 

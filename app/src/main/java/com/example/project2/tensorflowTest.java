@@ -178,8 +178,6 @@ public class tensorflowTest extends Fragment {
                     b.setVisibility(View.VISIBLE);
                     b.setText("");
                     b.setText(key+"\n"+String.format("%.2f",topList.get(key))+"%");
-                    if(topList.get(key)>90.0) break;
-                    else cnt++;
                 }
 
 

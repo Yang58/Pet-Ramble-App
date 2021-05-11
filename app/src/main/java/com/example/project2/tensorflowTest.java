@@ -1,12 +1,18 @@
 package com.example.project2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -118,6 +124,7 @@ public class tensorflowTest extends Fragment {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                selfPermissionCheck();
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -178,6 +185,7 @@ public class tensorflowTest extends Fragment {
                     b.setVisibility(View.VISIBLE);
                     b.setText("");
                     b.setText(key+"\n"+String.format("%.2f",topList.get(key))+"%");
+                    cnt++;
                 }
 
 
@@ -272,5 +280,14 @@ public class tensorflowTest extends Fragment {
             // Create a map to access the result based on label
             Map floatMap = labels.getMapWithFloatValue();
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void selfPermissionCheck(){
+        String tmp = "";
+        MainActivity ma = (MainActivity)getActivity();
+        v.getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+        tmp+=Manifest.permission.READ_EXTERNAL_STORAGE+" ";
+        ActivityCompat.requestPermissions(ma,tmp.trim().split(" "),1);
     }
 }

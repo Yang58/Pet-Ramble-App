@@ -82,10 +82,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             FirebaseFirestore fbdb = FirebaseFirestore.getInstance();
-
-
-
-
             DocumentReference docRef = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
             // 변경 DB변경 완료 후 펫 정보로 변경
 

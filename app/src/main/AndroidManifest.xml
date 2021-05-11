@@ -31,6 +31,9 @@
             android:name=".GoogleMap.WalkFinishPopup"
             android:theme="@android:style/Theme.Dialog" />
         <activity
+            android:name=".GoogleMap.WalkFinishPopup2"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
             android:name=".Camera.MediaScanner"
             tools:ignore="Instantiatable" />
         <activity

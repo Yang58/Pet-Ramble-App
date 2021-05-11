@@ -27,8 +27,10 @@ import com.example.project2.GoogleMap.MapsFragment;
 import com.example.project2.Login_Membership.InfoEditActivity;
 import com.example.project2.Main.CustomAdapter;
 import com.example.project2.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,6 +52,11 @@ public class HomeFragment extends Fragment {
     TextView petage ;
     TextView petkind ;
     TextView infoedit;
+
+    TextView c;
+    TextView d;
+    TextView h;
+    TextView m;
 
     Button btnCamera;
 
@@ -75,6 +82,12 @@ public class HomeFragment extends Fragment {
         petage = v.findViewById(R.id.MPA);
         petkind = v.findViewById(R.id.MPK);
         petImage = v.findViewById(R.id.home_img);
+
+        c = v.findViewById(R.id.tv_c);
+        d = v.findViewById(R.id.tv_d);
+        h = v.findViewById(R.id.tv_h);
+        m = v.findViewById(R.id.tv_m);
+
         infoedit = v.findViewById(R.id.info_edit);
         //ViewPager에 설정할 Adapter 객체 생성
         //ListView에서 사용하는 Adapter와 같은 역할.
@@ -101,6 +114,34 @@ public class HomeFragment extends Fragment {
                     petname.setText(value.getString("petName"));
                     petage.setText(value.getString("petAge"));
                     petkind.setText(value.getString("petKind"));
+                }
+            });
+
+            DocumentReference doc = FBdb.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
+            doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document = task.getResult();
+                    if(document != null) {
+                        if (document.exists()) {
+                            doc.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                                    h.setText(value.getString("walking_Time_h"));
+                                    m.setText(value.getString("walking_Time_m"));
+                                    c.setText(value.getString("walking_Count"));
+                                    d.setText(value.getString("walking_Distance"));
+
+                                }
+                            });
+                        }else{
+
+                            h.setText("0");
+                            m.setText("0");
+                            c.setText("0");
+                            d.setText("0");
+                        }
+                    }
                 }
             });
 

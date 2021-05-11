@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -31,6 +30,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -44,7 +44,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -53,6 +52,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -69,12 +70,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.io.IOException;
-import java.nio.file.attribute.AclEntryPermission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -109,6 +108,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private LatLng startPoint = null;
     private LatLng endPoint = null;
     private static int walkDistance = 0;
+
+
+    private int h1 ;
+    private int m1 ;
+    private int d1 ;
+    private int c1;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
@@ -147,7 +152,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
         final View layout = inflater.inflate(R.layout.activity_maps_fragment, container, false);
 
-        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton)layout.findViewById(R.id.btn_start); //시작
+        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) layout.findViewById(R.id.btn_start); //시작
         final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) layout.findViewById(R.id.btn_finish); //종료
 
         mChr = (Chronometer) layout.findViewById(R.id.chronometer);
@@ -176,7 +181,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     }
 
     //타 사용자 위치 표시
-    public void showOtherLocation(){
+    public void showOtherLocation() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference ref = database.getReference().child("mapData");
@@ -184,11 +189,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot d : snapshot.getChildren()){
+                for (DataSnapshot d : snapshot.getChildren()) {
                     //다른 사람의 UID
                     String otherUID = d.getKey();
                     //나를 제외한 다른 사람의 위치 변경이 감지되었을 경우
-                    if(otherUID.equals(user.getUid())) continue;
+                    if (otherUID.equals(user.getUid())) continue;
                     //데이터를 가져온다
                     HashMap<String, HashMap<String, Object>> value = (HashMap<String, HashMap<String, Object>>) d.getValue();
                     //시작 좌표
@@ -201,14 +206,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     LatLng endPos = new LatLng(endLat, endLng);
 
                     //선 추가
-                    PolylineOptions line = new PolylineOptions().add(startPos,endPos).clickable(true).color(Color.RED).width(20);
+                    PolylineOptions line = new PolylineOptions().add(startPos, endPos).clickable(true).color(Color.RED).width(20);
                     try {
                         otherLines.get(otherUID).add(line);
-                    }catch (NullPointerException e){
+                    } catch (NullPointerException e) {
                         otherLines.put(otherUID, new ArrayList<>());
                         otherLines.get(otherUID).add(line);
                     }
-                    otherLinesSaved.add(mMap.addPolyline(otherLines.get(otherUID).get(otherLines.get(otherUID).size()-1)));
+                    otherLinesSaved.add(mMap.addPolyline(otherLines.get(otherUID).get(otherLines.get(otherUID).size() - 1)));
 
                     //마커 추가
                     MarkerOptions marker = new MarkerOptions();
@@ -217,7 +222,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     try {
                         otherMarker.get(otherUID).remove();
                         otherMarker.put(otherUID, mMap.addMarker(marker));
-                    }catch(NullPointerException e) {
+                    } catch (NullPointerException e) {
                         otherMarker.put(otherUID, mMap.addMarker(marker));
                     }
                 }
@@ -320,10 +325,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             Intent bgService = new Intent(mContext, LocationBackground.class);
 //            mContext.startService(bgService);
         } else {
-            ct.setVisibility(View.GONE); // 안보이기
-            st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
-            fi.setVisibility(View.GONE); //시작 버튼 활성화
 
+            final int count = 1;
             long WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
 
             int min = (int) (WalkTimeSum / 60);
@@ -331,22 +334,153 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             int sec = (int) (WalkTimeSum % 60);
             min = min % 60;
 
-            mChr.stop();
-            //위치정보 업데이트 중단
-            lm.removeUpdates(loListener);
-            Intent bgService = new Intent(mContext, LocationBackground.class);
-            mContext.stopService(bgService);
-            //다른 사람 선 다 지우기
-            for(Polyline p : otherLinesSaved){
-                p.remove();
-            }
+            FirebaseAuth user = FirebaseAuth.getInstance();
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+            DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
+            int finalMin = min;
 
-            Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
-            intent.putExtra("sec", String.valueOf(sec));
-            intent.putExtra("min", String.valueOf(min));
-            intent.putExtra("hour", String.valueOf(hour));
-            startActivityForResult(intent, 1);
+            db.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document = task.getResult();
+                    if(document != null){
+                        if(document.exists()){
+                            db.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) { //문서가 있고 데이터가 있을 떄 실행
+
+                                    if(finalMin >= 5){ // 산책 5분 이상 했을 때
+                                        Log.e(TAG,"Walk Data Upload");
+
+                                        String h = documentSnapshot.getString("walking_Time_h");
+                                        String m = documentSnapshot.getString("walking_Time_m");
+                                        String c = documentSnapshot.getString("walking_Count");
+                                        String d = documentSnapshot.getString("walking_Distance");
+
+                                        int h1 = Integer.parseInt(h);
+                                        int m1 = Integer.parseInt(m);
+                                        int c1 = Integer.parseInt(c);
+                                        int d1 = Integer.parseInt(d);
+
+                                        int sum_h = hour + h1;
+                                        int sum_m = finalMin + m1;
+                                        int sum_c = count + c1;
+                                        int sum_d = walkDistance + d1;
+
+                                        WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h),String.valueOf(sum_m),String.valueOf(sum_c),String.valueOf(sum_d));
+                                        WalkingUploader(walkingDB);
+
+                                        Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
+                                        intent.putExtra("sec", String.valueOf(sec));
+                                        intent.putExtra("min", String.valueOf(finalMin));
+                                        intent.putExtra("hour", String.valueOf(hour));
+                                        startActivityForResult(intent,1);
+
+                                        ct.setVisibility(View.GONE); // 안보이기
+                                        st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
+                                        fi.setVisibility(View.GONE); //시작 버튼 활성화
+
+                                        mChr.stop();
+                                        //위치정보 업데이트 중단
+                                        lm.removeUpdates(loListener);
+                                        Intent bgService = new Intent(mContext, LocationBackground.class);
+                                        mContext.stopService(bgService);
+                                        //다른 사람 선 다 지우기
+                                        for (Polyline p : otherLinesSaved) {
+                                            p.remove();
+                                        }
+
+                                    }else{
+                                        //권한 얻기
+                                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                                                && ActivityCompat.checkSelfPermission(getContext(),
+                                                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+                                                Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                            // TODO: Consider calling
+                                            //    ActivityCompat#requestPermissions
+                                            // here to request the missing permissions, and then overriding
+                                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                            //                                          int[] grantResults)
+                                            // to handle the case where the user grants the permission. See the documentation
+                                            // for ActivityCompat#requestPermissions for more details.
+                                            return;
+                                        }
+                                        Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
+                                        startActivity(intent);
+
+                                        //위치정보 업데이트 시작
+                                        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, loListener);
+                                        //백그라운드 서비스 시작
+                                        Intent bgService = new Intent(mContext, LocationBackground.class);
+//                                      mContext.startService(bgService);
+                                    }
+                                }
+                            });
+                        }else{ // 문서가 없을때 실행
+                            if(finalMin >= 5){
+
+                                Log.e(TAG,"test 1. Walk Data Null");
+
+                                Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
+                                intent.putExtra("sec", String.valueOf(sec));
+                                intent.putExtra("min", String.valueOf(finalMin));
+                                intent.putExtra("hour", String.valueOf(hour));
+                                startActivityForResult(intent,1);
+
+                                WalkingDB walkingDB = new WalkingDB(String.valueOf(hour),String.valueOf(finalMin),String.valueOf(count),String.valueOf(walkDistance));
+                                WalkingUploader(walkingDB);
+                                Log.e(TAG,"Walk Data Null");
+
+                                ct.setVisibility(View.GONE); // 안보이기
+                                st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
+                                fi.setVisibility(View.GONE); //시작 버튼 활성화
+
+                                mChr.stop();
+                                //위치정보 업데이트 중단
+                                lm.removeUpdates(loListener);
+                                Intent bgService = new Intent(mContext, LocationBackground.class);
+                                mContext.stopService(bgService);
+                                //다른 사람 선 다 지우기
+                                for (Polyline p : otherLinesSaved) {
+                                    p.remove();
+                                }
+                            }else{
+                                Log.e(TAG,"test 2. Walk Data Null");
+
+                                //위치정보 업데이트 시작
+                                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, loListener);
+                                //백그라운드 서비스 시작
+                                Intent bgService = new Intent(mContext, LocationBackground.class);
+//                                      mContext.startService(bgService);
+
+                                Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
+                                startActivity(intent);
+                            }
+
+                        }
+                    }
+                }
+            });
         }
+    }
+
+
+    private void WalkingUploader(WalkingDB walkDB){
+        FirebaseAuth user = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Login_user").document(user.getUid()).collection("Info").document("Walk").set(walkDB)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "walk Upload Success");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error",e);
+                    }
+                });
     }
 
     @Override

@@ -221,7 +221,7 @@
                                     android:layout_margin="8dp"
                                     android:layout_centerInParent="true"/>
                                 <TextView
-                                    android:id="@+id/t2"
+                                    android:id="@+id/tv_c"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
@@ -243,7 +243,7 @@
                                     android:hint="총 산책 거리"
                                     android:layout_centerInParent="true"/>
                                 <TextView
-                                    android:id="@+id/t4"
+                                    android:id="@+id/tv_d"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
@@ -254,30 +254,66 @@
                             </RelativeLayout>
 
                             <RelativeLayout
+                                android:id="@+id/R1"
                                 android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content">
+                                android:layout_height="match_parent"
+                                android:layout_weight="1">
+
                                 <TextView
                                     android:id="@+id/t5"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="8dp"
-                                    android:hint="총 산책 시간"
-                                    android:layout_centerInParent="true"/>
-                                <TextView
-                                    android:id="@+id/t6"
-                                    android:layout_width="wrap_content"
+                                    android:layout_centerInParent="true"
+                                    android:hint="총 산책 시간" />
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="00 : 00"
-                                    android:textColor="@color/black"
-                                    android:layout_margin="10dp"
-                                    android:layout_below="@+id/t5"
-                                    android:layout_centerHorizontal="true"/>
+                                    android:layout_below="@+id/t5">
+
+                                    <TextView
+                                        android:id="@+id/tv_h"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_toLeftOf="@+id/tv2"
+                                        android:text="0"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:id="@+id/tv2"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_toLeftOf="@+id/tvc"
+                                        android:text="시"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:id="@+id/tvc"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_centerInParent="true"
+                                        android:text="간"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:id="@+id/tv_m"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_toRightOf="@id/tvc"
+                                        android:text="00"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:id="@+id/tv3"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_toRightOf="@+id/tv_m"
+                                        android:text="분"
+                                        android:textColor="@color/black" />
+                                </RelativeLayout>
+
                             </RelativeLayout>
-
                         </LinearLayout>
-
-
 
                     </LinearLayout>
 

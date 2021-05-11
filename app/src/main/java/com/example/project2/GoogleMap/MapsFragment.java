@@ -30,7 +30,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -51,10 +50,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -109,12 +104,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private LatLng endPoint = null;
     private static int walkDistance = 0;
 
-
-    private int h1 ;
-    private int m1 ;
-    private int d1 ;
-    private int c1;
-
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
     private static ArrayList<Polyline> otherLinesSaved = new ArrayList<>();
@@ -152,7 +141,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
         final View layout = inflater.inflate(R.layout.activity_maps_fragment, container, false);
 
-        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) layout.findViewById(R.id.btn_start); //시작
+        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton)layout.findViewById(R.id.btn_start); //시작
         final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) layout.findViewById(R.id.btn_finish); //종료
 
         mChr = (Chronometer) layout.findViewById(R.id.chronometer);
@@ -181,7 +170,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     }
 
     //타 사용자 위치 표시
-    public void showOtherLocation() {
+    public void showOtherLocation(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference ref = database.getReference().child("mapData");
@@ -189,11 +178,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot d : snapshot.getChildren()) {
+                for(DataSnapshot d : snapshot.getChildren()){
                     //다른 사람의 UID
                     String otherUID = d.getKey();
                     //나를 제외한 다른 사람의 위치 변경이 감지되었을 경우
-                    if (otherUID.equals(user.getUid())) continue;
+                    if(otherUID.equals(user.getUid())) continue;
                     //데이터를 가져온다
                     HashMap<String, HashMap<String, Object>> value = (HashMap<String, HashMap<String, Object>>) d.getValue();
                     //시작 좌표
@@ -206,14 +195,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     LatLng endPos = new LatLng(endLat, endLng);
 
                     //선 추가
-                    PolylineOptions line = new PolylineOptions().add(startPos, endPos).clickable(true).color(Color.RED).width(20);
+                    PolylineOptions line = new PolylineOptions().add(startPos,endPos).clickable(true).color(Color.RED).width(20);
                     try {
                         otherLines.get(otherUID).add(line);
-                    } catch (NullPointerException e) {
+                    }catch (NullPointerException e){
                         otherLines.put(otherUID, new ArrayList<>());
                         otherLines.get(otherUID).add(line);
                     }
-                    otherLinesSaved.add(mMap.addPolyline(otherLines.get(otherUID).get(otherLines.get(otherUID).size() - 1)));
+                    otherLinesSaved.add(mMap.addPolyline(otherLines.get(otherUID).get(otherLines.get(otherUID).size()-1)));
 
                     //마커 추가
                     MarkerOptions marker = new MarkerOptions();
@@ -222,7 +211,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     try {
                         otherMarker.get(otherUID).remove();
                         otherMarker.put(otherUID, mMap.addMarker(marker));
-                    } catch (NullPointerException e) {
+                    }catch(NullPointerException e) {
                         otherMarker.put(otherUID, mMap.addMarker(marker));
                     }
                 }
@@ -319,12 +308,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
             mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
             mChr.start();
+            //최초 위치 갱신
+            getDeviceLocation();
             //위치정보 업데이트 시작
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, loListener);
             //백그라운드 서비스 시작
             Intent bgService = new Intent(mContext, LocationBackground.class);
 //            mContext.startService(bgService);
+            //지도 모든 선 지우기
+            mMap.clear();
+            //걸은 미터수 초기화
+            walkDistance = 0;
         } else {
+            ct.setVisibility(View.GONE); // 안보이기
+            st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
+            fi.setVisibility(View.GONE); //시작 버튼 활성화
 
             final int count = 1;
             long WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;

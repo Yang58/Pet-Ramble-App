@@ -131,6 +131,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static Bitmap iconBitmap;
     private static View marker_root_view;
     private static ImageView marker_imageView;
+    private static TextView marker_textView;
     private static String photoPath;
 
     //내 위치 관련
@@ -139,6 +140,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static float walkDistanceResult[] = new float[1];
     private static int walkDistance = 0;
     private ArrayList<PolylineOptions> myLinesSaved = new ArrayList<>();
+    private static long cameraCooldown;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
@@ -245,6 +247,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                             cashingImage(otherUID);
                             Bitmap b = BitmapFactory.decodeFile(photoPath);
                             marker_imageView.setImageBitmap(b);
+                            firestore.collection("users").document(otherUID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    marker_textView.setText(task.getResult().getString("name"));
+                                }
+                            });
                             iconBitmap = Bitmap.createScaledBitmap(createDrawableFromView(mContext, marker_root_view), 155, 180, false);
                             marker.position(startPos);
                             marker.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
@@ -291,13 +299,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
             //선 그리기
             myLinesSaved.add(new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN).width(20));
+            mMap.addPolyline(myLinesSaved.get(myLinesSaved.size() - 1));
 
             //움직이는동안 마커 일단 지우기
             currentMarker.remove();
 
             //카메라 부드럽게 중앙으로 이동
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(endPoint, 18));
-            mMap.addPolyline(myLinesSaved.get(myLinesSaved.size() - 1));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 18));
 
             //리얼타임 데이터베이스에 실시간으로 노드 전송
             Log.wtf("거리", String.valueOf(walkDistance == tmpDistance));
@@ -310,6 +318,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 endRef.setValue(endPoint);
                 lastTimeRef.setValue(Timestamp.now());
             }
+
             endPoint = startPoint;
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             try {
@@ -857,6 +866,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 String perKind = value.getString("petKind");
                 String petAge = value.getString("petAge");
 
+                if(name==null)return;
+
                 FragmentManager fm = getParentFragmentManager();
                 MarkerClickPopup popup = new MarkerClickPopup();
                 Bundle bundle = new Bundle();
@@ -879,6 +890,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private void setCustomMarkerView() {
         marker_root_view = LayoutInflater.from(mContext).inflate(R.layout.fragment_map_icon, null);
         marker_imageView = marker_root_view.findViewById(R.id.map_icon_container);
+        marker_textView = marker_root_view.findViewById(R.id.map_icon_name);
     }
 
     // View를 Bitmap으로 변환

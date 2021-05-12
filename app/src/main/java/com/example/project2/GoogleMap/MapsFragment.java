@@ -1,6 +1,7 @@
 package com.example.project2.GoogleMap;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
@@ -39,6 +41,7 @@ import androidx.fragment.app.FragmentManager;
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.R;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -63,6 +66,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -79,17 +83,21 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
 
     private FragmentActivity mContext;
+    private View v;
 
     private static final String TAG = MapsFragment.class.getSimpleName();
     private GoogleMap mMap;
@@ -108,11 +116,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private boolean mLocationPermissionGranted;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
-    private static final int UPDATE_INTERVAL_MS = 1000 * 60 * 1;  // 1분 단위 시간 갱신
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 1000 * 30; // 30초 단위로 화면 갱신
+    private static final int UPDATE_INTERVAL_MS = 1000 * 60 * 1;        // 1분 단위 시간 갱신
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 1000 * 30;    // 30초 단위로 화면 갱신
 
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+
+    //파이어베이스 인스턴스
+    FirebaseAuth user = FirebaseAuth.getInstance();
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();  //DB
+    FirebaseDatabase database = FirebaseDatabase.getInstance();     //리얼타임 DB
 
     //위치 마커 비트맵
     private static Bitmap iconBitmap;
@@ -162,12 +175,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mCurrentLocatiion = savedInstanceState.getParcelable(KEY_LOCATION);
             CameraPosition mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
-        final View layout = inflater.inflate(R.layout.activity_maps_fragment, container, false);
+        v = inflater.inflate(R.layout.activity_maps_fragment, container, false);
 
-        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton)layout.findViewById(R.id.btn_start); //시작
-        final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) layout.findViewById(R.id.btn_finish); //종료
+        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_start); //시작
+        final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_finish); //종료
 
-        mChr = (Chronometer) layout.findViewById(R.id.chronometer);
+        mChr = (Chronometer) v.findViewById(R.id.chronometer);
 
         st.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,26 +196,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
-        mapView = (MapView) layout.findViewById(R.id.mapview);
+        mapView = (MapView) v.findViewById(R.id.mapview);
         if (mapView != null) {
             mapView.onCreate(savedInstanceState);
         }
         mapView.getMapAsync(this);
 
-        return layout;
+        return v;
     }
 
     //타 사용자 위치 표시
-    public void showOtherLocation(){
+    public void showOtherLocation() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference ref = database.getReference().child("mapData");
         MarkerOptions marker = new MarkerOptions();
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot d : snapshot.getChildren()){
+                for (DataSnapshot d : snapshot.getChildren()) {
                     //다른 사람의 UID
                     String otherUID = d.getKey();
                     //나를 제외한 다른 사람의 위치 변경이 감지되었을 경우
@@ -210,40 +222,42 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     try {
                         //데이터를 가져온다
                         HashMap<String, HashMap<String, Object>> value = (HashMap<String, HashMap<String, Object>>) d.getValue();
-                        //시작 좌표
-                        float startLat = Float.valueOf(value.get("start").get("latitude").toString());
-                        float startLng = Float.valueOf(value.get("start").get("longitude").toString());
-                        LatLng startPos = new LatLng(startLat, startLng);
                         //도착 좌표
-                        float endLat = Float.valueOf(value.get("end").get("latitude").toString());
-                        float endLng = Float.valueOf(value.get("end").get("longitude").toString());
-                        LatLng endPos = new LatLng(endLat, endLng);
-                        //마지막 위치 좌표
-                        float lastLat = Float.valueOf(value.get("lastPos").get("latitude").toString());
-                        float lastLng = Float.valueOf(value.get("lastPos").get("longitude").toString());
-                        LatLng lastPos = new LatLng(lastLat, lastLng);
+                        LatLng startPos = new LatLng(
+                                Float.valueOf(value.get("start").get("latitude").toString()),
+                                Float.valueOf(value.get("start").get("longitude").toString())
+                        );
+                        //시작 위치 좌표
+                        LatLng endPos = new LatLng(
+                                Float.valueOf(value.get("end").get("latitude").toString()),
+                                Float.valueOf(value.get("end").get("longitude").toString())
+                        );
+                        //마지막 이동 시간
+                        int time = Integer.valueOf(value.get("lastTime").get("seconds").toString());
+                        int passedTime = (int) Timestamp.now().getSeconds()-time;
 
-                        //만일 접속종료 마지막 위치가 현재 위치와 같다면(=산책중이 아니라면) 패스
-                        if (endPos.equals(lastPos)) continue;
+                        //만일 접속종료 마지막 위치가 현재 위치와 같다면( = 산책중이 아니라면)패스
+                        if (startPos.equals(endPos) && passedTime>10) {
+                            otherMarker.get(otherUID).remove();
+                            continue;
+                        } else {
+                            //마커 셋팅
+                            cashingImage(otherUID);
+                            Bitmap b = BitmapFactory.decodeFile(photoPath);
+                            marker_imageView.setImageBitmap(b);
+                            iconBitmap = Bitmap.createScaledBitmap(createDrawableFromView(mContext, marker_root_view), 155, 180, false);
+                            marker.position(startPos);
+                            marker.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
 
-                        //마커 셋팅
-                        cashingImage(otherUID);
-                        Bitmap b = BitmapFactory.decodeFile(photoPath);
-                        marker_imageView.setImageBitmap(b);
-                        iconBitmap = Bitmap.createScaledBitmap(createDrawableFromView(mContext, marker_root_view),155,180,false);
-                        marker.position(endPos);
-                        marker.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
-                        //마커 추가
-                        try {
+                            //마커 추가
                             otherMarker.get(otherUID).remove();
                             otherMarker.put(otherUID, mMap.addMarker(marker));
                             otherMarker.get(otherUID).setTitle(otherUID);
-                        } catch (NullPointerException e) {
-                            otherMarker.put(otherUID, mMap.addMarker(marker));
-                            otherMarker.get(otherUID).setTitle(otherUID);
                         }
-                    }catch(NullPointerException e){
-                        Log.wtf("경고","초기 사용자 발견, 건너뜁니다.");
+                    } catch (Exception e) {
+                        marker.position(new LatLng(0,0));
+                        otherMarker.put(otherUID, mMap.addMarker(marker));
+                        otherMarker.get(otherUID).setTitle(otherUID);
                     }
                 }
             }
@@ -257,42 +271,53 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
     //위치정보 업데이트 처리 객체
     public LocationListener loListener = new LocationListener() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onLocationChanged(Location location) {
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             DatabaseReference startRef = database.getReference().child("mapData").child(user.getUid()).child("start");
             DatabaseReference endRef = database.getReference().child("mapData").child(user.getUid()).child("end");
-            DatabaseReference lastPosRef = database.getReference().child("mapData").child(user.getUid()).child("lastPos");
+            DatabaseReference lastTimeRef = database.getReference().child("mapData").child(user.getUid()).child("lastTime");
+            LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
+            //현재 위치, startPoint에 지속적으로 위치가 갱신됨
             startPoint = new LatLng(location.getLatitude(), location.getLongitude());
             if (endPoint == null)
                 endPoint = new LatLng(location.getLatitude(), location.getLongitude());
-            //리얼타임 데이터베이스에 실시간으로 노드 전송
-            startRef.setValue(startPoint);
-            endRef.setValue(endPoint);
-            if(!startPoint.equals(endPoint)) {
-                //걸은 거리 구하기 미터 단위
-                Location.distanceBetween(startPoint.latitude,startPoint.longitude, endPoint.latitude,endPoint.longitude,walkDistanceResult);
-                Log.wtf("걸은거리:",String.valueOf(walkDistanceResult[0]));
-                walkDistance += (int)walkDistanceResult[0];
-                //선 그리기
-                PolylineOptions line = new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN).width(20);
-                myLinesSaved.add(line);
-                //움직이는동안 마커 일단 지우기
-                currentMarker.remove();
-                //카메라 부드럽게 중앙으로 이동
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(endPoint, 18));
-                mMap.addPolyline(line);
-                endPoint = startPoint;
-            }
-            //임시로 걸은 거리 칼로리 칸에 표시
-            TextView tv = mContext.findViewById(R.id.map_txt_calorie);
-            tv.setText(String.valueOf(walkDistance));
-            //마지막 위치 전송
-            lastPosRef.setValue(endPoint);
 
-            Log.wtf("위치", startPoint.toString() + "+" + endPoint.toString());
+            //걸은 거리 구하기 미터 단위
+            Location.distanceBetween(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude, walkDistanceResult);
+            int tmpDistance = walkDistance;
+            walkDistance += (int) walkDistanceResult[0];
+
+            //선 그리기
+            myLinesSaved.add(new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN).width(20));
+
+            //움직이는동안 마커 일단 지우기
+            currentMarker.remove();
+
+            //카메라 부드럽게 중앙으로 이동
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(endPoint, 18));
+            mMap.addPolyline(myLinesSaved.get(myLinesSaved.size() - 1));
+
+            //리얼타임 데이터베이스에 실시간으로 노드 전송
+            Log.wtf("거리", String.valueOf(walkDistance == tmpDistance));
+            //1미터도 안움직였으면 멈춘걸로 처리
+            if (walkDistance == tmpDistance) {
+                startRef.setValue(startPoint); //멈춤
+                endRef.setValue(startPoint);
+            } else {
+                startRef.setValue(startPoint); //움직이는 중
+                endRef.setValue(endPoint);
+                lastTimeRef.setValue(Timestamp.now());
+            }
+            endPoint = startPoint;
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            try {
+                //임시로 걸은 거리 칼로리 칸에 표시
+                TextView tv = mContext.findViewById(R.id.map_txt_calorie);
+                tv.setText(String.valueOf(walkDistance));
+            } catch (NullPointerException e) {
+            }
         }
 
         @Override
@@ -311,187 +336,181 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
     };
 
+    //최초로 산책 실행 여부가 결정되는 곳
     public void setWalkState(boolean b) {
-        final View view = getView();
-        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-        final CardView ct = view.findViewById(R.id.cardtest);
-        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) view.findViewById(R.id.btn_start); //시작
-        final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) view.findViewById(R.id.btn_finish); //종료
-
         isWalkStart = b;
 
         if (isWalkStart) { // 시작
-            //권한 얻기
-            if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this.getContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(),
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
+            startProcess();
+        } else {  // 종료
+            endProcess();
+        }
+    }
+
+    //위치 권한 얻기
+    private void getMapLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+    }
+
+    //산책버튼 나타내기,숨기기
+    //b가 true일시 산책 시작, false일시 산책 종료
+    private void setWalkButton(boolean b) {
+        final CardView ct = v.findViewById(R.id.cardtest);
+        final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_start); //시작
+        final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_finish); //종료
+        if (b) {
             ct.setVisibility(View.VISIBLE); // 보이기
             st.setVisibility(View.GONE); // 시작 버튼 클릭시 숨기고
             fi.setVisibility(View.VISIBLE); //종료 버튼 활성화
+        } else {
+            ct.setVisibility(View.GONE); // 안보이기
+            st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
+            fi.setVisibility(View.GONE); //시작 버튼 활성화
+        }
+    }
 
-            mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
-            mChr.start();
-            //최초 위치 갱신
-            lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            //위치정보 업데이트 시작
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, loListener);
-            //백그라운드 서비스 시작
-            Intent bgService = new Intent(mContext, LocationBackground.class);
+    //버튼 눌러서산책시작시에 실행되는 과정
+    @SuppressLint("MissingPermission")
+    private void startProcess() {
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        //권한 얻기
+        getMapLocationPermission();
+        setWalkButton(true);
+
+        mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
+        mChr.start();
+        //최초 위치 갱신
+        lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        //위치정보 업데이트 시작
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, loListener);
+        //백그라운드 서비스 시작
+        Intent bgService = new Intent(mContext, LocationBackground.class);
 //            mContext.startService(bgService);
-            //지도 모든 선 지우기
-            mMap.clear();
-            //걸은 미터수 초기화
-            walkDistance = 0;
-        } else {  // 종료
-            final int count = 1;
-            long WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
+        //지도 모든 선 지우기
+        mMap.clear();
+        //걸은 미터수 초기화
+        walkDistance = 0;
+    }
 
-            int min = (int) (WalkTimeSum / 60);
-            int hour = (min / 60);
-            int sec = (int) (WalkTimeSum % 60);
-            min = min % 60;
+    //버튼 눌러서 산책 종료시 실행되는 과정
+    @SuppressLint("MissingPermission")
+    private void endProcess() {
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        final int count = 1;
+        long WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
 
-            FirebaseAuth user = FirebaseAuth.getInstance();
-            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-            DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
-            int finalMin = min;
-            db.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    DocumentSnapshot document = task.getResult();
-                    if(document != null){
-                        if(document.exists()){
-                            db.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) { //문서가 있을 때 실행
+        int min = (int) (WalkTimeSum / 60);
+        int hour = (min / 60);
+        int sec = (int) (WalkTimeSum % 60);
+        min = min % 60;
 
-                                    if(finalMin >= 5){ // 산책 5분 이상 했을 때
-                                        Log.e(TAG,"Walk Data Upload");
+        //다른사람 마커 다 지우기
+        List<String> keySet = new ArrayList<>(otherMarker.keySet());
+        for(String i : keySet){
+            otherMarker.get(i).remove();
+        }
 
-                                        String h = documentSnapshot.getString("walking_Time_h");
-                                        String m = documentSnapshot.getString("walking_Time_m");
-                                        String c = documentSnapshot.getString("walking_Count");
-                                        String d = documentSnapshot.getString("walking_Distance");
+        DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
 
-                                        int h1 = Integer.parseInt(h);
-                                        int m1 = Integer.parseInt(m);
-                                        int c1 = Integer.parseInt(c);
-                                        int d1 = Integer.parseInt(d);
+        int finalMin = min;
+        db.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot document = task.getResult();
+                if ((document != null) && document.exists()) {
+                    db.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) { //문서가 있을 때 실행
+                            Log.e(TAG, "Walk Data Upload");
 
-                                        int sum_h = hour + h1;
-                                        int sum_m = finalMin + m1;
-                                        int sum_c = count + c1;
-                                        int sum_d = walkDistance + d1;
+                            String h = documentSnapshot.getString("walking_Time_h");
+                            String m = documentSnapshot.getString("walking_Time_m");
+                            String c = documentSnapshot.getString("walking_Count");
+                            String d = documentSnapshot.getString("walking_Distance");
 
-                                        WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h),String.valueOf(sum_m),String.valueOf(sum_c),String.valueOf(sum_d));
-                                        WalkingUploader(walkingDB);
+                            int h1 = Integer.parseInt(h);
+                            int m1 = Integer.parseInt(m);
+                            int c1 = Integer.parseInt(c);
+                            int d1 = Integer.parseInt(d);
 
-                                        Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
-                                        intent.putExtra("sec", String.valueOf(sec));
-                                        intent.putExtra( "min", String.valueOf(finalMin));
-                                        intent.putExtra("hour", String.valueOf(hour));
-                                        startActivityForResult(intent,1);
+                            int sum_h = hour + h1;
+                            int sum_m = finalMin + m1;
+                            int sum_c = count + c1;
+                            int sum_d = walkDistance + d1;
 
-                                        ct.setVisibility(View.GONE); // 안보이기
-                                        st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
-                                        fi.setVisibility(View.GONE); //시작 버튼 활성화
-
-                                        mChr.stop();
-                                        //위치정보 업데이트 중단
-                                        lm.removeUpdates(loListener);
-                                        Intent bgService = new Intent(mContext, LocationBackground.class);
-                                        mContext.stopService(bgService);
-                                        //다른 사람 선 다 지우기
-                                        for (Polyline p : otherLinesSaved) {
-                                            p.remove();
-                                        }
-
-                                    }else{ // 5분 이상 안했을 때
-                                        //권한 얻기
-                                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                                                && ActivityCompat.checkSelfPermission(getContext(),
-                                                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
-                                                Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                            // TODO: Consider calling
-                                            //    ActivityCompat#requestPermissions
-                                            // here to request the missing permissions, and then overriding
-                                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                            //                                          int[] grantResults)
-                                            // to handle the case where the user grants the permission. See the documentation
-                                            // for ActivityCompat#requestPermissions for more details.
-                                            return;
-                                        }
-                                        Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
-                                        startActivity(intent);
-
-                                        //위치정보 업데이트 시작
-                                        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, loListener);
-                                        //백그라운드 서비스 시작
-                                        Intent bgService = new Intent(mContext, LocationBackground.class);
-//                                      mContext.startService(bgService);
-                                    }
-                                }
-                            });
-                        }else{ // 문서가 없을때 실행
-                            if(finalMin >= 5){ // 5분 이상 산책 했을 때
-                                Log.e(TAG,"test 1. Walk Data Null");
+                            if (finalMin >= 5) {// 5분 이상 산책 했을 때
+                                WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
+                                WalkingUploader(walkingDB);
+                                Log.e(TAG,"Walk Data Null");
 
                                 Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
                                 intent.putExtra("sec", String.valueOf(sec));
                                 intent.putExtra("min", String.valueOf(finalMin));
                                 intent.putExtra("hour", String.valueOf(hour));
-                                startActivityForResult(intent,1);
+                                startActivityForResult(intent, 1);
 
-                                WalkingDB walkingDB = new WalkingDB(String.valueOf(hour),String.valueOf(finalMin),String.valueOf(count),String.valueOf(walkDistance));
-                                WalkingUploader(walkingDB);
-                                Log.e(TAG,"Walk Data Null");
-
-                                ct.setVisibility(View.GONE); // 안보이기
-                                st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
-                                fi.setVisibility(View.GONE); //시작 버튼 활성화
-
-                                mChr.stop();
                                 //위치정보 업데이트 중단
                                 lm.removeUpdates(loListener);
-                                Intent bgService = new Intent(mContext, LocationBackground.class);
-                                mContext.stopService(bgService);
-                                //다른 사람 선 다 지우기
-                                for (Polyline p : otherLinesSaved) {
-                                    p.remove();
-                                }
-                            }else{// 5분 미만만산책 했을 때
+                                setWalkButton(false);
+                                mChr.stop();
+                            } else {// 5분 미만만산책 했을 때
                                 Log.e(TAG,"test 2. Walk Data Null");
-
-                                //위치정보 업데이트 시작
-                                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, loListener);
-                                //백그라운드 서비스 시작
-                                Intent bgService = new Intent(mContext, LocationBackground.class);
-//                                      mContext.startService(bgService);
-
                                 Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
                                 startActivity(intent);
-                            }
 
+                                //위치정보 업데이트 중단
+                                lm.removeUpdates(loListener);
+                                setWalkButton(false);
+                                mChr.stop();
+                            }
                         }
+                    });
+                } else { // 문서가 없을때 실행
+                    Log.e(TAG, "test 1. Walk Data Null");
+
+                    if (finalMin >= 5) { // 5분 이상 산책 했을 때
+                        Log.e(TAG, "Walk Data Null");
+                        WalkingDB walkingDB = new WalkingDB(String.valueOf(hour), String.valueOf(finalMin), String.valueOf(count), String.valueOf(walkDistance));
+                        WalkingUploader(walkingDB);
+
+                        Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
+                        intent.putExtra("sec", String.valueOf(sec));
+                        intent.putExtra("min", String.valueOf(finalMin));
+                        intent.putExtra("hour", String.valueOf(hour));
+                        startActivityForResult(intent, 1);
+
+                        //위치정보 업데이트 중단
+                        lm.removeUpdates(loListener);
+                        setWalkButton(false);
+                        mChr.stop();
+                    } else {// 5분 미만만산책 했을 때
+                        Log.e(TAG, "test 2. Walk Data Null");
+
+                        Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
+                        startActivity(intent);
+
+                        //위치정보 업데이트 중단
+                        lm.removeUpdates(loListener);
+                        setWalkButton(false);
+                        mChr.stop();
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
-    private void WalkingUploader(WalkingDB walkDB){
+    private void WalkingUploader(WalkingDB walkDB) {
         FirebaseAuth user = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Login_user").document(user.getUid()).collection("Info").document("Walk").set(walkDB)
@@ -504,7 +523,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error",e);
+                        Log.w(TAG, "Error", e);
                     }
                 });
     }
@@ -551,7 +570,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         updateLocationUI();
 
         getDeviceLocation();
-
+        //다른사람 마커 다 지우기
+        List<String> keySet = new ArrayList<>(otherMarker.keySet());
+        for(String i : keySet){
+            otherMarker.get(i).remove();
+        }
         //마커 준비
         setCustomMarkerView();
 
@@ -659,7 +682,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
                         String markerSnippet = "애견 이름 : " + value.getString("petName")
-                                + "    견종 : " + value.getString("petKind")+ "    나 이 : " + value.getString("petAge") + " 살 ";
+                                + "    견종 : " + value.getString("petKind") + "    나 이 : " + value.getString("petAge") + " 살 ";
                         String markerTitle = getCurrentAddress(currentPosition);
 
                         Log.d(TAG, "Time :" + CurrentTime() + " onLocationResult : " + markerSnippet);
@@ -837,15 +860,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 FragmentManager fm = getParentFragmentManager();
                 MarkerClickPopup popup = new MarkerClickPopup();
                 Bundle bundle = new Bundle();
-                bundle.putString("photoUrl",profileImg);
-                bundle.putString("name",name);
-                bundle.putString("petName",petName);
-                bundle.putString("petKind",perKind);
-                bundle.putString("petAge",petAge);
+                bundle.putString("photoUrl", profileImg);
+                bundle.putString("name", name);
+                bundle.putString("petName", petName);
+                bundle.putString("petKind", perKind);
+                bundle.putString("petAge", petAge);
                 popup.setArguments(bundle);
                 fm.beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_bottom,R.anim.slide_out_bottom,R.anim.slide_in_top,R.anim.slide_out_top)
-                        .add(popup,"userInfo")
+                        .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
+                        .add(popup, "userInfo")
                         .commit();
             }
         });
@@ -875,14 +898,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         return bitmap;
     }
 
-    public void cashingImage(String UID){
+    public void cashingImage(String UID) {
         FirebaseFirestore dbRef = FirebaseFirestore.getInstance();
         FirebaseStorage storageRef = FirebaseStorage.getInstance();
 
         //이미지 파일 캐싱
         String fileName = String.valueOf(UID.hashCode());
         String fileType = ".JPG";
-        File imageCache = new File(getContext().getCacheDir(), fileName+fileType);
+        File imageCache = new File(getContext().getCacheDir(), fileName + fileType);
 
         if (!imageCache.exists()) {
             //캐싱된 이미지가 아직 존재하지 않을 경우
@@ -892,14 +915,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                     loadImage loadImage = new loadImage(getContext().getCacheDir(), value.getString("photoUrl"), fileName, innerFileType);
                     loadImage.execute();
-                    photoPath = mContext.getCacheDir().toString()+"/"+fileName+innerFileType;
+                    photoPath = mContext.getCacheDir().toString() + "/" + fileName + innerFileType;
                     Log.wtf("캐싱", photoPath);
                 }
             });
         } else {
             File imageCacheList = new File(getContext().getCacheDir().toString());
             for (File j : imageCacheList.listFiles()) {
-                if(j.getName().equals(fileName+fileType)) {
+                if (j.getName().equals(fileName + fileType)) {
                     photoPath = j.getPath();
                     Log.wtf("이미지 캐싱", j.getPath());
                 }

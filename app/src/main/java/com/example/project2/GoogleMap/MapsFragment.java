@@ -15,8 +15,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
@@ -37,11 +37,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.R;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -83,15 +83,12 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
@@ -135,17 +132,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static String photoPath;
 
     //내 위치 관련
-    private LatLng startPoint = null;
-    private LatLng endPoint = null;
+    private static LatLng startPoint = null;
+    private static LatLng endPoint = null;
     private static float walkDistanceResult[] = new float[1];
     private static int walkDistance = 0;
-    private ArrayList<PolylineOptions> myLinesSaved = new ArrayList<>();
+    private static PolylineOptions myLineOption = new PolylineOptions();
+    private static ArrayList<PolylineOptions> myLinesSaved = new ArrayList<>();
     private static long cameraCooldown;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
     private static ArrayList<Polyline> otherLinesSaved = new ArrayList<>();
     private static HashMap<String, Marker> otherMarker = new HashMap<>();
+
+    //백그라운드
+    Intent bgService;
 
     Chronometer mChr;
 
@@ -171,7 +172,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
+        Log.wtf("맵","켜짐");
         // Layout 을 inflate 하는 곳이다.
         if (savedInstanceState != null) {
             mCurrentLocatiion = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -298,14 +299,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             walkDistance += (int) walkDistanceResult[0];
 
             //선 그리기
-            myLinesSaved.add(new PolylineOptions().add(startPoint, endPoint).clickable(true).color(Color.GREEN).width(20));
+            myLinesSaved.add(myLineOption.add(startPoint, endPoint));
             mMap.addPolyline(myLinesSaved.get(myLinesSaved.size() - 1));
 
             //움직이는동안 마커 일단 지우기
             currentMarker.remove();
 
             //카메라 부드럽게 중앙으로 이동
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 18));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 16));
 
             //리얼타임 데이터베이스에 실시간으로 노드 전송
             Log.wtf("거리", String.valueOf(walkDistance == tmpDistance));
@@ -396,6 +397,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         getMapLocationPermission();
         setWalkButton(true);
 
+        myLineOption.color(Color.GREEN).width(20);
+
         mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
         mChr.start();
         //최초 위치 갱신
@@ -404,8 +407,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         //위치정보 업데이트 시작
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, loListener);
         //백그라운드 서비스 시작
-        Intent bgService = new Intent(mContext, LocationBackground.class);
-//            mContext.startService(bgService);
+        Intent serviceIntent = new Intent(mContext, LocationBackground.class);
+        serviceIntent.setAction("startForeground");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            mContext.startForegroundService(serviceIntent);
+        else mContext.startService(serviceIntent);
+
         //지도 모든 선 지우기
         mMap.clear();
         //걸은 미터수 초기화
@@ -429,6 +436,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         for(String i : keySet){
             otherMarker.get(i).remove();
         }
+
+        //백그라운드 서비스 종료\
+        mContext.stopService(bgService);
 
         DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
 

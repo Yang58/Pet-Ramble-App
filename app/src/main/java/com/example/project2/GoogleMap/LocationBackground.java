@@ -1,159 +1,92 @@
 package com.example.project2.GoogleMap;
 
 import android.Manifest;
+import android.app.AppOpsManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+
+import com.example.project2.Main.MainActivity;
+import com.example.project2.R;
 
 public class LocationBackground extends Service {
-    public static final String BROADCAST_ACTION = "Hello World";
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
-    public LocationManager locationManager;
-    public MyLocationListener listener;
-    public Location previousBestLocation = null;
-
-    Intent intent;
-    int counter = 0;
+    private static Thread triggerService;
+    private static LocationManager lm;
+    private static Context context;
+    private static Thread mThread;
+    private static int mCount = 0;
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        intent = new Intent(BROADCAST_ACTION);
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.wtf("서비스", "서비스 시작");
+        context = getBaseContext();
+
+        if (intent.getAction().equals("startForeground")) {
+            startFgService();
+        }
+        return START_STICKY;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void startFgService() {
+        // PendingIntent를 이용하면 포그라운드 서비스 상태에서 알림을 누르면 앱의 MainActivity를 다시 열게 된다.
+        Intent testIntent = new Intent(getApplicationContext(), MainActivity.class);
+        testIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        testIntent.setAction(Intent.ACTION_MAIN);
+        testIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pendingIntent
+                = PendingIntent.getActivity(getApplicationContext(), 0, testIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // 오래오 윗버젼일 때는 아래와 같이 채널을 만들어 Notification과 연결해야 한다.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("channel", "play!!",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+
+            // Notification과 채널 연걸
+            NotificationManager mNotificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+            mNotificationManager.createNotificationChannel(channel);
+
+            // Notification 세팅
+            NotificationCompat.Builder notification
+                    = new NotificationCompat.Builder(getApplicationContext(), "channel")
+                    .setSmallIcon(R.drawable.loading3)
+                    .setContentTitle("현재 실행 중인 앱 이름")
+                    .setContentIntent(pendingIntent)
+                    .setContentText("");
+
+            // id 값은 0보다 큰 양수가 들어가야 한다.
+            mNotificationManager.notify(1, notification.build());
+            startForeground(1, notification.build());
+        }
+    }
+
     @Override
     public void onStart(Intent intent, int startId) {
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        listener = new MyLocationListener();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, (LocationListener) listener);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
+
+        super.onStart(intent, startId);
     }
 
-    @Override
+    @Nullable
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
-        if (currentBestLocation == null) {
-            // A new location is always better than no location
-            return true;
-        }
-
-        // Check whether the new location fix is newer or older
-        long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
-        boolean isNewer = timeDelta > 0;
-
-        // If it's been more than two minutes since the current location, use the new location
-        // because the user has likely moved
-        if (isSignificantlyNewer) {
-            return true;
-            // If the new location is more than two minutes older, it must be worse
-        } else if (isSignificantlyOlder) {
-            return false;
-        }
-
-        // Check whether the new location fix is more or less accurate
-        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
-        boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-        // Check if the old and new location are from the same provider
-        boolean isFromSameProvider = isSameProvider(location.getProvider(),
-                currentBestLocation.getProvider());
-
-        // Determine location quality using a combination of timeliness and accuracy
-        if (isMoreAccurate) {
-            return true;
-        } else if (isNewer && !isLessAccurate) {
-            return true;
-        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
-     * Checks whether two providers are the same
-     */
-    private boolean isSameProvider(String provider1, String provider2) {
-        if (provider1 == null) {
-            return provider2 == null;
-        }
-        return provider1.equals(provider2);
-    }
-
-
-    @Override
-    public void onDestroy() {
-        // handler.removeCallbacks(sendUpdatesToUI);
-        super.onDestroy();
-        Log.v("STOP_SERVICE", "DONE");
-        locationManager.removeUpdates(listener);
-    }
-
-    public static Thread performOnBackgroundThread(final Runnable runnable) {
-        final Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    runnable.run();
-                } finally {
-
-                }
-            }
-        };
-        t.start();
-        return t;
-    }
-
-    public class MyLocationListener implements LocationListener {
-
-        public void onLocationChanged(final Location loc) {
-            Log.i("*****", "Location changed");
-            if (isBetterLocation(loc, previousBestLocation)) {
-                loc.getLatitude();
-                loc.getLongitude();
-                intent.putExtra("Latitude", loc.getLatitude());
-                intent.putExtra("Longitude", loc.getLongitude());
-                intent.putExtra("Provider", loc.getProvider());
-                sendBroadcast(intent);
-
-            }
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        public void onProviderDisabled(String provider) {
-            Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
-        }
-
-
-        public void onProviderEnabled(String provider) {
-            Toast.makeText(getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
-        }
     }
 }

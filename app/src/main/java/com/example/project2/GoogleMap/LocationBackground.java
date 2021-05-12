@@ -69,7 +69,7 @@ public class LocationBackground extends Service {
             NotificationCompat.Builder notification
                     = new NotificationCompat.Builder(getApplicationContext(), "channel")
                     .setSmallIcon(R.drawable.loading3)
-                    .setContentTitle("현재 실행 중인 앱 이름")
+                    .setContentTitle("다른 유저들에게 현재 위치가 표시됩니다")
                     .setContentIntent(pendingIntent)
                     .setContentText("");
 
@@ -88,5 +88,14 @@ public class LocationBackground extends Service {
     @Nullable
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onDestroy() {
+        Log.wtf("서비스", "정지");
+        stopForeground(true);
+        NotificationManager notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+        notificationManager.deleteNotificationChannel("channel");
     }
 }

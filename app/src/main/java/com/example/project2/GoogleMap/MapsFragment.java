@@ -83,6 +83,7 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -137,7 +138,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static float walkDistanceResult[] = new float[1];
     private static int walkDistance = 0;
     private static PolylineOptions myLineOption = new PolylineOptions();
-    private static ArrayList<PolylineOptions> myLinesSaved = new ArrayList<>();
+    private static ArrayList<Polyline> myLinesSaved = new ArrayList<>();
     private static long cameraCooldown;
 
     //다른 사람 위치 표시
@@ -146,7 +147,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static HashMap<String, Marker> otherMarker = new HashMap<>();
 
     //백그라운드
-    Intent bgService;
+    Intent serviceIntent;
 
     Chronometer mChr;
 
@@ -172,13 +173,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        Log.wtf("맵","켜짐");
         // Layout 을 inflate 하는 곳이다.
         if (savedInstanceState != null) {
             mCurrentLocatiion = savedInstanceState.getParcelable(KEY_LOCATION);
             CameraPosition mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
         v = inflater.inflate(R.layout.activity_maps_fragment, container, false);
+
+        //백그라운드 서비스
+        serviceIntent = new Intent(mContext, LocationBackground.class);
 
         final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_start); //시작
         final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_finish); //종료
@@ -267,6 +270,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                         marker.position(new LatLng(0,0));
                         otherMarker.put(otherUID, mMap.addMarker(marker));
                         otherMarker.get(otherUID).setTitle(otherUID);
+                        otherMarker.get(otherUID).remove();
                     }
                 }
             }
@@ -299,8 +303,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             walkDistance += (int) walkDistanceResult[0];
 
             //선 그리기
-            myLinesSaved.add(myLineOption.add(startPoint, endPoint));
-            mMap.addPolyline(myLinesSaved.get(myLinesSaved.size() - 1));
+            myLinesSaved.add(mMap.addPolyline(myLineOption.add(startPoint, endPoint)));
+            Log.wtf("Polyline",myLinesSaved.size()+"");
 
             //움직이는동안 마커 일단 지우기
             currentMarker.remove();
@@ -397,24 +401,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         getMapLocationPermission();
         setWalkButton(true);
 
-        myLineOption.color(Color.GREEN).width(20);
-
         mChr.setBase(SystemClock.elapsedRealtime()); // 시간 초기화
         mChr.start();
+
+        //지도 모든 선 지우기
+        mMap.clear();
+        myLinesSaved.clear();
+        myLineOption = new PolylineOptions();
+        myLineOption.color(Color.GREEN).width(20);
+
         //최초 위치 갱신
         lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         //위치정보 업데이트 시작
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, loListener);
         //백그라운드 서비스 시작
-        Intent serviceIntent = new Intent(mContext, LocationBackground.class);
         serviceIntent.setAction("startForeground");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             mContext.startForegroundService(serviceIntent);
         else mContext.startService(serviceIntent);
 
-        //지도 모든 선 지우기
-        mMap.clear();
         //걸은 미터수 초기화
         walkDistance = 0;
     }
@@ -431,14 +437,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         int sec = (int) (WalkTimeSum % 60);
         min = min % 60;
 
+        //위치정보 업데이트 중단
+        lm.removeUpdates(loListener);
+        setWalkButton(false);
+        mChr.stop();
+
+        //백그라운드 서비스 종료
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            mContext.stopService(serviceIntent);
+        else mContext.stopService(serviceIntent);
+
         //다른사람 마커 다 지우기
         List<String> keySet = new ArrayList<>(otherMarker.keySet());
         for(String i : keySet){
-            otherMarker.get(i).remove();
+            Marker pArr = otherMarker.get(i);
+            pArr.remove();
         }
-
-        //백그라운드 서비스 종료\
-        mContext.stopService(bgService);
+        otherMarker.clear();
 
         DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
 
@@ -478,20 +493,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                                 intent.putExtra("min", String.valueOf(finalMin));
                                 intent.putExtra("hour", String.valueOf(hour));
                                 startActivityForResult(intent, 1);
-
-                                //위치정보 업데이트 중단
-                                lm.removeUpdates(loListener);
-                                setWalkButton(false);
-                                mChr.stop();
                             } else {// 5분 미만만산책 했을 때
                                 Log.e(TAG,"test 2. Walk Data Null");
                                 Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
                                 startActivity(intent);
-
-                                //위치정보 업데이트 중단
-                                lm.removeUpdates(loListener);
-                                setWalkButton(false);
-                                mChr.stop();
                             }
                         }
                     });
@@ -508,21 +513,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                         intent.putExtra("min", String.valueOf(finalMin));
                         intent.putExtra("hour", String.valueOf(hour));
                         startActivityForResult(intent, 1);
-
-                        //위치정보 업데이트 중단
-                        lm.removeUpdates(loListener);
-                        setWalkButton(false);
-                        mChr.stop();
                     } else {// 5분 미만만산책 했을 때
                         Log.e(TAG, "test 2. Walk Data Null");
 
                         Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
                         startActivity(intent);
-
-                        //위치정보 업데이트 중단
-                        lm.removeUpdates(loListener);
-                        setWalkButton(false);
-                        mChr.stop();
                     }
                 }
             }

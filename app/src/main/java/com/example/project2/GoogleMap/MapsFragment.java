@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -50,6 +51,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -253,7 +258,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             //TODO: 시작시 지난 기록 기준으로 모든 유저의 마커와 라인이 생기는거 고치기
             //showOtherLocation();
             //걸은 거리 갱신(미터 단위)
-            walkDistance += 1;
+            walkDistance += 1;  
             //임시로 걸은 거리 칼로리 칸에 표시
             TextView tv = mContext.findViewById(R.id.map_txt_calorie);
             tv.setText(String.valueOf(walkDistance));
@@ -287,7 +292,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
         isWalkStart = b;
 
-        if (isWalkStart) {
+        if (isWalkStart) { // 시작
             //권한 얻기
             if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this.getContext(),
@@ -319,11 +324,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mMap.clear();
             //걸은 미터수 초기화
             walkDistance = 0;
-        } else {
-            ct.setVisibility(View.GONE); // 안보이기
-            st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
-            fi.setVisibility(View.GONE); //시작 버튼 활성화
-
+        } else {  // 종료
             final int count = 1;
             long WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
 
@@ -336,7 +337,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
             DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
             int finalMin = min;
-
             db.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -345,7 +345,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                         if(document.exists()){
                             db.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                 @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) { //문서가 있고 데이터가 있을 떄 실행
+                                public void onSuccess(DocumentSnapshot documentSnapshot) { //문서가 있을 때 실행
 
                                     if(finalMin >= 5){ // 산책 5분 이상 했을 때
                                         Log.e(TAG,"Walk Data Upload");
@@ -370,7 +370,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
                                         Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
                                         intent.putExtra("sec", String.valueOf(sec));
-                                        intent.putExtra("min", String.valueOf(finalMin));
+                                        intent.putExtra( "min", String.valueOf(finalMin));
                                         intent.putExtra("hour", String.valueOf(hour));
                                         startActivityForResult(intent,1);
 
@@ -388,7 +388,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                                             p.remove();
                                         }
 
-                                    }else{
+                                    }else{ // 5분 이상 안했을 때
                                         //권한 얻기
                                         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                                                 && ActivityCompat.checkSelfPermission(getContext(),
@@ -415,8 +415,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                                 }
                             });
                         }else{ // 문서가 없을때 실행
-                            if(finalMin >= 5){
-
+                            if(finalMin >= 5){ // 5분 이상 산책 했을 때
                                 Log.e(TAG,"test 1. Walk Data Null");
 
                                 Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);
@@ -442,7 +441,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                                 for (Polyline p : otherLinesSaved) {
                                     p.remove();
                                 }
-                            }else{
+                            }else{// 5분 미만만산책 했을 때
                                 Log.e(TAG,"test 2. Walk Data Null");
 
                                 //위치정보 업데이트 시작
@@ -461,7 +460,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             });
         }
     }
-
 
     private void WalkingUploader(WalkingDB walkDB){
         FirebaseAuth user = FirebaseAuth.getInstance();

@@ -1,5 +1,7 @@
 package com.example.project2.Community.ui.main;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -210,6 +212,19 @@ public class CommunityMain extends Fragment {
         return view;
     }
 
+    public void listViewFadeIn(){
+        RecyclerView listView = view.findViewById(R.id.cm_main_list_recyclerContainer);
+        listView.setAlpha(0f);
+        listView.setVisibility(View.VISIBLE);
+
+        int shortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
+        listView.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null);
+    }
+
     public void updateList(){
         SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
         RecyclerView listView = view.findViewById(R.id.cm_main_list_recyclerContainer);
@@ -234,7 +249,6 @@ public class CommunityMain extends Fragment {
                         Log.i("정보","내 글 불러오기 완료");
                     }
                 });
-
                 //친구 글 목록 가져오기
                 communityDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -249,7 +263,7 @@ public class CommunityMain extends Fragment {
                                     public void onComplete() {
                                         if (innerAI.get(0) +1 == result.size()) {
                                             //가림막 해제
-                                            listView.setVisibility(View.VISIBLE);
+                                            listViewFadeIn();
                                             //글이 하나도 없는지 체크
                                             chkContentCount();
                                             //어댑터 업데이트
@@ -263,7 +277,7 @@ public class CommunityMain extends Fragment {
                             }
                         }catch(NullPointerException e){
                             //가림막 해제
-                            listView.setVisibility(View.VISIBLE);
+                            listViewFadeIn();
                             //새로고침 해제
                             refreshLayout.setRefreshing(false);
                             Log.wtf("경고",e.getMessage());

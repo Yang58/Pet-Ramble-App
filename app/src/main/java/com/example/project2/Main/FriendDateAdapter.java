@@ -1,31 +1,35 @@
-package com.example.project2.Friend;
+package com.example.project2.Main;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
+
+
+import com.example.project2.Friend.FriendListItem;
 
 import com.example.project2.R;
 
 import java.util.ArrayList;
 
-public class FriendListAdapter extends BaseAdapter {
+public class FriendDateAdapter extends BaseAdapter {
     // Adapter에 추가된 데이터를 저장하기 위한 ArrayList
-    private ArrayList<FriendListItem> listViewItemFriendList = new ArrayList<FriendListItem>() ;
+    private ArrayList<FriendDateItem> listViewItemFriendDate = new ArrayList<FriendDateItem>() ;
 
     // ListViewAdapter의 생성자
-    public FriendListAdapter() {
+    public FriendDateAdapter() {
 
     }
 
     // Adapter에 사용되는 데이터의 개수를 리턴. : 필수 구현
     @Override
     public int getCount() {
-        return listViewItemFriendList.size() ;
+        return listViewItemFriendDate.size() ;
     }
 
     // position에 위치한 데이터를 화면에 출력하는데 사용될 View를 리턴. : 필수 구현
@@ -37,27 +41,27 @@ public class FriendListAdapter extends BaseAdapter {
         // "listview_item" Layout을 inflate하여 convertView 참조 획득.
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.listview_people, parent, false);
+            convertView = inflater.inflate(R.layout.listview_frienddate, parent, false);
         }
 
         // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
-        /*
-        ImageView iconImageView = (ImageView) convertView.findViewById(R.id.friend_image) ;
 
-         */
-        TextView titleTextView = (TextView) convertView.findViewById(R.id.friend_text) ;
-
+        TextView friendTextView = (TextView) convertView.findViewById(R.id.friend_who);
+        //TextView dateTextView = (TextView) convertView.findViewById(R.id.friend_date);
+        TextView timeTextView = (TextView) convertView.findViewById(R.id.friend_time);
+        TextView titleTextView = (TextView) convertView.findViewById(R.id.friend_content);
 
         // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
-        FriendListItem friendListItem = listViewItemFriendList.get(position);
+        FriendDateItem friendDateItem = listViewItemFriendDate.get(position);
 
         // 아이템 내 각 위젯에 데이터 반영
         /*
         iconImageView.setImageResource(R.drawable.images);
-
          */
-        titleTextView.setText(friendListItem.getTitle());
-
+        friendTextView.setText(friendDateItem.getWho());
+        timeTextView.setText(friendDateItem.getTime());
+        //dateTextView.setText(friendDateItem.getDate());
+        titleTextView.setText(friendDateItem.getContent());
 
         return convertView;
     }
@@ -71,16 +75,17 @@ public class FriendListAdapter extends BaseAdapter {
     // 지정한 위치(position)에 있는 데이터 리턴 : 필수 구현
     @Override
     public Object getItem(int position) {
-        return listViewItemFriendList.get(position) ;
+        return listViewItemFriendDate.get(position) ;
     }
 
     // 아이템 데이터 추가를 위한 함수. 개발자가 원하는대로 작성 가능.
-    public void addItem(ImageView icon, String title) {
-        FriendListItem item = new FriendListItem();
-        item.setIcon(icon);
-        item.setTitle(title);
+    public void addItem(String who, String time, String content) {
+        FriendDateItem item = new FriendDateItem();
+        item.setWho(who);
 
+        item.setTime(time);
+        item.setContent(content);
 
-        listViewItemFriendList.add(item);
+        listViewItemFriendDate.add(item);
     }
 }

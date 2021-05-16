@@ -259,6 +259,8 @@ public class CommunityMain extends Fragment {
                                             refreshLayout.setRefreshing(false);
                                             Log.wtf("진행도", (innerAI.get(0) +1) + "/" + result.size());
                                         }
+
+
                                     }
                                 });
                             }
@@ -358,6 +360,7 @@ public class CommunityMain extends Fragment {
                                                             for (File j : imageCacheList.listFiles()) {
                                                                 if(j.getName().equals(fileName+fileType)) {
                                                                     tmpItem.addContentImage(j.getPath());
+
                                                                     Log.wtf("이미지 캐싱", j.getPath());
                                                                 }
                                                             }

@@ -66,9 +66,12 @@ public class PublicChattingFragment extends Fragment{
                     public void onClick(View v) {
                         if (chat_edit.getText().toString().equals(""))
                             return;
+                        /*
                         ChatDTO chat = new ChatDTO(USER_NAME, chat_edit.getText().toString(), Timestamp.now().getSeconds()); //ChatDTO를 이용하여 데이터를 묶는다.
                         databaseReference.child("publicchat").child(CHAT_NAME).push().setValue(chat); // 데이터 푸쉬
                         chat_edit.setText(""); //입력창 초기화
+
+                         */
                     }
                 });
             }

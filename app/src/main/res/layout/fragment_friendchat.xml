@@ -17,16 +17,17 @@
             android:layout_height="100dp"
             android:orientation="horizontal">
             <ImageView
-            android:id="@+id/friendchat_imageview"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/baseline_group_24"/>
+                android:id="@+id/friendchat_imageview"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/baseline_group_24"/>
             <TextView
+                android:id="@+id/friendchat_friendname"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:text="친구이름"
-                android:textSize="26sp"
+                android:textSize="30sp"
                 android:gravity="center"/>
 
         </LinearLayout>
@@ -37,7 +38,7 @@
             android:layout_height="match_parent">
 
             <ListView
-                android:id="@+id/chat_view"
+                android:id="@+id/listview_chat"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>

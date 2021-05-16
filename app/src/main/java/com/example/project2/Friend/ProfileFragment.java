@@ -33,14 +33,13 @@ import com.google.firebase.storage.StorageReference;
 1.커뮤니티에서 친구추가 가능하게.
 2.친구화면에서 프로필 사진 출력가능.
 3.이메일 클릭으로 이메일 외 정보 참조. (일단 프로필 까진 나옴.)
-4.정보 공개/비공개 여부 설정?(필요 할려나?)
+4.정보 공개/비공개 여부 설정? (필요 할려나?)
 5.친구 신청 수락/거절?
-6.공개채팅에서 채팅장 이름 터치로 채팅창 입장가능.
-7.공개채팅 프래그먼트로.
  */
 
 public class ProfileFragment extends Fragment {
     private String result;
+    private String target_id;
     private String target_uid;
 
     private static String TAG = "ProfileFragment";
@@ -67,11 +66,13 @@ public class ProfileFragment extends Fragment {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         target_uid = (String) document.get("user_UID");
+                                        target_id = (String) document.get("user_ID");
                                         Log.d("Debug","targetuid=" + target_uid);
 
                                         Bundle chatfriend = new Bundle();
-                                        chatfriend.putString("Chatfriend", target_uid);
-                                        getParentFragmentManager().setFragmentResult("FriendUID",chatfriend);
+                                        chatfriend.putString("friend_uid", target_uid);
+                                        chatfriend.putString("friend_id", target_id);
+                                        getParentFragmentManager().setFragmentResult("Chatfriend",chatfriend);
 
                                         db.collection("Login_user").document(target_uid).collection("Info").document("UserInfo").get()
                                                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -161,8 +162,7 @@ public class ProfileFragment extends Fragment {
 
                 Log.d("Debug","sending " + result);
 
-
-            }
+                }
         });
 
 

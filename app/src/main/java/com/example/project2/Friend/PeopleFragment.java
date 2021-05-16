@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -68,7 +69,10 @@ public class PeopleFragment extends Fragment {
         friend_mail = (EditText) v.findViewById(R.id.friend_mail);
         add_friend = (Button) v.findViewById(R.id.add_friend);
         friend_list = (ListView) v.findViewById(R.id.listview_people);
+        /*
         friend_image = (ImageView) v.findViewById(R.id.friend_image);
+
+         */
         friend_text = (TextView) v.findViewById(R.id.friend_text);
 
 
@@ -88,6 +92,7 @@ public class PeopleFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference emailRef = db.collection("Login_user");
         Query query = emailRef.whereEqualTo("user_ID", true);
+
 
         db.collection("community").document(user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -129,8 +134,11 @@ public class PeopleFragment extends Fragment {
                                         new OnSuccessListener<Uri>() {
                                             @Override
                                             public void onSuccess(Uri uri) {
+                                                /*
                                                 ImageView friend_image = (ImageView) v.findViewById(R.id.friend_image);
                                                 Glide.with(getActivity()).load(uri).into(friend_image);
+
+                                                 */
                                             }
                                         });
                                 adapter.addItem(friend_image, F_IDArray[i]);

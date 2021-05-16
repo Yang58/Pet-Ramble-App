@@ -27,8 +27,10 @@ import com.example.project2.GoogleMap.MapsFragment;
 import com.example.project2.Login_Membership.InfoEditActivity;
 import com.example.project2.Main.CustomAdapter;
 import com.example.project2.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,6 +39,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -49,7 +52,7 @@ public class HomeFragment extends Fragment {
     TextView petname ;
     TextView petage ;
     TextView petkind ;
-    TextView infoedit;
+
 
     Button btnCamera;
 
@@ -75,7 +78,7 @@ public class HomeFragment extends Fragment {
         petage = v.findViewById(R.id.MPA);
         petkind = v.findViewById(R.id.MPK);
         petImage = v.findViewById(R.id.home_img);
-        infoedit = v.findViewById(R.id.info_edit);
+
         //ViewPager에 설정할 Adapter 객체 생성
         //ListView에서 사용하는 Adapter와 같은 역할.
         //다만. ViewPager로 스크롤 될 수 있도록 되어 있다는 것이 다름
@@ -94,14 +97,16 @@ public class HomeFragment extends Fragment {
         if (user == null){
             Log.e("HomeFragment","회원 정보 없음");
         }else{
-            DocumentReference docRef = FBdb.collection("users").document(user.getUid());
-            docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                    petname.setText(value.getString("petName"));
-                    petage.setText(value.getString("petAge"));
-                    petkind.setText(value.getString("petKind"));
-                }
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            DocumentSnapshot document = task.getResult();
+                            petname.setText(document.getString("petName"));
+                            petage.setText(document.getString("petAge"));
+                            petkind.setText(document.getString("petKind"));
+                        }
             });
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -155,14 +160,6 @@ public class HomeFragment extends Fragment {
                 }
 
                 return false;
-            }
-        });
-
-        infoedit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), InfoEditActivity.class);
-                startActivity(intent);
             }
         });
 

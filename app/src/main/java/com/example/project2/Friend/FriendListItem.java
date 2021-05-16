@@ -22,5 +22,4 @@ public class FriendListItem {
     public String getTitle() {
         return this.titleStr ;
     }
-
 }

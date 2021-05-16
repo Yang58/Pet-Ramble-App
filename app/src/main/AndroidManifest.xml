@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -19,16 +20,21 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <service
             android:name=".GoogleMap.LocationBackground"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true"
+            android:foregroundServiceType="location"/>
 
         <activity android:name=".Chatting.MessageActivity" />
         <activity android:name=".Main.InquiryActivity" />
         <activity android:name=".Main.CalenderActivity" />
         <activity
             android:name=".GoogleMap.WalkFinishPopup"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".GoogleMap.WalkFinishPopup2"
             android:theme="@android:style/Theme.Dialog" />
         <activity
             android:name=".Camera.MediaScanner"
@@ -46,7 +52,7 @@
             android:value="AIzaSyB8NAN4VfMVsaboxOc9qtECUiulJMrH5nI" />
 
         <activity android:name=".Login_Membership.UserinfoActivity" />
-        <activity android:name=".Login_Membership.InfoEditActivity"/>
+        <activity android:name=".Login_Membership.InfoEditActivity" />
         <activity android:name=".Camera.CameraActivity" />
         <activity
             android:name=".Main.MainActivity"
@@ -68,11 +74,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <service
-            android:name="com.example.project2.GoogleMap.LocationBackground"
-            android:enabled="true"
-            android:exported="true" />
     </application>
 
 </manifest>

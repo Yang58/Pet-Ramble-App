@@ -1,70 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="24dp"
+        android:background="@color/defaultBG"
         android:orientation="vertical"
-        android:layout_margin="24dp">
+        android:visibility="visible">
 
-       <LinearLayout
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:orientation="vertical"
-           android:layout_gravity="right">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:orientation="vertical">
 
-           <FrameLayout
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
 
-               <TextView
-                   android:id="@+id/TV_like"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_margin="5dp"
-                   android:onClick="onClick"
-                   android:text="♡"
-                   android:textSize="25dp" />
+                <TextView
+                    android:id="@+id/TV_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:onClick="onClick"
+                    android:text="♡"
+                    android:textSize="25dp" />
 
 
-           </FrameLayout>
+            </FrameLayout>
 
-           <FrameLayout
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
 
-               <TextView
-                   android:layout_gravity="center"
-                   android:id="@+id/Like_count"
-                   android:gravity="right"
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent"
-                   android:layout_margin="5dp"
-                   android:text="0" />
-           </FrameLayout>
-       </LinearLayout>
+                <TextView
+                    android:id="@+id/Like_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:gravity="right"
+                    android:text="0" />
+            </FrameLayout>
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/Map_Userprofile"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
             android:layout_width="150dp"
-            android:layout_height="150dp"/>
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp" />
 
 
         <TextView
             android:id="@+id/TV_Nickname"
-            android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Nickname"/>
+            android:layout_margin="5dp"
+            android:text="Nickname" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,27 +78,27 @@
 
             <TextView
                 android:id="@+id/TV_PetName"
-                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="PetName"/>
+                android:layout_margin="5dp"
+                android:text="PetName" />
 
             <TextView
                 android:id="@+id/TV_PetAge"
-                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="PetAge"/>
+                android:layout_margin="5dp"
+                android:text="PetAge" />
 
             <TextView
                 android:id="@+id/TV_PetKind"
-                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="PetKind"/>
+                android:layout_margin="5dp"
+                android:text="PetKind" />
 
         </LinearLayout>
 
@@ -103,14 +107,15 @@
             android:id="@+id/btn_chatting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="채팅하기"
-            android:layout_margin="5dp"/>
+            android:layout_margin="5dp"
+            android:text="채팅하기" />
+
         <Button
             android:id="@+id/btn_exit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="나가기"
-            android:layout_margin="5dp"/>
+            android:layout_margin="5dp"
+            android:text="나가기" />
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

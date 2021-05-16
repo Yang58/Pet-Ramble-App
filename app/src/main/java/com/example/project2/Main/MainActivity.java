@@ -28,6 +28,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Camera.CameraActivity;
+import com.example.project2.Login_Membership.InfoEditActivity;
 import com.example.project2.Login_Membership.LoginActivity;
 import com.example.project2.Login_Membership.UserinfoActivity;
 import com.example.project2.R;
@@ -82,10 +83,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             FirebaseFirestore fbdb = FirebaseFirestore.getInstance();
-
-
-
-
             DocumentReference docRef = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
             // 변경 DB변경 완료 후 펫 정보로 변경
 
@@ -189,6 +186,11 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "달력 실행", Toast.LENGTH_SHORT).show();
                 Intent CalenderIntent = new Intent(getApplicationContext(), CalenderActivity.class);
                 startActivity(CalenderIntent);
+            }
+            if (id == R.id.action_InfoEdit) {
+                Toast.makeText(this, "회원정보 수정", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), InfoEditActivity.class);
+                startActivity(intent);
             }
             if (id == R.id.action_LoginOut) {
                 Toast.makeText(this, "로그아웃", Toast.LENGTH_SHORT).show();

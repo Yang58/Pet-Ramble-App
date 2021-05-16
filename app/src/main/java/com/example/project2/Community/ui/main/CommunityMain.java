@@ -1,5 +1,7 @@
 package com.example.project2.Community.ui.main;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,6 +31,7 @@ import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.Community.listView.recyclerOnItemClick;
 import com.example.project2.R;
 import com.example.project2.Community.listView.listViewAdapter;
+import com.example.project2.tensorflowTest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -190,14 +193,12 @@ public class CommunityMain extends Fragment {
         floatBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
-                    if(!user.getUid().equals("djSTIBJogDTVDv8ZZJIla2yanSI2"))
-                        communityDB.update("friend", FieldValue.arrayUnion("djSTIBJogDTVDv8ZZJIla2yanSI2"));
-                }catch (NullPointerException e){
-                    Map<String, ArrayList<String>> data = null;
-                    data.put("friend",new ArrayList<String>());
-                    communityDB.set(data);
-                }
+                FragmentManager fm = getParentFragmentManager();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_bottom,R.anim.slide_out_bottom,R.anim.slide_in_top,R.anim.slide_out_top)
+                        .add(R.id.container, new tensorflowTest())
+                        .addToBackStack("frag_communityWrite")
+                        .commit();
             }
         });
 
@@ -209,6 +210,19 @@ public class CommunityMain extends Fragment {
         });
 
         return view;
+    }
+
+    public void listViewFadeIn(){
+        RecyclerView listView = view.findViewById(R.id.cm_main_list_recyclerContainer);
+        listView.setAlpha(0f);
+        listView.setVisibility(View.VISIBLE);
+
+        int shortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
+        listView.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null);
     }
 
     public void updateList(){
@@ -235,7 +249,6 @@ public class CommunityMain extends Fragment {
                         Log.i("정보","내 글 불러오기 완료");
                     }
                 });
-
                 //친구 글 목록 가져오기
                 communityDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -250,7 +263,7 @@ public class CommunityMain extends Fragment {
                                     public void onComplete() {
                                         if (innerAI.get(0) +1 == result.size()) {
                                             //가림막 해제
-                                            listView.setVisibility(View.VISIBLE);
+                                            listViewFadeIn();
                                             //글이 하나도 없는지 체크
                                             chkContentCount();
                                             //어댑터 업데이트
@@ -266,7 +279,7 @@ public class CommunityMain extends Fragment {
                             }
                         }catch(NullPointerException e){
                             //가림막 해제
-                            listView.setVisibility(View.VISIBLE);
+                            listViewFadeIn();
                             //새로고침 해제
                             refreshLayout.setRefreshing(false);
                             Log.wtf("경고",e.getMessage());

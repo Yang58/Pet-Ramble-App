@@ -135,10 +135,11 @@ public class DateEditFragment extends Fragment {
                             String calendarcontent = (String) document.get("content");
                             String timecontent = (String) document.get("time");
                             edit_schedule.setText(calendarcontent);
-                            String time[] = timecontent.split(":");
-                            timepicker.setHour(Integer.parseInt(time[0]));
-                            timepicker.setMinute(Integer.parseInt(time[1]));
-
+                            if( timecontent!=null) {
+                                String time[] = timecontent.split(":");
+                                timepicker.setHour(Integer.parseInt(time[0]));
+                                timepicker.setMinute(Integer.parseInt(time[1]));
+                            }
                             Personal = (Boolean) document.get("public");
 
                             if (Personal.equals(true)) {

@@ -54,6 +54,11 @@ public class HomeFragment extends Fragment {
     TextView petkind ;
 
 
+    TextView c;
+    TextView d;
+    TextView h;
+    TextView m;
+
     Button btnCamera;
 
     FragmentManager FM;
@@ -78,6 +83,11 @@ public class HomeFragment extends Fragment {
         petage = v.findViewById(R.id.MPA);
         petkind = v.findViewById(R.id.MPK);
         petImage = v.findViewById(R.id.home_img);
+        c = v.findViewById(R.id.tv_c);
+        d = v.findViewById(R.id.tv_d);
+        h = v.findViewById(R.id.tv_h);
+        m = v.findViewById(R.id.tv_m);
+
 
         //ViewPager에 설정할 Adapter 객체 생성
         //ListView에서 사용하는 Adapter와 같은 역할.
@@ -107,6 +117,35 @@ public class HomeFragment extends Fragment {
                             petage.setText(document.getString("petAge"));
                             petkind.setText(document.getString("petKind"));
                         }
+            });
+
+            DocumentReference doc = FBdb.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
+            doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document = task.getResult();
+                    if(document != null) {
+                        if (document.exists()) {
+                            doc.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                                    h.setText(value.getString("walking_Time_h"));
+                                    m.setText(value.getString("walking_Time_m"));
+                                    c.setText(value.getString("walking_Count"));
+                                    d.setText(value.getString("walking_Distance"));
+
+                                }
+                            });
+                        }else{
+                            h.setText("0");
+                            m.setText("0");
+                            c.setText("0");
+                            d.setText("0");
+
+
+                        }
+                    }
+                }
             });
 
             FirebaseStorage storage = FirebaseStorage.getInstance();

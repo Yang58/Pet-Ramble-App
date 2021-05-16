@@ -15,31 +15,32 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="bottom">
+        android:gravity="bottom"
+        android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton                android:id="@+id/btn_start"
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/btn_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/white"
                 android:layout_gravity="center"
-                android:text="산책 시작"
+                android:layout_margin="10dp"
+                android:backgroundTint="@color/white"
                 android:fontFamily="@font/tmoneyroundwindextrabold"
-                app:icon="@drawable/baseline_directions_walk_24"
+                android:text="산책 시작"
                 android:theme="@style/MaterialTheme"
-                android:layout_margin="10dp"/>
+                app:icon="@drawable/baseline_directions_walk_24" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardtest"
-                android:backgroundTint="#D2DDDDDD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_margin="10dp"
+                android:backgroundTint="#D2DDDDDD"
                 android:visibility="invisible"
                 app:cardCornerRadius="20dp">
 
@@ -52,64 +53,66 @@
                         android:id="@+id/btn_finish"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
                         android:backgroundTint="@color/white"
-                        android:layout_gravity="center"
-                        android:text="산책 종료"
                         android:fontFamily="@font/tmoneyroundwindextrabold"
-                        app:icon="@drawable/baseline_directions_walk_24"
+                        android:text="산책 종료"
                         android:theme="@style/MaterialTheme"
-                        android:layout_margin="10dp"/>
+                        app:icon="@drawable/baseline_directions_walk_24" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:weightSum="10"
-                    android:orientation="horizontal">
-
-                    <Chronometer
-                        android:id="@+id/chronometer"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:format="시간 : %s"
-                        android:textColor="@android:color/black"
-                        android:textSize="20dp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="right"
-                        android:layout_marginLeft="10dp"
-                        android:text="칼로리 : "
-                        android:textColor="@android:color/black"
-                        android:textSize="20dp"/>
-
-                    <TextView
-                        android:id="@+id/map_txt_calorie"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
                         android:gravity="center"
-                        android:hint=" 00 "
-                        android:textColor="@android:color/black"
-                        android:textSize="20dp" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text=" kcal "
-                        android:textColor="@android:color/black"
-                        android:gravity="right"
-                        android:textSize="20dp"/>
-                </LinearLayout>
+                        android:orientation="horizontal"
+                        android:weightSum="10">
+
+                        <Chronometer
+                            android:id="@+id/chronometer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:format="시간 : %s"
+                            android:textColor="@android:color/black"
+                            android:textSize="20dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
+                            android:gravity="right"
+                            android:text="칼로리 : "
+                            android:textColor="@android:color/black"
+                            android:textSize="20dp" />
+
+                        <TextView
+                            android:id="@+id/map_txt_calorie"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint=" 00 "
+                            android:textColor="@android:color/black"
+                            android:textSize="20dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:gravity="right"
+                            android:text=" kcal "
+                            android:textColor="@android:color/black"
+                            android:textSize="20dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </FrameLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

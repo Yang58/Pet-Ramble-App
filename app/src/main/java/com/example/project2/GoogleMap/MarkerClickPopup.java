@@ -74,41 +74,18 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
 
         profile = v.findViewById(R.id.Map_Userprofile);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
-        DocumentReference docRef = FBdb.collection("users").document(user.getUid());
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                NickName.setText(value.getString("name"));
-                PetName.setText(value.getString("petName"));
-                PetAge.setText(value.getString("petAge"));
-                PetKind.setText(value.getString("petKind"));
-            }
-        });
+        Bundle bundle = getArguments();
+        NickName.setText(bundle.getString("name"));
+        PetName.setText(bundle.getString("petName"));
+        PetAge.setText(bundle.getString("petAge")+"살");
+        PetKind.setText(bundle.getString("petKind"));
+        Glide.with(getContext()).load(bundle.getString("photoUrl")).apply(new RequestOptions().circleCrop()).into(profile);
 
         File file = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES + "/profile_img");
         if (!file.isDirectory()) {
             //디렉토리가 없으면, 디렉토리를 만든다.
             file.mkdir();
         }
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference();
-        storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
-                new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Glide.with(getContext()).load(uri).apply(new RequestOptions().circleCrop()).into(profile);
-
-//                        Glide.with(getContext()).load(uri).into(profile);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
 
         // 이미지뷰 원 형태로 변경
 //        profile.setBackground(new ShapeDrawable(new OvalShape()));

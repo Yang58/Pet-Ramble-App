@@ -40,35 +40,314 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/corner_border"
-                        android:gravity="center"
                         android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="추천 산책로"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"
-                            android:textStyle="bold"
-                            android:textSize="20dp"
-                            android:padding="5dp"
-                            android:layout_gravity="center"/>
+                            android:gravity="center">
+                            <TextView
+                                android:id="@+id/home_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="건강 관리"
+                                android:textColor="@color/black"
+                                android:fontFamily="@font/tmoneyroundwindextrabold"
+                                android:textStyle="bold"
+                                android:textSize="20dp"
+                                android:padding="5dp"
+                                android:layout_margin="10dp"
+                                android:layout_gravity="top"/>
+                        </LinearLayout>
 
-                        <androidx.viewpager.widget.ViewPager
-                            android:id="@+id/pager"
+                        <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="200dp"
+                            android:layout_height="wrap_content"
                             android:layout_margin="5dp">
-                        </androidx.viewpager.widget.ViewPager>
 
-                        <me.relex.circleindicator.CircleIndicator
-                            android:id="@+id/indicator"
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:orientation="horizontal"
+                                android:weightSum="5"
+                                android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_weight="1.5">
+
+                                <TextView
+                                    android:id="@+id/tx1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                                    android:text="몸무게 : "
+                                    android:textColor="@color/black"
+                                    android:textSize="13dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_weight="3.5">
+
+                                <TextView
+                                    android:id="@+id/home_text_weight"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text=" 00 KG "
+                                    android:layout_margin="5dp"
+                                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                                    android:textSize="13dp"
+                                    android:textColor="@color/black"/>
+
+                            </LinearLayout>
+                            </LinearLayout>
+
+                        </RelativeLayout>
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="20dp"
-                            app:ci_drawable="@drawable/imagesilder"
-                            app:ci_height="7dp"
-                            app:ci_margin="4dp"
-                            app:ci_width="7dp"/>
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:orientation="horizontal"
+                            android:weightSum="5"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_weight="1.5">
+
+                                <TextView
+                                    android:id="@+id/tx3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:gravity="center"
+                                    android:text="옵션  "
+                                    android:layout_margin="5dp"
+                                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                                    android:textSize="13dp"
+                                    android:textColor="@color/black"/>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:layout_weight="3.5">
+
+                                <Spinner
+                                    android:id="@+id/home_spinner"
+                                    android:entries="@array/my_array"
+                                    android:layout_width="match_parent"
+                                    android:paddingRight="10dp"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/corner_border2"
+                                    android:layout_toRightOf="@+id/tx3"/>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center">
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp">
+                                <TextView
+                                    android:id="@+id/tx5"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="10dp"
+                                    android:text="사료 칼로리 입력 :  "
+                                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                                    android:textSize="13dp"
+                                    android:textColor="@color/black"/>
+
+                                <EditText
+                                    android:id="@+id/home_Edit_feed_kcal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_alignBaseline="@+id/tx5"
+                                    android:hint="1KG의 칼로리"
+                                    android:gravity="center"
+                                    android:textSize="13dp"
+                                    android:background="@null"
+                                    android:layout_toRightOf="@+id/tx5"/>
+
+                            </RelativeLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="10dp"
+                            android:background="@drawable/corner_border2"
+                            android:orientation="horizontal"
+                            android:weightSum="5">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:weightSum="7"
+                                android:layout_weight="3">
+
+                               <LinearLayout
+                                   android:layout_width="0dp"
+                                   android:layout_height="match_parent"
+                                   android:layout_gravity="center"
+                                   android:orientation="vertical"
+                                   android:gravity="center"
+                                   android:layout_margin="5dp"
+                                   android:layout_weight="4.5">
+
+
+                                   <TextView
+                                       android:id="@+id/tx7"
+                                       android:layout_width="match_parent"
+                                       android:layout_height="wrap_content"
+                                       android:layout_marginLeft="10dp"
+                                       android:layout_margin="5dp"
+                                       android:text="필요 칼로리 :  "
+                                       android:fontFamily="@font/tmoneyroundwindextrabold"
+                                       android:textSize="12dp"
+                                       android:textColor="@color/black"/>
+
+                                   <TextView
+                                       android:id="@+id/tx9"
+                                       android:layout_width="match_parent"
+                                       android:layout_height="wrap_content"
+                                       android:layout_marginLeft="10dp"
+                                       android:layout_margin="5dp"
+                                       android:text="사료 급여량 :  "
+                                       android:fontFamily="@font/tmoneyroundwindextrabold"
+                                       android:textSize="12dp"
+                                       android:textColor="@color/black"/>
+
+                                   <TextView
+                                       android:id="@+id/tx11"
+                                       android:layout_width="match_parent"
+                                       android:layout_height="wrap_content"
+                                       android:layout_margin="5dp"
+                                       android:layout_marginLeft="10dp"
+                                       android:text="추천 산책 시간 :  "
+                                       android:fontFamily="@font/tmoneyroundwindextrabold"
+                                       android:textSize="12dp"
+                                       android:textColor="@color/black"/>
+
+                               </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center"
+                                    android:orientation="vertical"
+                                    android:gravity="center"
+                                    android:layout_margin="5dp"
+                                    android:layout_weight="2.5">
+
+
+                                    <TextView
+                                        android:id="@+id/home_text_kcal"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@null"
+                                        android:layout_margin="5dp"
+                                        android:gravity="center"
+                                        android:text=" 00 kcal"
+                                        android:textSize="12dp" />
+
+
+                                    <TextView
+                                        android:id="@+id/home_text_feed"
+                                        android:layout_margin="5dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@null"
+                                        android:gravity="center"
+                                        android:text=" 00 g"
+                                        android:textSize="12dp" />
+
+
+                                    <TextView
+                                        android:id="@+id/home_text_walking_time"
+                                        android:layout_margin="5dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@null"
+                                        android:gravity="center"
+                                        android:text=" 00 분"
+                                        android:textSize="12dp" />
+
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="2">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent">
+
+                                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                                        android:id="@+id/home_button_check"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:layout_margin="10dp"
+                                        android:backgroundTint="@color/white"
+                                        android:layout_centerInParent="true"
+                                        android:fontFamily="@font/tmoneyroundwindextrabold"
+                                        android:text="입력 완료"
+                                        android:theme="@style/MaterialTheme"/>
+
+                                    <TextView
+                                        android:layout_margin="10dp"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentBottom="true"
+                                        android:textSize="10dp"
+                                        android:layout_alignParentRight="true"
+                                        android:text=" * 하루 기준 *"/>
+
+                                </RelativeLayout>
+
+
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
                     </LinearLayout>
 
                     </LinearLayout>
@@ -139,6 +418,7 @@
                                     android:textSize="10dp"
                                     android:layout_margin="5dp"
                                     android:text="  "/>
+
                                 </LinearLayout>
 
                                 <LinearLayout

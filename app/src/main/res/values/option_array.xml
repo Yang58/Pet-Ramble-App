@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="my_array">
+        <item> 선택해주세요.</item>
+        <item>1년 미만의 자견</item>
+        <item>1년 이상의 중성화 하지 않음</item>
+        <item>중성화 완료 건강한 상태</item>
+        <item>노견</item>
+        <item>비만의 징후(다이어트 시작)</item>
+        <item> 심각한 비만 </item>
+        <item> 임신 상태 </item>
+        <item> 수유 기간 </item>
+    </string-array>
+
+</resources>

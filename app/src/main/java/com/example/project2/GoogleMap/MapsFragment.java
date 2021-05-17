@@ -37,7 +37,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.FirebaseDB.WalkingDB;
@@ -83,7 +82,6 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -484,8 +482,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                             int sum_d = walkDistance + d1;
 
                             if (finalMin >= 5) {// 5분 이상 산책 했을 때
-                                WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
-                                WalkingUploader(walkingDB);
+
+                                if(sum_m >= 60){
+                                    int hour = sum_m / 60;
+                                    sum_m = sum_m % 60;
+
+                                    WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h + hour), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
+                                    WalkingUploader(walkingDB);
+                                }else{
+
+                                    WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
+                                    WalkingUploader(walkingDB);
+
+                                }
+
                                 Log.e(TAG,"Walk Data Null");
 
                                 Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);

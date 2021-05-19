@@ -104,7 +104,6 @@ public class HomeFragment extends Fragment {
         h = v.findViewById(R.id.tv_h);
         m = v.findViewById(R.id.tv_m);
 
-        //EditText 클릭 이벤트
         Edit_Feed_kcal.setInputType(EditorInfo.TYPE_NULL);
         Edit_Feed_kcal.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +111,6 @@ public class HomeFragment extends Fragment {
                 ((EditText)view).setInputType(EditorInfo.TYPE_CLASS_TEXT);
             }
         });
-        //EditText 종료 후 이벤트
         Edit_Feed_kcal.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {

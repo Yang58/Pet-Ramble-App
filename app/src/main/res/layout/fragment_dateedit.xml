@@ -75,6 +75,13 @@
         android:hint="일정을 입력하세요.">
     </EditText>
 
+
+    <Button
+        android:id="@+id/schedule_locate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="위치 설정">
+    </Button>
     <Button
         android:id="@+id/schedule_sav"
         android:layout_width="match_parent"

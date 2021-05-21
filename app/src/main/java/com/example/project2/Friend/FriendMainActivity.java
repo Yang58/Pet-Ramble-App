@@ -1,5 +1,6 @@
 package com.example.project2.Friend;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.project2.Chatting.PublicChatStartFragment;
+import com.example.project2.Chatting.PublicChattingFragment;
 import com.example.project2.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -26,6 +28,9 @@ public class FriendMainActivity extends AppCompatActivity {
         publicChatStartFragment = new PublicChatStartFragment();
 
         FM.beginTransaction().replace(R.id.friend_frameLayout,peopleFragment).commit();
+
+
+        getSupportActionBar().hide();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomnav);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

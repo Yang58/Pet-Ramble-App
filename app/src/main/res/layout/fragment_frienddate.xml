@@ -4,26 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
-
     <TextView
         android:id="@+id/friend_schedule"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@drawable/friend_custom"
-        android:layout_margin="5dp"
         android:text="친구 일정"
         android:textSize="24dp"
-        android:textColor="@color/black"
+        android:textColor="@color/purple_500"
         android:layout_gravity="center"/>
 
     <ListView
         android:id="@+id/listview_frienddate"
-        android:background="@drawable/corner_border2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
 
 
 

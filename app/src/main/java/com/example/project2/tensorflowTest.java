@@ -122,6 +122,7 @@ public class tensorflowTest extends Fragment {
 
         Button b = view.findViewById(R.id.tf_btn_getImg);
         b.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
                 selfPermissionCheck();

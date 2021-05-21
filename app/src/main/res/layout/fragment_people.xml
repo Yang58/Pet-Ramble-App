@@ -3,44 +3,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_margin="5dp"
-        android:fontFamily="@font/tmoneyroundwindextrabold"
-        android:textSize="20sp"
-        android:textColor="@color/defaultButtonText"
-        android:text="활동중인 친구들"/>
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:background="@color/black"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/friend_mail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:hint="추가할 친구의 이메일 입력"
-        android:layout_gravity="left"
-        android:gravity="left"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/add_friend"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="친구 추가"/>
+            <ListView
+                android:id="@+id/listview_people"
+                android:layout_width="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_height="match_parent"/>
 
-    <ListView
-        android:id="@+id/listview_people"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="3"
+                android:background="#BCFFF7E9"
+                android:layout_alignParentBottom="true">
+
+                <EditText
+                    android:id="@+id/friend_mail"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:background="@null"
+                    android:layout_marginLeft="10dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="추가할 친구의 이메일 입력"
+                    android:layout_gravity="center"
+                    android:gravity="left"/>
+
+                <Button
+                    android:id="@+id/add_friend"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/button_custom"
+                    android:layout_height="wrap_content"
+                    android:text="친구 추가"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
 
 
 

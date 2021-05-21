@@ -6,11 +6,16 @@
         <item
             android:id="@+id/action_people"
             android:icon="@drawable/baseline_group_24"
-            android:title="people"/>
+            android:title="친구 목록"/>
         <item
             android:id="@+id/action_chat"
             android:icon="@drawable/baseline_chat_black_24dp"
-            android:title="chatting"/>
+            android:title="채팅"/>
+
+        <item
+            android:id="@+id/action_ranking"
+            android:icon="@drawable/baseline_chat_black_24dp"
+            android:title="순위"/>
 
     </group>
 

@@ -1,5 +1,6 @@
 package com.example.project2.Friend;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +26,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -70,6 +73,8 @@ public class FriendChatFragment extends Fragment {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
 
+
+
         getParentFragmentManager().setFragmentResultListener("Chatfriend",this,new FragmentResultListener(){
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
@@ -100,7 +105,7 @@ public class FriendChatFragment extends Fragment {
                 CHAT_NAME = ROOM_ID;
                 USER_NAME = user.getEmail();
 
-//                openChat(CHAT_NAME);
+                openChat(CHAT_NAME);
 
 
                 // 메시지 전송 버튼에 대한 클릭 리스너 지정
@@ -138,35 +143,36 @@ public class FriendChatFragment extends Fragment {
         adapter.remove(sdf.format(time)+" " + chatDTO.getUserName() + " : " + chatDTO.getMessage());
     }
 
-//    private void openChat(String chatName) {
-//        // 리스트 어댑터 생성 및 세팅
-//        final ArrayAdapter<String> adapter
-//                = new ArrayAdapter<String>(getActivity(), R.id.listview_chat, R.id.chat_text);
-//        chat_view.setAdapter(adapter);
-//
-//        // 데이터 받아오기 및 어댑터 데이터 추가 및 삭제 등..리스너 관리
-//        databaseReference.child("friendchat").child(chatName).addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                addMessage(dataSnapshot, adapter);
-//                Log.e("LOG", "s:"+s);
-//            }
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//            }
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                removeMessage(dataSnapshot, adapter);
-//            }
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
+    private void openChat(String chatName) {
+        // 리스트 어댑터 생성 및 세팅
+        @SuppressLint("ResourceType")
+        final ArrayAdapter<String> adapter
+                = new ArrayAdapter<String>(getActivity(), R.id.listview_chat, R.id.chat_text);
+        chat_view.setAdapter(adapter);
+
+        // 데이터 받아오기 및 어댑터 데이터 추가 및 삭제 등..리스너 관리
+        databaseReference.child("friendchat").child(chatName).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                addMessage(dataSnapshot, adapter);
+                Log.e("LOG", "s:"+s);
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                removeMessage(dataSnapshot, adapter);
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 }
 

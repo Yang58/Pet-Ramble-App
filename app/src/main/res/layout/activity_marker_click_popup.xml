@@ -15,45 +15,6 @@
         android:orientation="vertical"
         android:visibility="visible">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-
-                <TextView
-                    android:id="@+id/TV_like"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:onClick="onClick"
-                    android:text="♡"
-                    android:textSize="25dp" />
-
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-
-                <TextView
-                    android:id="@+id/Like_count"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_margin="5dp"
-                    android:gravity="right"
-                    android:text="0" />
-            </FrameLayout>
-        </LinearLayout>
-
         <ImageView
             android:id="@+id/Map_Userprofile"
             android:layout_width="150dp"
@@ -61,14 +22,38 @@
             android:layout_gravity="center"
             android:layout_marginBottom="10dp" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/nick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="@color/black"
+                    android:layout_toLeftOf="@+id/center"
+                    android:layout_margin="5dp"
+                    android:text="닉네임" />
+                <TextView
+                    android:id="@+id/center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_margin="5dp"
+                    android:text="  :  " />
+                <TextView
+                    android:id="@+id/TV_Nickname"
+                    android:layout_toRightOf="@+id/center"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="Nickname" />
 
-        <TextView
-            android:id="@+id/TV_Nickname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="5dp"
-            android:text="Nickname" />
+            </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -81,6 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textColor="@color/black"
                 android:layout_margin="5dp"
                 android:text="PetName" />
 
@@ -89,6 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textColor="@color/black"
                 android:layout_margin="5dp"
                 android:text="PetAge" />
 
@@ -97,6 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textColor="@color/black"
                 android:layout_margin="5dp"
                 android:text="PetKind" />
 
@@ -107,6 +95,7 @@
             android:id="@+id/btn_chatting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_custom"
             android:layout_margin="5dp"
             android:text="채팅하기" />
 
@@ -114,6 +103,7 @@
             android:id="@+id/btn_exit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_custom"
             android:layout_margin="5dp"
             android:text="나가기" />
     </LinearLayout>

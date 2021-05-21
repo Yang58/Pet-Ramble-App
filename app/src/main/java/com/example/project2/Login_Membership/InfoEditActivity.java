@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,6 +48,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class InfoEditActivity extends AppCompatActivity {
     private static final String TAG = "InfoEditActivity";
@@ -130,82 +137,96 @@ public class InfoEditActivity extends AppCompatActivity {
         btn_Check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String Edit_name = edit_name.getText().toString();
-                String Edit_phoneNum = edit_phoneNum.getText().toString();
-                String Edit_Nickname = edit_Nickname.getText().toString();
-                String Edit_petName = edit_petName.getText().toString();
-                String Edit_petAge = edit_petAge.getText().toString();
-                String Edit_petKind = edit_petKind.getText().toString();
-                String Edit_petWeight = edit_petWeight.getText().toString();
-                String Edit_petBirthday = edit_petBirthday.getText().toString();
 
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                StorageReference storageRef = storage.getReference();
+                try {
+                    String Edit_name = edit_name.getText().toString();
+                    String Edit_phoneNum = edit_phoneNum.getText().toString();
+                    String Edit_Nickname = edit_Nickname.getText().toString();
+                    String Edit_petName = edit_petName.getText().toString();
+                    String Edit_petAge = edit_petAge.getText().toString();
+                    String Edit_petKind = edit_petKind.getText().toString();
+                    String Edit_petWeight = edit_petWeight.getText().toString();
+                    SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
+                    Date Edit_petBirthday = sdf.parse(edit_petBirthday.getText().toString());
 
-                RadioGroup genderGroup = findViewById(R.id.edit_genderGroup);
-                RadioGroup Neutralization = findViewById(R.id.edit_Neutral);
-                RadioGroup Vaccination = findViewById(R.id.edit_Vaccination);
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageRef = storage.getReference();
 
-                int Gender = genderGroup.getCheckedRadioButtonId();
-                int Neutral = Neutralization.getCheckedRadioButtonId();
-                int Vaccine = Vaccination.getCheckedRadioButtonId();
+                    RadioGroup genderGroup = findViewById(R.id.edit_genderGroup);
+                    RadioGroup Neutralization = findViewById(R.id.edit_Neutral);
+                    RadioGroup Vaccination = findViewById(R.id.edit_Vaccination);
 
-                RadioButton GenderCheck = findViewById(Gender);
-                RadioButton NeutralizationCheck = findViewById(Neutral);
-                RadioButton VaccinationCheck = findViewById(Vaccine);
+                    int Gender = genderGroup.getCheckedRadioButtonId();
+                    int Neutral = Neutralization.getCheckedRadioButtonId();
+                    int Vaccine = Vaccination.getCheckedRadioButtonId();
 
-                StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
-                Log.d("Debug",Edit_name);
-                if (uri == null) {
-                    UserInfoDB userInfoDB = new UserInfoDB(Edit_name, Edit_Nickname, null, Edit_phoneNum);
-                    MyPetDB myPetDB = new MyPetDB(Edit_petName,Edit_petBirthday,Edit_petAge,Edit_petKind,Edit_petWeight, GenderCheck.getText().toString(), NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
+                    RadioButton GenderCheck = findViewById(Gender);
+                    RadioButton NeutralizationCheck = findViewById(Neutral);
+                    RadioButton VaccinationCheck = findViewById(Vaccine);
 
-                    Log.d("Debug","Uri was null.");
-                    UserinfoUploader(userInfoDB);
-                    Petinfouploader(myPetDB);
+                    StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
+                    Log.d("Debug",Edit_name);
+                    if (uri == null) {
+                        UserInfoDB userInfoDB = new UserInfoDB(Edit_name, Edit_Nickname, null, Edit_phoneNum);
+                        MyPetDB myPetDB = new MyPetDB(Edit_petName,Edit_petAge,Edit_petBirthday,Edit_petKind,Edit_petWeight, GenderCheck.getText().toString(), NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
 
-                    Toast.makeText(InfoEditActivity.this, "업로드.", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(InfoEditActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }else{
-                    try {
-                        InputStream stream = new FileInputStream(new File(imageUrl));
-                        UploadTask uploadTask = mountainImagesRef.putStream(stream);
-                        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                            @Override
-                            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                                if (!task.isSuccessful()) {
-                                    throw task.getException();
+                        Log.d("Debug","Uri was null.");
+                        UserinfoUploader(userInfoDB);
+                        Petinfouploader(myPetDB);
+
+                        Toast.makeText(InfoEditActivity.this, "업로드.", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(InfoEditActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        try {
+                            InputStream stream = new FileInputStream(new File(imageUrl));
+                            UploadTask uploadTask = mountainImagesRef.putStream(stream);
+                            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                                @Override
+                                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                    if (!task.isSuccessful()) {
+                                        throw task.getException();
+                                    }
+                                    return mountainImagesRef.getDownloadUrl();
                                 }
-                                return mountainImagesRef.getDownloadUrl();
-                            }
-                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Uri> task) {
-                                if (task.isSuccessful()) {
-                                    Uri downloadUri = task.getResult();
+                            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    if (task.isSuccessful()) {
+                                        Uri downloadUri = task.getResult();
 
-                                    UserInfoDB userInfoDB = new UserInfoDB(Edit_name, Edit_Nickname, downloadUri.toString(), Edit_phoneNum);
-                                    MyPetDB myPetDB = new MyPetDB(Edit_petName, Edit_petBirthday, Edit_petAge, Edit_petKind, Edit_petWeight, GenderCheck.getText().toString(), NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
+                                        UserInfoDB userInfoDB = new UserInfoDB(Edit_name, Edit_Nickname, downloadUri.toString(), Edit_phoneNum);
+                                        MyPetDB myPetDB = new MyPetDB(Edit_petName, Edit_petAge, Edit_petBirthday, Edit_petKind, Edit_petWeight, GenderCheck.getText().toString(), NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
 
-                                    UserinfoUploader(userInfoDB);
-                                    Petinfouploader(myPetDB);
-                                    Toast.makeText(InfoEditActivity.this, "업로드.", Toast.LENGTH_SHORT).show();
+                                        UserinfoUploader(userInfoDB);
+                                        Petinfouploader(myPetDB);
+                                        Toast.makeText(InfoEditActivity.this, "업로드.", Toast.LENGTH_SHORT).show();
 
-                                    Intent intent = new Intent(InfoEditActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    Toast.makeText(InfoEditActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(InfoEditActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Toast.makeText(InfoEditActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
-                        });
-                    } catch (FileNotFoundException e) {
-                        Log.e("로그", "에러: " + e.toString());
+                            });
+                        } catch (FileNotFoundException e) {
+                            Log.e("로그", "에러: " + e.toString());
+                        }
                     }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
+
             }
+    });
+   edit_petBirthday.setOnClickListener(new View.OnClickListener() {
+         @Override
+        public void onClick(View v) {
+            Toast.makeText(InfoEditActivity.this,"8자리숫자를 입력하세요(예:20020525)",Toast.LENGTH_SHORT).show();
+        }
     });
 }
 
@@ -271,6 +292,7 @@ public class InfoEditActivity extends AppCompatActivity {
                                                 profile_Nickname.setText((String) document.get("user_nickname"));
                                             }
                                         });
+
                                 db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").get()
                                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
@@ -289,7 +311,20 @@ public class InfoEditActivity extends AppCompatActivity {
                                                 edit_petWeight.setText((String) document.get("petWeight"));
 
                                                 EditText edit_petBirthday = (EditText) findViewById(R.id.edit_birthday);
-                                                edit_petBirthday.setText((String) document.get("petBrithday"));
+                                                Timestamp i = (Timestamp) document.get("petBrithday");
+
+                                                SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
+                                                String str = sdf.format( new Date( i.toDate().getTime()));
+                                                Log.d("Debug", str);
+
+                                                try {
+                                                    Date endDate = sdf.parse(edit_petBirthday.getText().toString());
+
+                                                } catch (ParseException e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                                edit_petBirthday.setText(str);
 
                                                 RadioButton gender1 = (RadioButton) findViewById(R.id.gender1);
                                                 RadioButton gender2 = (RadioButton) findViewById(R.id.gender2);

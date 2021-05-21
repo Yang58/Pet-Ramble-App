@@ -47,7 +47,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /* TO-DO list
     1.petBirthday date형식으로 바꾸기.
@@ -119,6 +124,8 @@ public class UserinfoActivity extends AppCompatActivity {
         });
 
 
+
+
         // 이미지뷰 원 형태로 변경
 //        user_profile.setBackground(new ShapeDrawable(new OvalShape()));
 //        if(Build.VERSION.SDK_INT >= 21){
@@ -141,6 +148,13 @@ public class UserinfoActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(UserinfoActivity.this,"별명을 입력해주세요.",Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        petBirthday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(UserinfoActivity.this,"8자리숫자를 입력하세요(예:20020525)",Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -184,97 +198,100 @@ public class UserinfoActivity extends AppCompatActivity {
         String userPhoneNumber =((EditText)findViewById(R.id.edit_phoneNum)).getText().toString();
 
         String petName = ((EditText) findViewById(R.id.edit_petName)).getText().toString();
-        String petBrithday = ((EditText) findViewById(R.id.edit_birthday)).getText().toString();
         String petAge = ((EditText) findViewById(R.id.edit_petAge)).getText().toString();
         String petKind = ((EditText) findViewById(R.id.edit_petKind)).getText().toString();
         String petWeight = ((EditText)findViewById(R.id.edit_petWeight)).getText().toString();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
+            Date petBrithday = sdf.parse(petBirthday.getText().toString());
 
+            if (userNickname.length() > 0) {
 
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReference();
+                user  = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (userNickname.length() > 0 && petBrithday.length() > 0) {
+                StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
 
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageRef = storage.getReference();
-            user  = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference photo = database.getReference("friend").child(user.getUid()).child("photo");
+                DatabaseReference name = database.getReference("friend").child(user.getUid()).child("name");
+                DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
+                DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
 
-            StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
+                RadioGroup genderGroup = findViewById(R.id.genderGroup);
+                RadioGroup NeutralizationGroup = findViewById(R.id.NeutralizationGroup);
+                RadioGroup VaccinationGroup = findViewById(R.id.VaccinationGroup);
 
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference photo = database.getReference("friend").child(user.getUid()).child("photo");
-            DatabaseReference name = database.getReference("friend").child(user.getUid()).child("name");
-            DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
-            DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
+                int Gender = genderGroup.getCheckedRadioButtonId();
+                int Neutralization = NeutralizationGroup.getCheckedRadioButtonId();
+                int Vaccination = VaccinationGroup.getCheckedRadioButtonId();
 
-            RadioGroup genderGroup = findViewById(R.id.genderGroup);
-            RadioGroup NeutralizationGroup = findViewById(R.id.NeutralizationGroup);
-            RadioGroup VaccinationGroup = findViewById(R.id.VaccinationGroup);
+                RadioButton GenderCheck = findViewById(Gender);
+                RadioButton NeutralizationCheck = findViewById(Neutralization);
+                RadioButton VaccinationCheck = findViewById(Vaccination);
 
-            int Gender = genderGroup.getCheckedRadioButtonId();
-            int Neutralization = NeutralizationGroup.getCheckedRadioButtonId();
-            int Vaccination = VaccinationGroup.getCheckedRadioButtonId();
+                MyPetDB myPetDB = new MyPetDB(petName,petAge,petBrithday,petKind,petWeight,GenderCheck.getText().toString(),NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
 
-            RadioButton GenderCheck = findViewById(Gender);
-            RadioButton NeutralizationCheck = findViewById(Neutralization);
-            RadioButton VaccinationCheck = findViewById(Vaccination);
+                if (uri == null) {
+                    User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind,null);
+                    UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,null,userPhoneNumber);
+                    Friend f_list = new Friend(friend,friend_mail);
 
-            MyPetDB myPetDB = new MyPetDB(petName,petBrithday,petAge,petKind,petWeight,GenderCheck.getText().toString(),NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
+                    photo.setValue(null);
+                    name.setValue(userNickname);
+                    pet.setValue(petKind);
+                    age.setValue(petAge);
 
-            if (uri == null) {
-                User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind,null);
-                UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,null,userPhoneNumber);
-                Friend f_list = new Friend(friend,friend_mail);
+                    Petinfouploader(myPetDB);
+                    UserinfoUploader(userInfoDB);
+                    UserProfileUploader(userinfo);
+                    EmptyFriendlistUploader(f_list);
 
-                photo.setValue(null);
-                name.setValue(userNickname);
-                pet.setValue(petKind);
-                age.setValue(petAge);
-
-                Petinfouploader(myPetDB);
-                UserinfoUploader(userInfoDB);
-                UserProfileUploader(userinfo);
-                EmptyFriendlistUploader(f_list);
-
-            } else {
-                try {
-                    InputStream stream = new FileInputStream(new File(imageUrl));
-                    UploadTask uploadTask = mountainImagesRef.putStream(stream);
-                    uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                        @Override
-                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
+                } else {
+                    try {
+                        InputStream stream = new FileInputStream(new File(imageUrl));
+                        UploadTask uploadTask = mountainImagesRef.putStream(stream);
+                        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                            @Override
+                            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                if (!task.isSuccessful()) {
+                                    throw task.getException();
+                                }
+                                return mountainImagesRef.getDownloadUrl();
                             }
-                            return mountainImagesRef.getDownloadUrl();
-                        }
-                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if (task.isSuccessful()) {
-                                Uri downloadUri = task.getResult();
+                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    Uri downloadUri = task.getResult();
 
-                                photo.setValue(downloadUri.toString());
-                                name.setValue(userNickname);
-                                pet.setValue(petKind);
-                                age.setValue(petAge);
-
-                                UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,downloadUri.toString(),userPhoneNumber);
-                                User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind, downloadUri.toString());
-                                Friend f_list = new Friend(friend,friend_mail);
-                                UserinfoUploader(userInfoDB);
-                                Petinfouploader(myPetDB);
-                                UserProfileUploader(userinfo);
-                                EmptyFriendlistUploader(f_list);
-                            } else {
-                                Toast.makeText(UserinfoActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
+                                    photo.setValue(downloadUri.toString());
+                                    name.setValue(userNickname);
+                                    pet.setValue(petKind);
+                                    age.setValue(petAge);
+                                    UserInfoDB userInfoDB = new UserInfoDB(userName,userNickname,downloadUri.toString(),userPhoneNumber);
+                                    User userinfo = new User(userNickname, petBrithday, petName, petAge, petKind, downloadUri.toString());
+                                    Friend f_list = new Friend(friend,friend_mail);
+                                    UserinfoUploader(userInfoDB);
+                                    Petinfouploader(myPetDB);
+                                    UserProfileUploader(userinfo);
+                                    EmptyFriendlistUploader(f_list);
+                                } else {
+                                    Toast.makeText(UserinfoActivity.this, "회원 정보를 저장하지 못했습니다. ", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                    });
-                } catch (FileNotFoundException e) {
-                    Log.e("로그", "에러: " + e.toString());
+                        });
+                    } catch (FileNotFoundException e) {
+                        Log.e("로그", "에러: " + e.toString());
+                    }
                 }
+            } else {
+                Toast.makeText(this, "회원 정보를 입력해주세요 ", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Toast.makeText(this, "회원 정보를 입력해주세요 ", Toast.LENGTH_SHORT).show();
+        } catch (ParseException e) {
+            Log.d("Debug","null error!");
+            e.printStackTrace();
         }
     }
 
@@ -353,6 +370,8 @@ public class UserinfoActivity extends AppCompatActivity {
                     }
                 });
     }
+
+
 
 
 

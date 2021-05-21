@@ -1,9 +1,11 @@
 package com.example.project2.FirebaseDB;
 
+import java.util.Date;
+
 public class User {
 
     public String person_name;
-    public String petBrithday; // 강아지 생일로 변경
+    public Date petBirthday; // 강아지 생일로 변경
     public String petName;
     public String petAge;
     public String petKind;
@@ -11,10 +13,10 @@ public class User {
 
     public User(){}
 
-    public User(String person_name, String petBrithday, String petName, String petAge, String petKind, String photoUrl){
+    public User(String person_name, Date petBirthday, String petName, String petAge, String petKind, String photoUrl){
         
         this.person_name = person_name;
-        this.petBrithday = petBrithday;
+        this.petBirthday = petBirthday;
         this.petName = petName;
         this.petAge = petAge;
         this.petKind = petKind;
@@ -30,12 +32,12 @@ public class User {
         this.person_name = person_name;
     }
 
-    public String getPetBrithday(){
-        return this.petBrithday;
+    public Date getPetBirthday(){
+        return this.petBirthday;
     }
 
-    public void setPetBrithday(String petBrithday){
-        this.petBrithday = petBrithday;
+    public void setPetBirthday(Date petBrithday){
+        this.petBirthday = petBirthday;
     }
 
     public String getpetName(){

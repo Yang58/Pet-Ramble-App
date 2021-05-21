@@ -16,6 +16,19 @@
         android:orientation="vertical"
         android:gravity="center">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:paddingLeft="10dp"
+            android:text="회원 정보 "
+            android:textColor="@android:color/black"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+
         <ImageView
             android:id="@+id/profile_imageView"
             android:layout_width="160dp"
@@ -32,11 +45,12 @@
 
     </LinearLayout>
 
+
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -49,156 +63,44 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical">
-            <LinearLayout
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@drawable/info_conder"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
+                android:text="사용자 정보"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_margin="5dp"
+                android:textColor="@color/black"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edit_name"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="사용자 정보"
-                    android:layout_gravity="center"
-                    android:gravity="center"
                     android:layout_margin="5dp"
-                    android:textColor="@color/black"/>
+                    android:ems="5"
+                    android:gravity="center"
+                    android:hint="이름"
+                    android:inputType="textPersonName"
+                    android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <EditText
+                    android:id="@+id/edit_phoneNum"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:weightSum="5"
-                    android:layout_margin="6dp"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 이름 "
-                            android:layout_margin="8dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3">
-
-                        <EditText
-                            android:id="@+id/edit_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="35dp"
-                            android:layout_marginLeft="10dp"
-                            android:background="@drawable/edit_text_custom"
-                            android:gravity="center"
-                            android:ems="8"
-                            android:inputType="textPersonName"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:weightSum="5"
-                    android:layout_margin="6dp"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 번호 "
-                            android:layout_margin="8dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3">
-
-                        <EditText
-                            android:id="@+id/edit_phoneNum"
-                            android:layout_width="match_parent"
-                            android:layout_height="35dp"
-                            android:layout_marginLeft="10dp"
-                            android:background="@drawable/edit_text_custom"
-                            android:gravity="center"
-                            android:ems="8"
-                            android:inputType="phone"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:weightSum="5"
-                    android:layout_margin="6dp"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 닉네임 "
-                            android:layout_margin="8dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3">
-
-                        <EditText
-                            android:id="@+id/edit_Nickname"
-                            android:layout_width="match_parent"
-                            android:layout_height="35dp"
-                            android:layout_marginLeft="10dp"
-                            android:background="@drawable/edit_text_custom"
-                            android:gravity="center"
-                            android:ems="8"
-                            android:inputType="textPersonName"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
+                    android:layout_margin="5dp"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="번호"
+                    android:inputType="textPersonName"
+                    android:textStyle="bold" />
 
             </LinearLayout>
-
-
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -206,7 +108,6 @@
                 android:layout_gravity="center"
                 android:background="@drawable/info_conder"
                 android:gravity="center"
-                android:layout_margin="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -219,240 +120,97 @@
                     android:textColor="@color/black"/>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:weightSum="5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <EditText
+                        android:id="@+id/edit_Nickname"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_margin="5dp"
+                        android:ems="8"
+                        android:gravity="center"
+                        android:hint="닉네임"
+                        android:inputType="textPersonName"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 이름 "
-                            android:layout_margin="5dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <EditText
+                        android:id="@+id/edit_birthday"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="3">
-
-                        <EditText
-                            android:id="@+id/edit_petName"
-                            android:layout_width="match_parent"
-                            android:layout_height="35dp"
-                            android:layout_marginLeft="10dp"
-                            android:background="@drawable/edit_text_custom"
-                            android:ems="8"
-                            android:gravity="center"
-                            android:inputType="textPersonName"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
+                        android:layout_margin="5dp"
+                        android:ems="8"
+                        android:gravity="center"
+                        android:hint="애완동물 생일"
+                        android:inputType="number"
+                        android:textStyle="bold"
+                        android:maxLength="8"/>
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:weightSum="5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <EditText
+                        android:id="@+id/edit_petName"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_margin="5dp"
+                        android:ems="8"
+                        android:gravity="center"
+                        android:hint="애완동물 이름"
+                        android:inputType="textPersonName"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 나이 "
-                            android:layout_margin="5dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <EditText
+                        android:id="@+id/edit_petAge"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="3">
-
-                        <EditText
-                            android:id="@+id/edit_petAge"
-                            android:layout_width="match_parent"
-                            android:background="@drawable/edit_text_custom"
-                            android:layout_height="35dp"
-                            android:layout_marginLeft="10dp"
-                            android:ems="8"
-                            android:gravity="center"
-                            android:inputType="number"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
+                        android:layout_margin="5dp"
+                        android:ems="8"
+                        android:gravity="center"
+                        android:hint="나이"
+                        android:inputType="number"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:weightSum="5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <EditText
+                        android:id="@+id/edit_petKind"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_margin="5dp"
+                        android:ems="8"
+                        android:gravity="center"
+                        android:hint="종류"
+                        android:inputType="text"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 몸무게 "
-                            android:layout_margin="5dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <EditText
+                        android:id="@+id/edit_petWeight"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="3">
-
-                        <EditText
-                            android:id="@+id/edit_petWeight"
-                            android:layout_width="match_parent"
-                            android:layout_marginLeft="10dp"
-                            android:layout_height="35dp"
-                            android:background="@drawable/edit_text_custom"
-                            android:ems="8"
-                            android:gravity="center"
-                            android:inputType="number"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
+                        android:layout_margin="5dp"
+                        android:ems="8"
+                        android:gravity="center"
+                        android:hint="몸무게"
+                        android:inputType="text"
+                        android:textStyle="bold"
+                        />
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:weightSum="5"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 생일 "
-                            android:layout_margin="5dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="3">
-
-                        <EditText
-                            android:id="@+id/edit_birthday"
-                            android:layout_width="match_parent"
-                            android:layout_height="35dp"
-                            android:background="@drawable/edit_text_custom"
-                            android:ems="8"
-                            android:gravity="center"
-                            android:layout_marginLeft="10dp"
-                            android:inputType="number"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:weightSum="5"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="right"
-                            android:text=" 종류 "
-                            android:layout_margin="5dp"
-                            android:textSize="15dp"
-                            android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="3">
-                        <EditText
-                            android:id="@+id/edit_petKind"
-                            android:layout_width="match_parent"
-                            android:layout_height="35dp"
-                            android:layout_marginLeft="10dp"
-                            android:ems="8"
-                            android:background="@drawable/edit_text_custom"
-                            android:gravity="center"
-                            android:inputType="text"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-
-                <LinearLayout
+              <LinearLayout
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:weightSum="3"
-                  android:layout_margin="5dp"
                   android:orientation="horizontal">
 
                   <RelativeLayout
@@ -465,7 +223,6 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_centerInParent="true"
-                          android:textColor="@color/black"
                           android:fontFamily="@font/tmoneyroundwindextrabold"
                           android:text="성 별 "
                           android:textSize="15dp" />
@@ -502,7 +259,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:weightSum="3"
-                    android:layout_margin="5dp"
                     android:orientation="horizontal">
 
                     <RelativeLayout
@@ -516,7 +272,6 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:text="중성화 여부 "
-                            android:textColor="@color/black"
                             android:textSize="15dp"
                             android:fontFamily="@font/tmoneyroundwindextrabold"/>
 
@@ -552,7 +307,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:weightSum="3"
-                    android:layout_margin="5dp"
                     android:orientation="horizontal">
 
                     <RelativeLayout
@@ -565,7 +319,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
-                            android:textColor="@color/black"
                             android:fontFamily="@font/tmoneyroundwindextrabold"
                             android:text="예방접종 여부 "
                             android:textSize="15dp" />
@@ -617,7 +370,6 @@
             android:id="@+id/btn_Check"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_custom"
             android:layout_margin="5dp"
             android:text="완료"
             android:textStyle="bold" />

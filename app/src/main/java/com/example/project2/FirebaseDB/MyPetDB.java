@@ -1,7 +1,9 @@
 package com.example.project2.FirebaseDB;
 
+import java.util.Date;
+
 public class MyPetDB {
-    public String petBrithday;
+    public Date petBrithday;
     public String petName;
     public String petAge;
     public String petKind;
@@ -11,7 +13,7 @@ public class MyPetDB {
     public String petVaccination; // 예방접종 여부
 
 
-    public MyPetDB(String petName, String petAge, String petBrithday, String petKind,String petWeight,String petGender, String petNeutralization, String petVaccination){
+    public MyPetDB(String petName, String petAge, Date petBrithday, String petKind,String petWeight,String petGender, String petNeutralization, String petVaccination){
         this.petName = petName;
         this.petAge =  petAge;
         this.petBrithday = petBrithday;
@@ -22,7 +24,7 @@ public class MyPetDB {
         this.petVaccination = petVaccination;
     }
 
-    public MyPetDB(String petName, String petAge, String petBrithday, String petKind,String petWeight){
+    public MyPetDB(String petName, String petAge, Date petBrithday, String petKind,String petWeight){
         this.petName = petName;
         this.petAge =  petAge;
         this.petBrithday = petBrithday;
@@ -38,11 +40,11 @@ public class MyPetDB {
         this.petAge = petAge;
     }
 
-    public String getPetBrithday() {
+    public Date getPetBrithday() {
         return petBrithday;
     }
 
-    public void setPetBrithday(String petBrithday) {
+    public void setPetBrithday(Date petBrithday) {
         this.petBrithday = petBrithday;
     }
 

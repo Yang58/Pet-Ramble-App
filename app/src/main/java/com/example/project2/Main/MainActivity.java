@@ -1,37 +1,49 @@
 package com.example.project2.Main;
 
 import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Camera.CameraActivity;
-import com.example.project2.Community.ui.main.CommunityMain;
-import com.example.project2.Friend.FriendFragment;
-import com.example.project2.GoogleMap.MapsFragment;
 import com.example.project2.Login_Membership.InfoEditActivity;
 import com.example.project2.Login_Membership.LoginActivity;
 import com.example.project2.Login_Membership.UserinfoActivity;
-import com.example.project2.MainHome.HomeFragment;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -40,12 +52,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private HomeFragment homeFragment;
-    private CommunityMain fragment_Community;
-    private MapsFragment fragmentMap;
-    private FriendFragment friendFragment;
-    private FragmentManager FM;
-    private FragmentTransaction transaction;
+    ImageView imageView;
+    TextView textViewEmail;
+    TextView textViewName;
 
     private long backKeyPressedTime = 0;
     final int GET_GALLERY_IMAGE = 200;
@@ -55,9 +64,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageReference = storage.getReference();
+
+//        getSupportActionBar().setTitle("🦮");
+//        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         // Firebase 회원정보
         if (user == null) { // 회원 정보가 없을시 로그인 화면이동
@@ -66,24 +84,30 @@ public class MainActivity extends AppCompatActivity {
         } else {
             FirebaseFirestore fbdb = FirebaseFirestore.getInstance();
             DocumentReference docRef = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
+            // 변경 DB변경 완료 후 펫 정보로 변경
 
-            //            DocumentReference documentReference = fbdb.collection("Login_user").document(user.getUid());
-//            documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//                @Override
-//                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-//                    textViewEmail.setText(value.getString("user_ID"));
-//                    Log.d("MainActivity","User_ID : " + textViewEmail);
-//                }
-//            });
-//
-//            DocumentReference UserInfo = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
-//            UserInfo.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//                @Override
-//                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-//                    textViewName.setText(value.getString("user_name")+"님 안녕하세요");
-//                    Log.d("MainActivity","User_ID : " + textViewEmail);
-//                }
-//            });
+            View headerView = navigationView.getHeaderView(0);
+            imageView = headerView.findViewById(R.id.Drawer_image);
+            textViewName = headerView.findViewById(R.id.Drawer_name);
+            textViewEmail = headerView.findViewById(R.id.Drawer_Email);
+
+            DocumentReference documentReference = fbdb.collection("Login_user").document(user.getUid());
+            documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                    textViewEmail.setText(value.getString("user_ID"));
+                    Log.d("MainActivity","User_ID : " + textViewEmail);
+                }
+            });
+
+            DocumentReference UserInfo = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+            UserInfo.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                    textViewName.setText(value.getString("user_name")+"님 안녕하세요");
+                    Log.d("MainActivity","User_ID : " + textViewEmail);
+                }
+            });
 
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() { // 유저 uid에 애견정보가 있다면 정보 출력
                 @Override
@@ -92,23 +116,23 @@ public class MainActivity extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if (document != null) {
                             if (document.exists()) {
-//                                storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
-//                                        new OnSuccessListener<Uri>() {
-//                                            @Override
-//                                            public void onSuccess(Uri uri) {
-//                                                Glide.with(getApplicationContext()).load(uri).apply(new RequestOptions().circleCrop()).into(imageView);
-//                                            }
-//                                        }).addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//
-//                                    }
-//                                });
+                                storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
+                                        new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                Glide.with(getApplicationContext()).load(uri).apply(new RequestOptions().circleCrop()).into(imageView);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
 
-//                                imageView.setBackground(new ShapeDrawable(new OvalShape()));
-//                                if(Build.VERSION.SDK_INT >= 21) {
-//                                    imageView.setClipToOutline(true);
-//                                }
+                                    }
+                                });
+
+                                imageView.setBackground(new ShapeDrawable(new OvalShape()));
+                                if(Build.VERSION.SDK_INT >= 21) {
+                                    imageView.setClipToOutline(true);
+                                }
 
                                 Log.d(TAG, "" + document.getId() +
                                         " data: " + document.getData());
@@ -124,72 +148,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
-
-            FM = getSupportFragmentManager();
-            homeFragment = new HomeFragment();
-
-            transaction = FM.beginTransaction();
-            transaction.replace(R.id.container,homeFragment).commit();
-            ActionBar actionBar = getSupportActionBar();
-            BottomNavigationView bottomNavigationView = findViewById(R.id.main_nav);
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch (item.getItemId()) {
-                        case (R.id.action_home):
-                            if (homeFragment == null) {
-                                homeFragment = new HomeFragment();
-                                FM.beginTransaction().add(R.id.container, homeFragment).commit();
-                            }
-                            if (homeFragment != null) FM.beginTransaction().show(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
-                            actionBar.show();
-                            break;
-                        case (R.id.action_maps):
-                            if (fragmentMap == null) {
-                                fragmentMap = new MapsFragment();
-                                FM.beginTransaction().add(R.id.container, fragmentMap).commit();
-                            }
-                            if (homeFragment != null) FM.beginTransaction().hide(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
-                            actionBar.hide();
-                            break;
-
-                        case R.id.action_comm:
-                            if (fragment_Community == null) {
-                                fragment_Community = new CommunityMain();
-                                FM.beginTransaction().add(R.id.container, fragment_Community).commit();
-                            }
-                            if (homeFragment != null) FM.beginTransaction().hide(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
-                            actionBar.hide();
-                            break;
-
-                        case R.id.action_friend:
-                            if (friendFragment == null) {
-                                friendFragment = new FriendFragment();
-                                FM.beginTransaction().add(R.id.container, friendFragment).commit();
-                            }
-                            if (homeFragment != null) FM.beginTransaction().hide(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().show(friendFragment).commit();
-                            actionBar.hide();
-                            break;
-                    }
-
-                    return false;
-                }
-            });
         }
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_home)
+                .setDrawerLayout(drawer)
+                .build();
 
-    }
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+
+        }
 
         @Override
         public boolean onCreateOptionsMenu (Menu menu){
@@ -235,6 +205,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
             return super.onOptionsItemSelected(item);
+        }
+        @Override
+        public boolean onSupportNavigateUp() {
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                    || super.onSupportNavigateUp();
         }
     }
 

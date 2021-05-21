@@ -2,10 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="none">
-        <item
-            android:id="@+id/action_home"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="홈"/>
+
         <item
             android:id="@+id/action_maps"
             android:icon="@drawable/baseline_map_24"
@@ -18,6 +15,7 @@
             android:id="@+id/action_comm"
             android:icon="@drawable/baseline_question_answer_24"
             android:title="커뮤니티"/>
+
     </group>
 
 </menu>

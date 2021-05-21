@@ -1,6 +1,7 @@
 package com.example.project2.Main.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +29,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Community.ui.main.CommunityMain;
-import com.example.project2.Friend.FriendFragment;
+import com.example.project2.Friend.FriendMainActivity;
 import com.example.project2.GoogleMap.MapsFragment;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -78,7 +79,6 @@ public class HomeFragment extends Fragment {
 
     private CommunityMain fragment_Community;
     private MapsFragment fragmentMap;
-    private FriendFragment friendFragment;
 
     private HomeViewModel homeViewModel;
 
@@ -104,6 +104,7 @@ public class HomeFragment extends Fragment {
         h = v.findViewById(R.id.tv_h);
         m = v.findViewById(R.id.tv_m);
 
+        //EditText 클릭 이벤트
         Edit_Feed_kcal.setInputType(EditorInfo.TYPE_NULL);
         Edit_Feed_kcal.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +112,7 @@ public class HomeFragment extends Fragment {
                 ((EditText)view).setInputType(EditorInfo.TYPE_CLASS_TEXT);
             }
         });
+        //EditText 종료 후 이벤트
         Edit_Feed_kcal.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -204,7 +206,7 @@ public class HomeFragment extends Fragment {
                                                     @Override
                                                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                                                         String weight = documentSnapshot.getString("petWeight");
-                                                        double day_kcal = 70 * Math.pow( Double.valueOf(weight) , 0.75) * finalOption;
+                                                        double day_kcal = 70 * Double.valueOf(weight) * 0.75 * finalOption;
                                                         double day_feed = 1000 * day_kcal / Double.valueOf(Edit_Feed_kcal.getText().toString());
 
                                                         home_Day_kcal.setText(String.format("%.2f",day_kcal)+ " kcal ");
@@ -220,8 +222,6 @@ public class HomeFragment extends Fragment {
                                 });
                             }
                         }
-                        // EditText 포커스 ( 커서 ) 제거
-                        Edit_Feed_kcal.setInputType(EditorInfo.TYPE_NULL);
                         // 키패드 내리기
                         InputMethodManager mInputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                         mInputMethodManager.hideSoftInputFromWindow(Edit_Feed_kcal.getWindowToken(), 0);
@@ -315,7 +315,6 @@ public class HomeFragment extends Fragment {
                         }
                         if (fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
                         if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                        if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
                         break;
 
                     case R.id.action_comm:
@@ -325,17 +324,11 @@ public class HomeFragment extends Fragment {
                         }
                         if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
                         if (fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
-                        if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
                         break;
 
                     case R.id.action_friend:
-                        if (friendFragment == null) {
-                            friendFragment = new FriendFragment();
-                            FM.beginTransaction().add(R.id.container, friendFragment).commit();
-                         }
-                        if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                        if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                        if (friendFragment != null) FM.beginTransaction().show(friendFragment).commit();
+                        Intent intent = new Intent(getContext(), FriendMainActivity.class);
+                        startActivity(intent);
                         break;
                 }
 

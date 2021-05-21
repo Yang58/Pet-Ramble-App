@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">멍리단길</string>
+    <string name="app_name">Community_T1</string>
     <string name="title_activity_test">TestActivity</string>
     <!--
     This string is used for square devices and overridden by hello_world in

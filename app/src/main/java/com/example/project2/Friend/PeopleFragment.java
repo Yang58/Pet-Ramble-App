@@ -3,11 +3,10 @@ package com.example.project2.Friend;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,9 +17,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.example.project2.FirebaseDB.User;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -68,24 +69,6 @@ public class PeopleFragment extends Fragment {
         friend_mail = (EditText) v.findViewById(R.id.friend_mail);
         add_friend = (Button) v.findViewById(R.id.add_friend);
         friend_list = (ListView) v.findViewById(R.id.listview_people);
-
-        friend_mail.setInputType(EditorInfo.TYPE_NULL);
-        friend_mail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((EditText)view).setInputType(EditorInfo.TYPE_CLASS_TEXT);
-            }
-        });
-        friend_mail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                String inText = textView.getText().toString();
-                // Do Something...
-                textView.setInputType(EditorInfo.TYPE_NULL);
-                return true;
-            }
-        });
-
         /*
         friend_image = (ImageView) v.findViewById(R.id.friend_image);
 

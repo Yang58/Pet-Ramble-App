@@ -6,15 +6,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,6 +46,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -95,22 +93,6 @@ public class UserinfoActivity extends AppCompatActivity {
         petName = (EditText)findViewById(R.id.edit_petName);
         petKind = (EditText) findViewById(R.id.edit_petKind);
 
-        Edit_name.setInputType(EditorInfo.TYPE_NULL);
-        Edit_name.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((EditText)view).setInputType(EditorInfo.TYPE_CLASS_TEXT);
-            }
-        });
-        Edit_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                String inText = textView.getText().toString();
-                // Do Something...
-                textView.setInputType(EditorInfo.TYPE_NULL);
-                return true;
-            }
-        });
 
 
         user_profile.setOnClickListener(new View.OnClickListener() {
@@ -218,9 +200,9 @@ public class UserinfoActivity extends AppCompatActivity {
                 DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
                 DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
 
-                RadioGroup genderGroup = findViewById(R.id.edit_genderGroup);
-                RadioGroup NeutralizationGroup = findViewById(R.id.edit_Neutral);
-                RadioGroup VaccinationGroup = findViewById(R.id.edit_Vaccination);
+                RadioGroup genderGroup = findViewById(R.id.genderGroup);
+                RadioGroup NeutralizationGroup = findViewById(R.id.NeutralizationGroup);
+                RadioGroup VaccinationGroup = findViewById(R.id.VaccinationGroup);
 
                 int Gender = genderGroup.getCheckedRadioButtonId();
                 int Neutralization = NeutralizationGroup.getCheckedRadioButtonId();

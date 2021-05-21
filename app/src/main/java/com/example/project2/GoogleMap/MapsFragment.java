@@ -31,7 +31,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -41,7 +40,6 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.FirebaseDB.WalkingDB;
-import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -179,9 +177,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             CameraPosition mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
         v = inflater.inflate(R.layout.activity_maps_fragment, container, false);
-
-        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
-        actionBar.hide();
 
         //백그라운드 서비스
         serviceIntent = new Intent(mContext, LocationBackground.class);

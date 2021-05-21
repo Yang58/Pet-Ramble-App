@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -63,23 +61,6 @@ public class LoginActivity extends AppCompatActivity {
 
         id = (EditText) findViewById(R.id.edit_Login_id);
         pw  = (EditText) findViewById(R.id.edit_Login_pw);
-
-        id.setInputType(EditorInfo.TYPE_NULL);
-        id.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((EditText)view).setInputType(EditorInfo.TYPE_CLASS_TEXT);
-            }
-        });
-        id.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                String inText = textView.getText().toString();
-                // Do Something...
-                textView.setInputType(EditorInfo.TYPE_NULL);
-                return true;
-            }
-        });
 
         getSupportActionBar().setTitle("AppName");
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));

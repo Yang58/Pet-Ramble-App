@@ -4,18 +4,30 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/edit_title"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="m월 dd일 일정 수정"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        android:textColor="@color/purple_500">
-    </TextView>
+        android:background="@drawable/friend_custom">
+
+        <TextView
+            android:id="@+id/edit_title"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="m월 dd일 일정 수정"
+            android:textSize="20dp"
+            android:fontFamily="@font/tmoneyroundwindextrabold"
+            android:textColor="@color/black">
+        </TextView>
+    </LinearLayout>
+
+
 
     <TimePicker
+        android:layout_margin="10dp"
         android:id="@+id/timepick"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,6 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:layout_marginRight="5dp"
                 android:text="공개"/>
 
             <RadioButton
@@ -72,21 +85,36 @@
         android:id="@+id/schedule_edit"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:layout_marginLeft="5dp"
+        android:background="@null"
         android:hint="일정을 입력하세요.">
     </EditText>
 
-    <Button
-        android:id="@+id/schedule_sav"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="저장">
-    </Button>
-    <Button
-        android:id="@+id/schedule_alarm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="저장 및 알람">
-    </Button>
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/schedule_sav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_custom"
+            android:layout_margin="5dp"
+            android:layout_above="@+id/schedule_alarm"
+            android:text="저장">
+        </Button>
+        <Button
+            android:id="@+id/schedule_alarm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_custom"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+            android:text="저장 및 알람">
+        </Button>
+
+    </RelativeLayout>
+
 
 
 </LinearLayout>

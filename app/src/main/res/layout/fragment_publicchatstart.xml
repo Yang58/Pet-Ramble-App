@@ -1,77 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout_editor_absoluteY="81dp"
-    tools:layout_editor_absoluteX="0dp">
+    android:orientation="vertical"
+    android:weightSum="7">
 
     <LinearLayout
+        android:id="@+id/Linear1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5.5"
         android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/friend_custom">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:layout_margin="10dp"
+                android:text="오픈 채팅 목록"
+                android:fontFamily="@font/tmoneyroundwindextrabold"
+                android:textColor="@color/black"
+                android:gravity="center"/>
+        </LinearLayout>
+
+            <ListView
+                android:id="@+id/chat_list"
+                android:layout_margin="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5">
 
         <LinearLayout
-            android:layout_weight="2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true">
+            android:layout_above="@+id/Linear2">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
-                android:text="채팅방 입장 또는 새로 만들기"
-                android:layout_marginBottom="20dp"
-                android:gravity="center"/>
+                android:layout_margin="10dp"
+                android:fontFamily="@font/tmoneyroundwindextrabold"
+                android:textColor="@color/black"
+                android:text="채팅방 새로 만들기"/>
+        </LinearLayout>
 
-            <TextView
-                android:id="@+id/welcome"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:layout_marginBottom="20dp"
-                android:gravity="center"/>
+        <LinearLayout
+            android:id="@+id/Linear2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="5"
+            android:background="@drawable/corner_border2"
+            android:layout_alignParentBottom="true">
 
             <EditText
                 android:id="@+id/user_chat"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="3.5"
+                android:layout_height="match_parent"
                 android:inputType="textPersonName"
-                android:hint="CHAT NAME"
-                android:layout_gravity="center"
+                android:hint="New chatting room"
+                android:background="@null"
+                android:layout_gravity="bottom"
                 android:gravity="center"
-                android:layout_marginBottom="20dp"/>
+                android:layout_margin="10dp"/>
 
             <Button
                 android:id="@+id/user_next"
-                android:layout_width="100dp"
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/button_custom"
+                android:layout_margin="10dp"
                 android:layout_height="wrap_content"
-                android:text="GO"/>
+                android:text="만들기"/>
+
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_weight="2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20dp"                android:text="현재 개설된 채팅방"
-                android:layout_marginBottom="20dp"
-                android:gravity="center"/>
-            <ListView
-                android:id="@+id/chat_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </ListView>
-        </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
 
-</RelativeLayout>
+
+</LinearLayout>

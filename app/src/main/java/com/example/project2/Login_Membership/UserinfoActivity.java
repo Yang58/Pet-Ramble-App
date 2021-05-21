@@ -49,7 +49,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -219,9 +218,9 @@ public class UserinfoActivity extends AppCompatActivity {
                 DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
                 DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
 
-                RadioGroup genderGroup = findViewById(R.id.genderGroup);
-                RadioGroup NeutralizationGroup = findViewById(R.id.NeutralizationGroup);
-                RadioGroup VaccinationGroup = findViewById(R.id.VaccinationGroup);
+                RadioGroup genderGroup = findViewById(R.id.edit_genderGroup);
+                RadioGroup NeutralizationGroup = findViewById(R.id.edit_Neutral);
+                RadioGroup VaccinationGroup = findViewById(R.id.edit_Vaccination);
 
                 int Gender = genderGroup.getCheckedRadioButtonId();
                 int Neutralization = NeutralizationGroup.getCheckedRadioButtonId();

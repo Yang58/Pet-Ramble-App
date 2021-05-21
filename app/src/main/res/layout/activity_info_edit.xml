@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".Login_Membership.InfoEditActivity">
+    tools:context=".Login_Membership.UserJoinActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,34 +16,19 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_margin="10dp"
-            android:paddingLeft="10dp"
-            android:text="회원 정보 "
-            android:textColor="@android:color/black"
-            android:textSize="25dp"
-            android:textStyle="bold" />
-
         <ImageView
             android:id="@+id/edit_Profile"
             android:layout_width="160dp"
             android:layout_height="160dp"
             app:srcCompat="@drawable/baseline_group_24" />
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:hint="이미지를 누르면 프로필 사진을 수정 할 수 있습니다."
+            android:hint="이미지를 누르면 프로필 사진을 추가 할 수 있습니다."
             android:textStyle="bold"
             android:gravity="center"/>
-
     </LinearLayout>
-
 
     <ScrollView
         android:layout_width="match_parent"
@@ -52,16 +37,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
             android:orientation="vertical">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
+                android:layout_margin="10dp"
+                android:background="@drawable/info_conder"
                 android:orientation="vertical">
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -72,315 +54,475 @@
                     android:textColor="@color/black"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:weightSum="5"
+                    android:layout_margin="6dp"
                     android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/edit_Name"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:ems="5"
-                        android:gravity="center"
-                        android:hint="이름"
-                        android:inputType="textPersonName"
-                        android:textStyle="bold" />
-
-                    <EditText
-                        android:id="@+id/edit_phoneNum"
-                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 이름 "
+                            android:layout_margin="8dp"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:ems="10"
-                        android:gravity="center"
-                        android:hint="번호"
-                        android:inputType="textPersonName"
-                        android:textStyle="bold" />
-
+                        android:layout_weight="3">
+                        <EditText
+                            android:id="@+id/edit_Name"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/edit_text_custom"
+                            android:gravity="center"
+                            android:ems="8"
+                            android:inputType="textPersonName"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/info_conder"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="반려견 정보"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:layout_margin="5dp"
-                        android:textColor="@color/black"/>
-
+                    android:weightSum="5"
+                    android:layout_margin="6dp"
+                    android:orientation="horizontal">
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 번호 "
+                            android:layout_margin="8dp"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3">
+                        <EditText
+                            android:id="@+id/edit_phoneNum"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/edit_text_custom"
+                            android:gravity="center"
+                            android:ems="8"
+                            android:inputType="phone"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="5"
+                    android:layout_margin="6dp"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 닉네임 "
+                            android:layout_margin="8dp"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
 
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3">
                         <EditText
                             android:id="@+id/edit_Nickname"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
-                            android:ems="8"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/edit_text_custom"
                             android:gravity="center"
-                            android:hint="닉네임"
+                            android:ems="8"
                             android:inputType="textPersonName"
                             android:textStyle="bold" />
 
-                        <EditText
-                            android:id="@+id/edit_birthday"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
-                            android:ems="8"
-                            android:gravity="center"
-                            android:hint="애완동물 생일"
-                            android:inputType="number"
-                            android:textStyle="bold"
-                            android:maxLength="8"/>
-
                     </LinearLayout>
-
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/info_conder"
+                android:gravity="center"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+                <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="반려견 정보"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_margin="5dp"
+                android:textColor="@color/black"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:weightSum="5"
+                    android:orientation="horizontal">
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 이름 "
+                            android:layout_margin="5dp"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="3">
                         <EditText
                             android:id="@+id/edit_petName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/edit_text_custom"
                             android:ems="8"
                             android:gravity="center"
-                            android:hint="애완동물 이름"
                             android:inputType="textPersonName"
                             android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:weightSum="5"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 나이 "
+                            android:layout_margin="5dp"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="3">
                         <EditText
                             android:id="@+id/edit_petAge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
+                            android:layout_width="match_parent"
+                            android:background="@drawable/edit_text_custom"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
                             android:ems="8"
                             android:gravity="center"
-                            android:hint="나이"
                             android:inputType="number"
                             android:textStyle="bold" />
                     </LinearLayout>
-
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:weightSum="5"
+                    android:orientation="horizontal">
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/edit_petKind"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <TextView
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 몸무게 "
                             android:layout_margin="5dp"
-                            android:ems="8"
-                            android:gravity="center"
-                            android:hint="종류"
-                            android:inputType="text"
-                            android:textStyle="bold" />
-
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="3">
                         <EditText
                             android:id="@+id/edit_petWeight"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:layout_height="35dp"
+                            android:background="@drawable/edit_text_custom"
                             android:ems="8"
                             android:gravity="center"
-                            android:hint="몸무게"
+                            android:inputType="number"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:weightSum="5"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 생일 "
+                            android:layout_margin="5dp"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="3">
+                        <EditText
+                            android:id="@+id/edit_birthday"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:background="@drawable/edit_text_custom"
+                            android:ems="8"
+                            android:gravity="center"
+                            android:layout_marginLeft="10dp"
+                            android:inputType="number"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:weightSum="5"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:text=" 종류 "
+                            android:layout_margin="5dp"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="3">
+                        <EditText
+                            android:id="@+id/edit_petKind"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
+                            android:ems="8"
+                            android:background="@drawable/edit_text_custom"
+                            android:gravity="center"
                             android:inputType="text"
                             android:textStyle="bold" />
-
                     </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:weightSum="3"
-                        android:orientation="horizontal">
-
-                        <RelativeLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent">
-
-                            <TextView
-                                android:id="@+id/tx_gender"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:fontFamily="@font/tmoneyroundwindextrabold"
-                                android:text="성 별 "
-                                android:textSize="15dp" />
-
-                        </RelativeLayout>
-
-                        <RadioGroup
-                            android:id="@+id/edit_genderGroup"
-                            android:layout_width="0dp"
-                            android:layout_weight="2"
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="3"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal">
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/tx_gender"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal">
-
-                            <RadioButton
-                                android:id="@+id/gender1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:text="남아"/>
-
-                            <RadioButton
-                                android:id="@+id/gender2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toRightOf="@+id/RB_Gtrue"
-                                android:text="여아"/>
-
-                        </RadioGroup>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:weightSum="3"
+                            android:layout_centerInParent="true"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"
+                            android:text="성 별 "
+                            android:textSize="15dp" />
+                    </RelativeLayout>
+                    <RadioGroup
+                        android:id="@+id/edit_genderGroup"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:orientation="horizontal">
-
-                        <RelativeLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent">
-
-                            <TextView
-                                android:id="@+id/tx_Neutralization"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:text="중성화 여부 "
-                                android:textSize="15dp"
-                                android:fontFamily="@font/tmoneyroundwindextrabold"/>
-
-                        </RelativeLayout>
-
-                        <RadioGroup
-                            android:id="@+id/edit_Neutral"
-                            android:layout_width="0dp"
-                            android:layout_weight="2"
+                        <RadioButton
+                            android:id="@+id/gender1"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal">
-
-                            <RadioButton
-                                android:id="@+id/Neutralization1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:text="예"/>
-
-                            <RadioButton
-                                android:id="@+id/Neutralization2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toRightOf="@+id/RB_Ntrue"
-                                android:text="아니요"/>
-
-                        </RadioGroup>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:weightSum="3"
+                            android:layout_centerInParent="true"
+                            android:text="남아"/>
+                        <RadioButton
+                            android:id="@+id/gender2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/RB_Gtrue"
+                            android:text="여아"/>
+                    </RadioGroup>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="3"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal">
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/tx_petNeutralization"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="중성화 여부 "
+                            android:textColor="@color/black"
+                            android:textSize="15dp"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                    </RelativeLayout>
+                    <RadioGroup
+                        android:id="@+id/edit_Neutral"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:orientation="horizontal">
-
-                        <RelativeLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent">
-
-                            <TextView
-                                android:id="@+id/tx_petVaccination"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerHorizontal="true"
-                                android:fontFamily="@font/tmoneyroundwindextrabold"
-                                android:text="예방접종 여부 "
-                                android:textSize="15dp" />
-
-                        </RelativeLayout>
-
-                        <RadioGroup
-                            android:id="@+id/edit_Vaccination"
-                            android:layout_width="0dp"
-                            android:layout_weight="2"
+                        <RadioButton
+                            android:id="@+id/Neutralization1"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal">
-
-                            <RadioButton
-                                android:id="@+id/Vaccination1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:text="예"/>
-
-                            <RadioButton
-                                android:id="@+id/Vaccination2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toRightOf="@+id/RB_Vtrue"
-                                android:text="아니요"/>
-
-                        </RadioGroup>
-
-                    </LinearLayout>
+                            android:layout_centerInParent="true"
+                            android:text="예"/>
+                        <RadioButton
+                            android:id="@+id/Neutralization2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/RB_Ntrue"
+                            android:text="아니요"/>
+                    </RadioGroup>
 
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="3"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal">
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/tx_petVaccination"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"
+                            android:text="예방접종 여부 "
+                            android:textSize="15dp" />
+                    </RelativeLayout>
 
+                    <RadioGroup
+                        android:id="@+id/edit_Vaccination"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+                        <RadioButton
+                            android:id="@+id/Vaccination1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="예"/>
+                        <RadioButton
+                            android:id="@+id/Vaccination2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/RB_Vtrue"
+                            android:text="아니요"/>
+                    </RadioGroup>
+                </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
-
     </ScrollView>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="bottom"
         android:orientation="horizontal">
-
         <Button
             android:id="@+id/btn_Check"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_margin="5dp"
+            android:background="@drawable/button_custom"
             android:text="완료"
             android:textStyle="bold" />
-
         <Button
             android:id="@+id/btn_Back"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_margin="5dp"
+            android:background="@drawable/button_custom"
             android:text="뒤로"
             android:textStyle="bold" />
-
     </LinearLayout>
-
 </LinearLayout>

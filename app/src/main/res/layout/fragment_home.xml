@@ -159,7 +159,6 @@
                                     android:layout_width="match_parent"
                                     android:paddingRight="10dp"
                                     android:layout_height="wrap_content"
-                                    android:background="@drawable/corner_border2"
                                     android:layout_toRightOf="@+id/tx3"/>
 
                             </LinearLayout>
@@ -169,6 +168,8 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/corner_border2"
+                            android:layout_margin="10dp"
                             android:gravity="center">
                             <RelativeLayout
                                 android:layout_width="wrap_content"
@@ -386,11 +387,11 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:layout_marginTop="10dp"
-                                android:layout_gravity="center"
+                                android:layout_margin="10dp"
+                                android:textColor="@color/black"
+                                android:layout_gravity="left"
                                 android:fontFamily="@font/tmoneyroundwindextrabold"
-                                android:textSize="20dp"
+                                android:textSize="15dp"
                                 android:text="나의 강아지 정보  "/>
 
                             <LinearLayout
@@ -402,22 +403,53 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:gravity="left"
+                                    android:weightSum="5"
                                     android:orientation="horizontal">
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="10dp"
-                                    android:layout_margin="5dp"
-                                    android:text="이름 : "/>
-                                <TextView
-                                    android:id="@+id/MPN"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="10dp"
-                                    android:layout_margin="5dp"
-                                    android:text="  "/>
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="2">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="12dp"
+                                            android:layout_margin="5dp"
+                                            android:text="이름 : "/>
+
+                                        <TextView
+                                            android:id="@+id/MPN"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="12dp"
+                                            android:layout_margin="5dp"
+                                            android:text="  "/>
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="2">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_margin="5dp"
+                                            android:textSize="12dp"
+                                            android:text="나이 : "/>
+                                        <TextView
+                                            android:id="@+id/MPA"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="12dp"
+                                            android:layout_margin="5dp"
+                                            android:text="  "/>
+
+                                    </LinearLayout>
+
+
 
                                 </LinearLayout>
 
@@ -426,42 +458,25 @@
                                     android:layout_height="wrap_content"
                                     android:gravity="left"
                                     android:orientation="horizontal">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="5dp"
-                                    android:textSize="10dp"
-                                    android:text="나이 : "/>
-                                <TextView
-                                    android:id="@+id/MPA"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="10dp"
-                                    android:layout_margin="5dp"
-                                    android:text="  "/>
-                                </LinearLayout>
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="left"
-                                    android:orientation="horizontal">
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="10dp"
-                                    android:layout_margin="5dp"
-                                    android:text="종류 : "/>
-                                <TextView
-                                    android:id="@+id/MPK"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="10dp"
-                                    android:layout_margin="5dp"
-                                    android:text="  "/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12dp"
+                                        android:layout_margin="5dp"
+                                        android:text="종류 : "/>
+                                    <TextView
+                                        android:id="@+id/MPK"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12dp"
+                                        android:layout_margin="5dp"
+                                        android:text="  "/>
                                 </LinearLayout>
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
+
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -477,32 +492,40 @@
                         android:layout_height="match_parent"
                         android:background="@drawable/corner_border"
                         android:orientation="vertical">
+
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/tmoneyroundwindextrabold"
                             android:gravity="center"
                             android:layout_gravity="center"
+                            android:textColor="@color/black"
+                            android:layout_margin="5dp"
                             android:textStyle="bold"
-                            android:textSize="20dp"
+                            android:textSize="15dp"
                             android:text="산책 기록"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:weightSum="3"
                             android:orientation="horizontal">
 
                             <RelativeLayout
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content">
+                                android:layout_margin="5dp"
+                                android:background="@drawable/corner_border2"
+                                android:layout_height="match_parent">
                                 <TextView
                                     android:id="@+id/t1"
+                                    android:layout_alignParentTop="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:hint="총 횟수"
-                                    android:layout_margin="8dp"
+                                    android:paddingTop="10dp"
+                                    android:textColor="@color/black"
+                                    android:text="총 횟수"
+                                    android:layout_margin="5dp"
                                     android:layout_centerInParent="true"/>
                                 <TextView
                                     android:id="@+id/tv_c"
@@ -510,7 +533,6 @@
                                     android:layout_height="wrap_content"
                                     android:text="0"
                                     android:textColor="@color/black"
-                                    android:layout_margin="10dp"
                                     android:layout_below="@+id/t1"
                                     android:layout_centerHorizontal="true"/>
                             </RelativeLayout>
@@ -518,13 +540,18 @@
                             <RelativeLayout
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content">
+                                android:layout_margin="5dp"
+                                android:background="@drawable/corner_border2"
+                                android:layout_height="match_parent">
                                 <TextView
                                     android:id="@+id/t3"
+                                    android:layout_alignParentTop="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_margin="8dp"
-                                    android:hint="총 산책 거리"
+                                    android:layout_margin="5dp"
+                                    android:paddingTop="10dp"
+                                    android:textColor="@color/black"
+                                    android:text="총 산책 거리"
                                     android:layout_centerInParent="true"/>
                                 <TextView
                                     android:id="@+id/tv_d"
@@ -532,23 +559,29 @@
                                     android:layout_height="wrap_content"
                                     android:text="0"
                                     android:textColor="@color/black"
-                                    android:layout_margin="10dp"
                                     android:layout_below="@+id/t3"
                                     android:layout_centerHorizontal="true"/>
                             </RelativeLayout>
 
                             <RelativeLayout
                                 android:id="@+id/R1"
+                                android:layout_alignParentTop="true"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
+                                android:layout_margin="5dp"
+                                android:background="@drawable/corner_border2"
                                 android:layout_weight="1">
 
                                 <TextView
                                     android:id="@+id/t5"
+                                    android:layout_alignParentTop="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_centerInParent="true"
-                                    android:hint="총 산책 시간" />
+                                    android:textColor="@color/black"
+                                    android:layout_margin="5dp"
+                                    android:paddingTop="10dp"
+                                    android:text="총 산책 시간"
+                                    android:layout_centerInParent="true"/>
 
                                 <RelativeLayout
                                     android:layout_width="match_parent"
@@ -568,7 +601,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_toLeftOf="@+id/tvc"
-                                        android:text="시"
+                                        android:text="시간"
                                         android:textColor="@color/black" />
 
                                     <TextView
@@ -576,7 +609,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_centerInParent="true"
-                                        android:text="간"
+                                        android:text=" "
                                         android:textColor="@color/black" />
 
                                     <TextView

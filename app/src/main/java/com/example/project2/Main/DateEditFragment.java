@@ -57,7 +57,7 @@ public class DateEditFragment extends Fragment {
     public TextView title;
     private String datename;
     private String timename;
-    private Button save_btn, savealarm_btn,locate_btn;
+    private Button save_btn, savealarm_btn;
     private EditText edit_schedule;
     private RadioGroup Personal_check;
     private RadioButton personal_t,personal_f;
@@ -76,7 +76,6 @@ public class DateEditFragment extends Fragment {
         title = v.findViewById(R.id.edit_title);
         save_btn = v.findViewById(R.id.schedule_sav);
         savealarm_btn = v.findViewById(R.id.schedule_alarm);
-        locate_btn = v.findViewById(R.id.schedule_locate);
         edit_schedule = v.findViewById(R.id.schedule_edit);
         Personal_check = v.findViewById(R.id.personal);
         timename = String.format(timepicker.getHour()+":"+ timepicker.getMinute());
@@ -151,14 +150,6 @@ public class DateEditFragment extends Fragment {
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_schedule,calendarFragment).commit();
 
-            }
-        });
-
-        locate_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), LocateActivity.class);
-                startActivity(intent);
             }
         });
 

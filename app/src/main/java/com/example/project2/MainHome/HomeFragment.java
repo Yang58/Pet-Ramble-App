@@ -1,4 +1,4 @@
-package com.example.project2.Main.home;
+package com.example.project2.MainHome;
 
 import android.content.Context;
 import android.net.Uri;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -23,19 +22,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.Community.ui.main.CommunityMain;
 import com.example.project2.Friend.FriendFragment;
 import com.example.project2.GoogleMap.MapsFragment;
+import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -45,7 +43,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 
 public class HomeFragment extends Fragment {
 
@@ -80,13 +77,26 @@ public class HomeFragment extends Fragment {
     private MapsFragment fragmentMap;
     private FriendFragment friendFragment;
 
-    private HomeViewModel homeViewModel;
+    MainActivity activity;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        //이 메소드가 호출될떄는 프래그먼트가 엑티비티위에 올라와있는거니깐 getActivity메소드로 엑티비티참조가능
+        activity = (MainActivity) getActivity();
+    }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
-        View v = inflater.inflate(R.layout.fragment_home, container, false);
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        //이제 더이상 엑티비티 참초가안됨
+        activity = null;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //프래그먼트 메인을 인플레이트해주고 컨테이너에 붙여달라는 뜻임
+        ViewGroup v = (ViewGroup) inflater.inflate(R.layout.home_fragment , container, false);
 
         petname = v.findViewById(R.id.MPN);
         petage = v.findViewById(R.id.MPA);
@@ -120,12 +130,6 @@ public class HomeFragment extends Fragment {
                 return true;
             }
         });
-
-        //ViewPager에 설정할 Adapter 객체 생성
-        //ListView에서 사용하는 Adapter와 같은 역할.
-        //다만. ViewPager로 스크롤 될 수 있도록 되어 있다는 것이 다름
-        //PagerAdapter를 상속받은 CustomAdapter 객체 생성
-        //CustomAdapter에게 LayoutInflater 객체 전달
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
@@ -235,7 +239,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-
         if (user == null){
             Log.e("HomeFragment","회원 정보 없음");
         }else{
@@ -253,7 +256,7 @@ public class HomeFragment extends Fragment {
                             petweight.setText(document.getString("petWeight")+" KG ");
 
                         }
-            });
+                    });
             DocumentReference doc = FBdb.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
             doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -300,51 +303,11 @@ public class HomeFragment extends Fragment {
         }
 
         btnCamera = (Button)v.findViewById(R.id.action_camera);
-        //프래그먼트는 뷰와 다르게 context를 매개변수로 넣어줄 필요가 없다.
-        FM = getChildFragmentManager();
 
-        BottomNavigationView bottomNavigationView = v.findViewById(R.id.home_nav);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case (R.id.action_maps):
-                        if (fragmentMap == null) {
-                            fragmentMap = new MapsFragment();
-                            FM.beginTransaction().add(R.id.container, fragmentMap).commit();
-                        }
-                        if (fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
-                        if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                        if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
-                        break;
-
-                    case R.id.action_comm:
-                        if (fragment_Community == null) {
-                            fragment_Community = new CommunityMain();
-                            FM.beginTransaction().add(R.id.container, fragment_Community).commit();
-                        }
-                        if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                        if (fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
-                        if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
-                        break;
-
-                    case R.id.action_friend:
-                        if (friendFragment == null) {
-                            friendFragment = new FriendFragment();
-                            FM.beginTransaction().add(R.id.container, friendFragment).commit();
-                         }
-                        if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                        if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                        if (friendFragment != null) FM.beginTransaction().show(friendFragment).commit();
-                        break;
-                }
-
-                return false;
-            }
-        });
 
         return v;
+
+
+
     }
-
-
 }

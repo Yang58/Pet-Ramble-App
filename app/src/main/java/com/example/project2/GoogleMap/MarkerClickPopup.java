@@ -1,6 +1,5 @@
 package com.example.project2.GoogleMap;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -11,25 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.project2.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 
@@ -95,19 +82,6 @@ public class MarkerClickPopup extends DialogFragment implements View.OnClickList
 
         btnexit = (Button)v.findViewById(R.id.btn_exit);
         btnexit.setOnClickListener(this);
-
-        like = (TextView)v.findViewById(R.id.Like_count);
-
-        likecount = (TextView)v.findViewById(R.id.TV_like);
-        likecount.setOnClickListener(new View.OnClickListener(){
-            int count = 0;
-            @Override
-            public void onClick(View v){
-                ++count;
-                like.setText(" "+ count);
-
-            }
-        });
 
         setCancelable(true); // 화면 밖에 터치시 화면이 꺼지지 않게 하기 위함
         return v;

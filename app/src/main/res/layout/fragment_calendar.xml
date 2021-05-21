@@ -74,9 +74,10 @@
         android:gravity="center"
         android:text="산책 일정"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="#9E28B3"
+        android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:background="@drawable/friend_custom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -89,6 +90,7 @@
         android:layout_marginTop="76dp"
         android:layout_marginEnd="8dp"
         android:text="친구 일정 보기"
+        android:background="@drawable/button_custom"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -118,8 +120,8 @@
         android:layout_marginStart="8dp"
         android:text="수정"
         android:visibility="invisible"
+        android:background="@drawable/button_custom"
         app:layout_constraintBaseline_toBaselineOf="@+id/save_Btn"
-
         app:layout_constraintEnd_toEndOf="@+id/save_Btn"
         app:layout_constraintStart_toStartOf="parent" />
 

@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,9 +24,7 @@ import androidx.loader.content.CursorLoader;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.project2.FirebaseDB.Friend;
 import com.example.project2.FirebaseDB.MyPetDB;
-import com.example.project2.FirebaseDB.User;
 import com.example.project2.FirebaseDB.UserInfoDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
@@ -88,6 +88,26 @@ public class InfoEditActivity extends AppCompatActivity {
         edit_petWeight = (EditText) findViewById(R.id.edit_petWeight);
         edit_petBirthday = (EditText) findViewById(R.id.edit_birthday);
         Edit_profile = (ImageView) findViewById(R.id.edit_Profile);
+
+
+        edit_name.setInputType(EditorInfo.TYPE_NULL);
+        edit_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((EditText)view).setInputType(EditorInfo.TYPE_CLASS_TEXT);
+            }
+        });
+
+        edit_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                String inText = textView.getText().toString();
+                // Do Something...
+                textView.setInputType(EditorInfo.TYPE_NULL);
+                return true;
+            }
+        });
+
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();

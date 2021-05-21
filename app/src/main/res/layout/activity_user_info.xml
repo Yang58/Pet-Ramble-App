@@ -144,7 +144,8 @@
                         android:gravity="center"
                         android:hint="애완동물 생일"
                         android:inputType="number"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:maxLength="8"/>
 
                 </LinearLayout>
 
@@ -201,7 +202,8 @@
                         android:gravity="center"
                         android:hint="몸무게"
                         android:inputType="text"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        />
 
                 </LinearLayout>
 

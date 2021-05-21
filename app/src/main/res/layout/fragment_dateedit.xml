@@ -81,6 +81,12 @@
         android:layout_height="wrap_content"
         android:text="저장">
     </Button>
+    <Button
+        android:id="@+id/schedule_alarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="저장 및 알람">
+    </Button>
 
 
 </LinearLayout>

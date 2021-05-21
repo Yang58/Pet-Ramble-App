@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,12 +23,17 @@ import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /*To-Do
 1.커뮤니티에서 친구추가 가능하게.
@@ -110,7 +116,12 @@ public class ProfileFragment extends Fragment {
                                                         TextView profile_petWeight = (TextView) v.findViewById(R.id.profile_petWeight);
                                                         profile_petWeight.setText((String) document.get("petWeight"));
                                                         TextView profile_petBirthday = (TextView) v.findViewById(R.id.profile_petBirthday);
-                                                        profile_petBirthday.setText((String) document.get("petBrithday"));
+
+                                                        Timestamp i = (Timestamp) document.get("petBrithday");
+                                                        SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
+                                                        String str = sdf.format( new Date( i.toDate().getTime()));
+
+                                                        profile_petBirthday.setText(str);
 
                                                         /*
                                                         asdf = (String) document.get("petGender");

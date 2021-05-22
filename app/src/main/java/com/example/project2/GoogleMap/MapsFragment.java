@@ -10,12 +10,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -25,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,11 +40,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
+import com.google.android.gms.common.internal.FallbackServiceBroker;
+import com.google.android.gms.dynamic.SupportFragmentWrapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -56,10 +63,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Cap;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -69,6 +86,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -81,12 +99,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
@@ -129,7 +158,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static TextView marker_textView;
     private static String photoPath;
 
-    //내 위치 관련
+    //내 위치 관련 todo:내위치전역변수
     private static LatLng startPoint = null;
     private static LatLng endPoint = null;
     private static float walkDistanceResult[] = new float[1];
@@ -140,11 +169,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static ArrayList<LatLng> myCoordinateArray = new ArrayList<>();
     private static ArrayList<LatLng> myInterestArray = new ArrayList<>();
     private static long myWaitTime = 0;
+    private static String myPetWeight = null;
+    private static int tmp;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
     private static ArrayList<Polyline> otherLinesSaved = new ArrayList<>();
     private static HashMap<String, Marker> otherMarker = new HashMap<>();
+    private static ArrayList<Circle> circleArrayList = new ArrayList<>();
 
     //백그라운드
     private Intent serviceIntent;
@@ -233,6 +265,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     //나를 제외한 다른 사람의 위치 변경이 감지되었을 경우
                     if (otherUID.equals(user.getUid())) continue;
                     try {
+                        if(otherUID.equals("hotSpot")){
+                            for(Circle c : circleArrayList){
+                                c.remove();
+                            }
+                            for(DataSnapshot c : d.getChildren()) {
+                                HashMap<String, Double> value = (HashMap<String, Double>) c.getValue();
+                                CircleOptions circleOptions = new CircleOptions();
+                                circleOptions.clickable(true);
+                                circleOptions.strokeWidth(0);
+                                circleOptions.fillColor(Color.parseColor("#80fcac92"));
+                                circleOptions.radius(80);
+                                circleOptions.center(new LatLng(value.get("latitude"), value.get("longitude")));
+                                circleArrayList.add(mMap.addCircle(circleOptions));
+                                continue;
+                            }
+                        }
                         //데이터를 가져온다
                         HashMap<String, HashMap<String, Object>> value = (HashMap<String, HashMap<String, Object>>) d.getValue();
                         //도착 좌표
@@ -321,30 +369,29 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             myLinesSaved.add(mMap.addPolyline(myLineOption.add(startPoint, endPoint)));
             myBearingArray.add(location.getBearing());
             myCoordinateArray.add(endPoint);
-            if(Timestamp.now().getSeconds() - myWaitTime > 1){
+            if(Timestamp.now().getSeconds() - myWaitTime > 9){
                 myWaitTime=Timestamp.now().getSeconds();
 
-                CircleOptions circleOptions = new CircleOptions();
-                circleOptions.center(endPoint);
-                circleOptions.clickable(true);
-                circleOptions.strokeWidth(0);
-                circleOptions.fillColor(Color.parseColor("#80fcac92"));
-                circleOptions.radius(80);
+                MarkerOptions MarkerOptions = new MarkerOptions();
+                MarkerOptions.title("관심있는 장소");
+                MarkerOptions.snippet(String.valueOf(myInterestArray.size()));
+                MarkerOptions.position(endPoint);
 
                 if(myInterestArray.size()==0){
                     myInterestArray.add(endPoint);
-                    mMap.addCircle(circleOptions);
+                    mMap.addMarker(MarkerOptions);
                 }else {
-                    for (LatLng i : myInterestArray) {
+                    for (int i=0; i<myInterestArray.size(); i++) {
                         float[] result = new float[1];
-                        Location.distanceBetween(i.latitude, i.longitude, endPoint.latitude, endPoint.longitude, result);
+                        Location.distanceBetween(myInterestArray.get(i).latitude, myInterestArray.get(i).longitude, endPoint.latitude, endPoint.longitude, result);
                         if (result[0] > 80) {
                             myInterestArray.add(endPoint);
-                            mMap.addCircle(circleOptions);
+                            mMap.addMarker(MarkerOptions);
                             Log.wtf("거리", result[0] + "");
                         }
                     }
                 }
+                Log.wtf("리스트",myInterestArray.toString());
             }else{
                 myWaitTime=Timestamp.now().getSeconds();
             }
@@ -366,21 +413,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             try {
                 // 칼로리 표시
                 TextView tv = mContext.findViewById(R.id.map_txt_calorie);
-                int WalkTimeSum = (int) ((SystemClock.elapsedRealtime() - mChr.getBase()) / 1000);
-                int hour = WalkTimeSum / 60 / 60;
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                DocumentSnapshot document = task.getResult();
-                                String weight = document.getString("petWeight");
-                                double int_weight = Double.valueOf(weight);
-                                double kcal = int_weight * 2 * hour;
-                                tv.setText(String.format("%.2f",kcal));
-                            }
-                        });
-
+                double WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
+                double hour = WalkTimeSum / 60 / 60;
+                double int_weight = Double.valueOf(myPetWeight);
+                double kcal = int_weight * 3.8 * hour;
+                tv.setText(String.format("%.2f",kcal));
+                Log.wtf("시간",kcal+"");
             } catch (NullPointerException e) {
             }
         }
@@ -437,15 +475,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     //산책버튼 나타내기,숨기기
     //b가 true일시 산책 시작, false일시 산책 종료
     private void setWalkButton(boolean b) {
-
         final CardView ct = v.findViewById(R.id.cardtest);
         final ExtendedFloatingActionButton st = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_start); //시작
         final ExtendedFloatingActionButton fi = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_finish); //종료
-        if (b) { // 산책 시작
+        if (b) {
             ct.setVisibility(View.VISIBLE); // 보이기
             st.setVisibility(View.GONE); // 시작 버튼 클릭시 숨기고
             fi.setVisibility(View.VISIBLE); //종료 버튼 활성화
-        } else { // 산책 종료
+        } else {
             ct.setVisibility(View.GONE); // 안보이기
             st.setVisibility(View.VISIBLE); // 종료 버튼 클릭시 숨기고
             fi.setVisibility(View.GONE); //시작 버튼 활성화
@@ -458,6 +495,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private void startProcess() {
         LocationManager lm = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
+        //애견 몸무게 획득
+        final String[] weight = new String[1];
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                           @Override
+                                           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                               DocumentSnapshot document = task.getResult();
+                                               weight[0] = document.getString("petWeight");
+                                               myPetWeight = weight[0];
+                                           }
+                                       });
+
         //권한 얻기
         getMapLocationPermission();
         setWalkButton(true);
@@ -468,11 +518,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         //지도 모든 선 지우기
         mMap.clear();
         myBearingArray = new ArrayList<>();
+        myInterestArray = new ArrayList<>();
         myLinesSaved = new ArrayList<>();
         myLineOption = new PolylineOptions();
         myLineOption.color(Color.GREEN).width(20);
         walkDistanceResult= new float[1];
         walkDistance = 0;
+        myWaitTime= Timestamp.now().getSeconds();
         startPoint = null;
         endPoint = null;
 
@@ -680,14 +732,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         //타유저 위치 갱신
         showOtherLocation();
 
-        //마커 정보 클릭시  팝업 으로 이동
+        //마커 정보 클릭시  팝업 으로 이동 todo:마커정보클릭
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-
-                MarkerClickPopup m = MarkerClickPopup.getInstance();
-                m.show(getFragmentManager(), MarkerClickPopup.TAG_EVENT_DIALOG);
-
 //                startActivityForResult(); 나중에 사용자 정보 데이터 전달
             }
         });
@@ -907,7 +955,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     //todo:마커클릭
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if(marker.getTitle().equals("관심장소!")) return true;
+        if(marker.getTitle().equals("관심있는 장소")) {
+            FragmentManager fm = getParentFragmentManager();
+            MarkerInfoClick popup = new MarkerInfoClick();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("latlng", myInterestArray.get(Integer.valueOf(marker.getSnippet())));
+            popup.setArguments(bundle);
+            fm.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
+                    .add(popup, "locationInfo")
+                    .commit();
+            Log.wtf("클릭","했어");
+            return true;
+        }
         String UID = marker.getTitle();
         FirebaseFirestore fbRef = FirebaseFirestore.getInstance();
         DocumentReference dbRef = fbRef.collection("users").document(UID);

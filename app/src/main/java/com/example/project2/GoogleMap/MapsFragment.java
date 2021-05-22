@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
@@ -38,11 +40,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
+import com.google.android.gms.common.internal.FallbackServiceBroker;
+import com.google.android.gms.dynamic.SupportFragmentWrapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -55,11 +60,23 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Cap;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -82,14 +99,22 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
@@ -139,7 +164,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static int walkDistance = 0;
     private static PolylineOptions myLineOption = new PolylineOptions();
     private static ArrayList<Polyline> myLinesSaved = new ArrayList<>();
-    private static long cameraCooldown;
+    private static ArrayList<Float> myBearingArray = new ArrayList<>();
+    private static ArrayList<LatLng> myCoordinateArray = new ArrayList<>();
+    private static ArrayList<LatLng> myInterestArray = new ArrayList<>();
+    private static long myWaitTime = 0;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
@@ -147,7 +175,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static HashMap<String, Marker> otherMarker = new HashMap<>();
 
     //백그라운드
-    Intent serviceIntent;
+    private Intent serviceIntent;
+
+    private GoogleMap nMap;
 
     Chronometer mChr;
 
@@ -182,6 +212,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
         ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
         actionBar.hide();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) mContext.getSupportFragmentManager().findFragmentById(R.id.mapview);
 
         //백그라운드 서비스
         serviceIntent = new Intent(mContext, LocationBackground.class);
@@ -243,34 +275,41 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                         );
                         //마지막 이동 시간
                         int time = Integer.valueOf(value.get("lastTime").get("seconds").toString());
-                        int passedTime = (int) Timestamp.now().getSeconds()-time;
-
+                        int passedTime = (int) Timestamp.now().getSeconds() - time;
                         //만일 접속종료 마지막 위치가 현재 위치와 같다면( = 산책중이 아니라면)패스
-                        if (startPos.equals(endPos) && passedTime>10) {
+                        if (passedTime > 10) {
                             otherMarker.get(otherUID).remove();
+                            otherMarker.remove(otherUID);
                             continue;
                         } else {
                             //마커 셋팅
-                            cashingImage(otherUID);
-                            Bitmap b = BitmapFactory.decodeFile(photoPath);
-                            marker_imageView.setImageBitmap(b);
                             firestore.collection("users").document(otherUID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    cashingImage(otherUID);
+                                    Bitmap b = BitmapFactory.decodeFile(photoPath);
+                                    marker_imageView.setImageBitmap(b);
                                     marker_textView.setText(task.getResult().getString("name"));
+                                    iconBitmap = Bitmap.createScaledBitmap(createDrawableFromView(mContext, marker_root_view), 155, 180, false);
+                                    marker.position(startPos);
+                                    marker.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+
+                                    try {
+                                        //마커 추가
+                                        otherMarker.get(otherUID).remove();
+                                        otherMarker.put(otherUID, mMap.addMarker(marker));
+                                        otherMarker.get(otherUID).setTitle(otherUID);
+                                    }catch (NullPointerException e){
+                                        marker.position(new LatLng(0, 0));
+                                        otherMarker.put(otherUID, mMap.addMarker(marker));
+                                        otherMarker.get(otherUID).setTitle(otherUID);
+                                        otherMarker.get(otherUID).remove();
+                                    }
                                 }
                             });
-                            iconBitmap = Bitmap.createScaledBitmap(createDrawableFromView(mContext, marker_root_view), 155, 180, false);
-                            marker.position(startPos);
-                            marker.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
-
-                            //마커 추가
-                            otherMarker.get(otherUID).remove();
-                            otherMarker.put(otherUID, mMap.addMarker(marker));
-                            otherMarker.get(otherUID).setTitle(otherUID);
                         }
                     } catch (Exception e) {
-                        marker.position(new LatLng(0,0));
+                        marker.position(new LatLng(0, 0));
                         otherMarker.put(otherUID, mMap.addMarker(marker));
                         otherMarker.get(otherUID).setTitle(otherUID);
                         otherMarker.get(otherUID).remove();
@@ -285,15 +324,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
+    //todo:위치업뎃
     //위치정보 업데이트 처리 객체
     public LocationListener loListener = new LocationListener() {
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @SuppressLint("MissingPermission")
         @Override
         public void onLocationChanged(Location location) {
             DatabaseReference startRef = database.getReference().child("mapData").child(user.getUid()).child("start");
             DatabaseReference endRef = database.getReference().child("mapData").child(user.getUid()).child("end");
             DatabaseReference lastTimeRef = database.getReference().child("mapData").child(user.getUid()).child("lastTime");
-            LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
             //현재 위치, startPoint에 지속적으로 위치가 갱신됨
             startPoint = new LatLng(location.getLatitude(), location.getLongitude());
@@ -302,12 +342,41 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
             //걸은 거리 구하기 미터 단위
             Location.distanceBetween(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude, walkDistanceResult);
-            int tmpDistance = walkDistance;
             walkDistance += (int) walkDistanceResult[0];
+
 
             //선 그리기
             myLinesSaved.add(mMap.addPolyline(myLineOption.add(startPoint, endPoint)));
-            Log.wtf("Polyline",myLinesSaved.size()+"");
+            myBearingArray.add(location.getBearing());
+            myCoordinateArray.add(endPoint);
+            if(Timestamp.now().getSeconds() - myWaitTime > 1){
+                myWaitTime=Timestamp.now().getSeconds();
+
+                CircleOptions circleOptions = new CircleOptions();
+                circleOptions.center(endPoint);
+                circleOptions.clickable(true);
+                circleOptions.strokeWidth(0);
+                circleOptions.fillColor(Color.parseColor("#80fcac92"));
+                circleOptions.radius(80);
+
+                if(myInterestArray.size()==0){
+                    myInterestArray.add(endPoint);
+                    mMap.addCircle(circleOptions);
+                }else {
+                    for (LatLng i : myInterestArray) {
+                        float[] result = new float[1];
+                        Location.distanceBetween(i.latitude, i.longitude, endPoint.latitude, endPoint.longitude, result);
+                        if (result[0] > 80) {
+                            myInterestArray.add(endPoint);
+                            mMap.addCircle(circleOptions);
+                            Log.wtf("거리", result[0] + "");
+                        }
+                    }
+                }
+            }else{
+                myWaitTime=Timestamp.now().getSeconds();
+            }
+            Log.wtf("Polyline", myLinesSaved.size() + "");
 
             //움직이는동안 마커 일단 지우기
             currentMarker.remove();
@@ -316,19 +385,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 16));
 
             //리얼타임 데이터베이스에 실시간으로 노드 전송
-            Log.wtf("거리", String.valueOf(walkDistance == tmpDistance));
-            //1미터도 안움직였으면 멈춘걸로 처리
-            if (walkDistance == tmpDistance) {
-                startRef.setValue(startPoint); //멈춤
-                endRef.setValue(startPoint);
-            } else {
-                startRef.setValue(startPoint); //움직이는 중
-                endRef.setValue(endPoint);
-                lastTimeRef.setValue(Timestamp.now());
-            }
+            startRef.setValue(startPoint);
+            endRef.setValue(endPoint);
+            lastTimeRef.setValue(Timestamp.now());
 
             endPoint = startPoint;
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
             try {
                 //임시로 걸은 거리 칼로리 칸에 표시
                 TextView tv = mContext.findViewById(R.id.map_txt_calorie);
@@ -352,6 +414,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
         }
     };
+
+    public void makeStatistics() {
+        serviceIntent.setAction("startUploadPaths");
+        serviceIntent.putParcelableArrayListExtra("interest",myInterestArray);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            mContext.startForegroundService(serviceIntent);
+        else mContext.startService(serviceIntent);
+    }
 
     //최초로 산책 실행 여부가 결정되는 곳
     public void setWalkState(boolean b) {
@@ -395,10 +465,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
+    //todo:버튼시작
     //버튼 눌러서산책시작시에 실행되는 과정
     @SuppressLint("MissingPermission")
     private void startProcess() {
-        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         //권한 얻기
         getMapLocationPermission();
@@ -409,15 +480,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
         //지도 모든 선 지우기
         mMap.clear();
-        myLinesSaved.clear();
+        myBearingArray = new ArrayList<>();
+        myLinesSaved = new ArrayList<>();
         myLineOption = new PolylineOptions();
         myLineOption.color(Color.GREEN).width(20);
+        walkDistanceResult= new float[1];
+        walkDistance = 0;
+        startPoint = null;
+        endPoint = null;
+
+        myWaitTime = Timestamp.now().getSeconds();
 
         //최초 위치 갱신
-        lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        getDeviceLocation();
         //위치정보 업데이트 시작
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, loListener);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 2, loListener);
         //백그라운드 서비스 시작
         serviceIntent.setAction("startForeground");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -428,10 +505,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         walkDistance = 0;
     }
 
+    //todo:버튼종료
     //버튼 눌러서 산책 종료시 실행되는 과정
     @SuppressLint("MissingPermission")
     private void endProcess() {
-        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         final int count = 1;
         long WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
 
@@ -450,13 +528,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mContext.stopService(serviceIntent);
         else mContext.stopService(serviceIntent);
 
+        //위치정보 통계 시작
+        makeStatistics();
+
         //다른사람 마커 다 지우기
         List<String> keySet = new ArrayList<>(otherMarker.keySet());
-        for(String i : keySet){
+        for (String i : keySet) {
             Marker pArr = otherMarker.get(i);
             pArr.remove();
         }
         otherMarker.clear();
+
 
         DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
 
@@ -509,7 +591,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                                 intent.putExtra("hour", String.valueOf(hour));
                                 startActivityForResult(intent, 1);
                             } else {// 5분 미만만산책 했을 때
-                                Log.e(TAG,"test 2. Walk Data Null");
+                                Log.e(TAG, "test 2. Walk Data Null");
                                 Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup2.class);
                                 startActivity(intent);
                             }
@@ -586,6 +668,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         mapView.onSaveInstanceState(outState);
     }
 
+    //todo:지도준비
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -601,7 +684,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         getDeviceLocation();
         //다른사람 마커 다 지우기
         List<String> keySet = new ArrayList<>(otherMarker.keySet());
-        for(String i : keySet){
+        for (String i : keySet) {
             otherMarker.get(i).remove();
         }
         //마커 준비
@@ -658,35 +741,35 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         mMap.moveCamera(cameraUpdate);
     }
 
-    String getCurrentAddress(LatLng latlng) {
-        // 위치 정보와 지역으로부터 주소 문자열을 구한다.
-        List<Address> addressList = null;
-        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-
-        // 지오코더를 이용하여 주소 리스트를 구한다.
-        try {
-            addressList = geocoder.getFromLocation(latlng.latitude, latlng.longitude, 1);
-        } catch (IOException e) {
-            Toast.makeText(mContext, "위치로부터 주소를 인식할 수 없습니다. 네트워크가 연결되어 있는지 확인해 주세요.", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-            return "주소 인식 불가";
-        }
-
-        if (addressList.size() < 1) { // 주소 리스트가 비어있는지 비어 있으면
-            return "해당 위치에 주소 없음";
-        }
-
-        // 주소를 담는 문자열을 생성하고 리턴
-        Address address = addressList.get(0);
-        StringBuilder addressStringBuilder = new StringBuilder();
-        for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-            addressStringBuilder.append(address.getAddressLine(i));
-            if (i < address.getMaxAddressLineIndex())
-                addressStringBuilder.append("\n");
-        }
-
-        return addressStringBuilder.toString();
-    }
+//    String getCurrentAddress(LatLng latlng) {
+//        // 위치 정보와 지역으로부터 주소 문자열을 구한다.
+//        List<Address> addressList = null;
+//        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+//
+//        // 지오코더를 이용하여 주소 리스트를 구한다.
+//        try {
+//            addressList = geocoder.getFromLocation(latlng.latitude, latlng.longitude, 1);
+//        } catch (IOException e) {
+//            Toast.makeText(mContext, "위치로부터 주소를 인식할 수 없습니다. 네트워크가 연결되어 있는지 확인해 주세요.", Toast.LENGTH_SHORT).show();
+//            e.printStackTrace();
+//            return "주소 인식 불가";
+//        }
+//
+//        if (addressList.size() < 1) { // 주소 리스트가 비어있는지 비어 있으면
+//            return "해당 위치에 주소 없음";
+//        }
+//
+//        // 주소를 담는 문자열을 생성하고 리턴
+//        Address address = addressList.get(0);
+//        StringBuilder addressStringBuilder = new StringBuilder();
+//        for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+//            addressStringBuilder.append(address.getAddressLine(i));
+//            if (i < address.getMaxAddressLineIndex())
+//                addressStringBuilder.append("\n");
+//        }
+//
+//        return addressStringBuilder.toString();
+//    }
 
 
     // 마커 클릭시 보여지는 주소와 위도 경도 ( 후에 사용자 정보로 변경 )
@@ -703,30 +786,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 LatLng currentPosition
                         = new LatLng(location.getLatitude(), location.getLongitude());
 
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                FirebaseFirestore FBdb = FirebaseFirestore.getInstance();
-                DocumentReference docRef = FBdb.collection("users").document(user.getUid());
-                docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-
-                        String markerSnippet = "애견 이름 : " + value.getString("petName")
-                                + "    견종 : " + value.getString("petKind") + "    나 이 : " + value.getString("petAge") + " 살 ";
-                        String markerTitle = getCurrentAddress(currentPosition);
-
-                        Log.d(TAG, "Time :" + CurrentTime() + " onLocationResult : " + markerSnippet);
-
-                        //현재 위치에 마커 생성하고 이동
-                        setCurrentLocation(location, markerTitle, markerSnippet);
-                        mCurrentLocatiion = location;
-
-                    }
-                });
-
-//                String markerSnippet = "위도 : " + String.valueOf(location.getLatitude())
-//                        + " 경도:" + String.valueOf(location.getLongitude());
-
-
+                //현재 위치에 마커 생성하고 이동
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentPosition);
+                mMap.moveCamera(cameraUpdate);
             }
         }
 
@@ -737,23 +799,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         SimpleDateFormat date = new SimpleDateFormat("yyyy/MM/dd");
         SimpleDateFormat time = new SimpleDateFormat("hh:mm:ss a");
         return time.format(today);
-    }
-
-    public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
-        if (currentMarker != null) currentMarker.remove();
-
-        LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(currentLatLng);
-        markerOptions.title(markerTitle);
-        markerOptions.snippet(markerSnippet);
-        markerOptions.draggable(true);
-
-        currentMarker = mMap.addMarker(markerOptions);
-
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
-        mMap.moveCamera(cameraUpdate);
     }
 
     private void getDeviceLocation() {
@@ -796,7 +841,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
 
     public boolean checkLocationServicesStatus() {
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -872,8 +917,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
+    //todo:마커클릭
     @Override
     public boolean onMarkerClick(Marker marker) {
+        if(marker.getTitle().equals("관심장소!")) return true;
         String UID = marker.getTitle();
         FirebaseFirestore fbRef = FirebaseFirestore.getInstance();
         DocumentReference dbRef = fbRef.collection("users").document(UID);
@@ -886,7 +933,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 String perKind = value.getString("petKind");
                 String petAge = value.getString("petAge");
 
-                if(name==null)return;
+                if (name == null) return;
 
                 FragmentManager fm = getParentFragmentManager();
                 MarkerClickPopup popup = new MarkerClickPopup();

@@ -53,7 +53,6 @@
                     android:gravity="center"
                     android:layout_margin="5dp"
                     android:textColor="@color/black"/>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -123,7 +122,6 @@
                             android:layout_marginLeft="10dp"
                             android:background="@drawable/edit_text_custom"
                             android:gravity="center"
-                            android:ems="8"
                             android:inputType="phone"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -295,7 +293,7 @@
                             android:background="@drawable/edit_text_custom"
                             android:ems="8"
                             android:gravity="center"
-                            android:inputType="number"
+                            android:inputType="numberDecimal"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
@@ -331,6 +329,7 @@
                             android:layout_height="35dp"
                             android:background="@drawable/edit_text_custom"
                             android:ems="8"
+                            android:hint="Ex)20210526"
                             android:gravity="center"
                             android:layout_marginLeft="10dp"
                             android:inputType="number"
@@ -363,13 +362,12 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_weight="3">
-                        <EditText
-                            android:id="@+id/edit_petKind"
+                        <Spinner
+                            android:id="@+id/Kind_spinner"
                             android:layout_width="match_parent"
                             android:layout_height="35dp"
+                            android:entries="@array/my_petArray"
                             android:layout_marginLeft="10dp"
-                            android:ems="8"
-                            android:background="@drawable/edit_text_custom"
                             android:gravity="center"
                             android:inputType="text"
                             android:textStyle="bold" />
@@ -456,7 +454,6 @@
                             android:layout_toRightOf="@+id/RB_Ntrue"
                             android:text="아니요"/>
                     </RadioGroup>
-
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -478,7 +475,6 @@
                             android:text="예방접종 여부 "
                             android:textSize="15dp" />
                     </RelativeLayout>
-
                     <RadioGroup
                         android:id="@+id/edit_Vaccination"
                         android:layout_width="0dp"
@@ -513,7 +509,8 @@
             android:id="@+id/btn_Check"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:background="@drawable/button_custom"
             android:text="완료"
             android:textStyle="bold" />

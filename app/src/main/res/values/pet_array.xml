@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="my_petArray">
+        <item> 선택해주세요.</item>
+        <item> 아펜핀셔 </item>
+        <item> 아프간 하운드 </item>
+        <item> 아프리카 사냥개 </item>
+        <item> 에어데일 테리어 </item>
+        <item> 아메리칸 스태퍼드셔 테리어 </item>
+        <item> 아펜젤러 세넨훈드 </item>
+        <item> 오스트레일리안 테리어 </item>
+        <item> 바센지 </item>
+        <item> 바셋하운드 </item>
+        <item> 비글 </item>
+        <item> 베들링턴 테리어 </item>
+        <item> 버니즈 마운틴 도그 </item>
+        <item> 블랙 앤 탄 쿤하운드 </item>
+        <item> 킹 찰스 스패니얼 </item>
+        <item> 블러드 하운드 </item>
+        <item> 블루틱 쿤하운드 </item>
+        <item> 보더콜리 </item>
+        <item> 보더 테리어 </item>
+        <item> 보르조이 </item>
+        <item> 보스턴 테리어 </item>
+        <item> 부비에 데 플랑드르 </item>
+        <item> 복서 </item>
+        <item> 브뤼셀 그리펀 </item>
+        <item> 브리아드 </item>
+        <item> 브리트니 스파니엘 </item>
+        <item> 불마스티프 </item>
+        <item> 케언 테리어 </item>
+        <item> 카디건 웰시 코기 </item>
+        <item> 체서피크 베이 리트리버 </item>
+        <item> 치와와 </item>
+        <item> 차우차우 </item>
+        <item> 클럼버 스파니엘 </item>
+        <item> 코커 스파니엘 </item>
+        <item> 콜리 </item>
+        <item> 컬리 코티드 리트리버 </item>
+        <item> 댄디 딘몬트 테리어 </item>
+        <item> 도베르만 </item>
+        <item> 잉글리시 폭스하운드 </item>
+        <item> 잉글리시 스프링어 스패니얼 </item>
+        <item> 프렌치 불도그 </item>
+        <item> 저먼 셰퍼드 </item>
+        <item> 골든 리트리버 </item>
+        <item> 케리 블루 테리어</item>
+        <item> 말라뮤트 </item>
+        <item> 말티즈 </item>
+        <item> 미니어처 푸들 </item>
+        <item> 미니어처 슈나우저 </item>
+        <item> 파피용 </item>
+        <item> 포메라니안 </item>
+        <item> 퍼그 </item>
+        <item> 세인트버나드 </item>
+        <item> 사모예드 </item>
+        <item> 시바견 </item>
+        <item> 시츄 </item>
+        <item> 시베리안 허스키 </item>
+        <item> 푸들 </item>
+        <item> 토이 푸들 </item>
+        <item> 요크셔 테리어 </item>
+
+    </string-array>
+</resources>

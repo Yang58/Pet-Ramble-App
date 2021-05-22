@@ -51,7 +51,6 @@ public class HomeFragment extends Fragment {
     TextView petage ;
     TextView petkind ;
 
-
     TextView home_text;
     TextView petweight;
     Spinner Option_Spinner;

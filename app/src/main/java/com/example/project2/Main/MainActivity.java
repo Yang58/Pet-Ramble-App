@@ -92,31 +92,23 @@ public class MainActivity extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if (document != null) {
                             if (document.exists()) {
-//                                storageReference.child("users/" + user.getUid() + "/profileImage.jpg").getDownloadUrl().addOnSuccessListener(
-//                                        new OnSuccessListener<Uri>() {
-//                                            @Override
-//                                            public void onSuccess(Uri uri) {
-//                                                Glide.with(getApplicationContext()).load(uri).apply(new RequestOptions().circleCrop()).into(imageView);
-//                                            }
-//                                        }).addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//
-//                                    }
-//                                });
-
-//                                imageView.setBackground(new ShapeDrawable(new OvalShape()));
-//                                if(Build.VERSION.SDK_INT >= 21) {
-//                                    imageView.setClipToOutline(true);
-//                                }
-
                                 Log.d(TAG, "" + document.getId() +
                                         " data: " + document.getData());
                             } else {
-//                                 유저 uid에 애견정보가 없다면 정보 입력창 이동
-                                Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
-                                startActivity(intent);
-                                Log.d(TAG, "No such document");
+                                Intent getintent = getIntent();
+                                int Resultcode = getintent.getIntExtra("check",0);
+                                if(Resultcode == 1){ // User info Ac 에서 코드값 넘어옴 ( 회원 정보 정상적으로 저장됨)
+                                    Log.d(TAG, "Resultcode = 1");
+                                    MainActivity.super.onStart(); //  데이터 출력을 위한 새로고침
+                                }
+                                else if(Resultcode == 0){
+                                    // 유저 uid에 애견정보가 없다면 정보 입력창 이동
+                                    Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
+                                    startActivity(intent);
+                                    Log.d(TAG, "Resultcode = 0");
+                                    Log.d(TAG, "No such document");
+                                }
+                                Log.d(TAG, "Resultcode = ?");
                             }
                         }
                     } else {

@@ -47,8 +47,8 @@ public class FriendFragment extends Fragment {
 
         peopleFragment = new PeopleFragment();
         publicChatStartFragment = new PublicChatStartFragment();
+
         FM.beginTransaction().replace(R.id.friend_frameLayout1,peopleFragment).commit();
-        
 
         BottomNavigationView bottomNavigationView = v.findViewById(R.id.bottomnav1);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

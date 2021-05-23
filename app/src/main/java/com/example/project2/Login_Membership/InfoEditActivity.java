@@ -1,6 +1,5 @@
 package com.example.project2.Login_Membership;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,15 +10,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,8 +36,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -77,10 +70,8 @@ public class InfoEditActivity extends AppCompatActivity {
     private EditText edit_petName;
     private EditText edit_petAge;
     private EditText edit_petBirthday;
-    private String edit_petKind;
+    private EditText edit_petKind;
     private EditText edit_petWeight;
-    private Spinner Kind_spinner;
-    private String temp_uri;
     Uri uri;
     ImageView Edit_profile;
 
@@ -93,10 +84,11 @@ public class InfoEditActivity extends AppCompatActivity {
         edit_Nickname = (EditText) findViewById(R.id.edit_Nickname);
         edit_petName = (EditText) findViewById(R.id.edit_petName);
         edit_petAge = (EditText) findViewById(R.id.edit_petAge);
-        Kind_spinner = (Spinner) findViewById(R.id.Kind_spinner);
+        edit_petKind = (EditText) findViewById(R.id.edit_petKind);
         edit_petWeight = (EditText) findViewById(R.id.edit_petWeight);
         edit_petBirthday = (EditText) findViewById(R.id.edit_birthday);
         Edit_profile = (ImageView) findViewById(R.id.edit_Profile);
+
 
         edit_name.setInputType(EditorInfo.TYPE_NULL);
         edit_name.setOnClickListener(new View.OnClickListener() {
@@ -116,28 +108,9 @@ public class InfoEditActivity extends AppCompatActivity {
             }
         });
 
-        Kind_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0){ // 종류 선택 안함
-                    edit_petKind = null;
-                }else{
-                    InputMethodManager mInputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    mInputMethodManager.hideSoftInputFromWindow(edit_petBirthday.getWindowToken(), 0);
-                    edit_petKind = (String) parent.getItemAtPosition(position);
-                    Log.e(TAG,"1. test log : "+ edit_petKind );
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(InfoEditActivity.this,"반려견 종류를 선택해주세요.",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         Log.d("Debug", "Running InfoEditActivitiy");
         Log.d("Debug", user.getUid());
         DataCollect();
@@ -164,14 +137,14 @@ public class InfoEditActivity extends AppCompatActivity {
         btn_Check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 try {
                     String Edit_name = edit_name.getText().toString();
                     String Edit_phoneNum = edit_phoneNum.getText().toString();
                     String Edit_Nickname = edit_Nickname.getText().toString();
                     String Edit_petName = edit_petName.getText().toString();
                     String Edit_petAge = edit_petAge.getText().toString();
-                    String Edit_petKind = edit_petKind;
-                    //String Edit_petKind = edit_petKind.getText().toString();
+                    String Edit_petKind = edit_petKind.getText().toString();
                     String Edit_petWeight = edit_petWeight.getText().toString();
                     SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
                     Date Edit_petBirthday = sdf.parse(edit_petBirthday.getText().toString());
@@ -191,22 +164,11 @@ public class InfoEditActivity extends AppCompatActivity {
                     RadioButton NeutralizationCheck = findViewById(Neutral);
                     RadioButton VaccinationCheck = findViewById(Vaccine);
 
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference photo = database.getReference("friend").child(user.getUid()).child("photo");
-                    DatabaseReference name = database.getReference("friend").child(user.getUid()).child("name");
-                    DatabaseReference pet = database.getReference("friend").child(user.getUid()).child("pet");
-                    DatabaseReference age = database.getReference("friend").child(user.getUid()).child("age");
-
                     StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
                     Log.d("Debug",Edit_name);
                     if (uri == null) {
-                        UserInfoDB userInfoDB = new UserInfoDB(Edit_name, Edit_Nickname, temp_uri, Edit_phoneNum);
+                        UserInfoDB userInfoDB = new UserInfoDB(Edit_name, Edit_Nickname, null, Edit_phoneNum);
                         MyPetDB myPetDB = new MyPetDB(Edit_petName,Edit_petAge,Edit_petBirthday,Edit_petKind,Edit_petWeight, GenderCheck.getText().toString(), NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
-
-                        name.setValue(Edit_Nickname);
-                        pet.setValue(Edit_petKind);
-                        age.setValue(Edit_petAge);
-                        photo.setValue(temp_uri);
 
                         Log.d("Debug","Uri was null.");
                         UserinfoUploader(userInfoDB);
@@ -218,7 +180,6 @@ public class InfoEditActivity extends AppCompatActivity {
                         finish();
                     }else{
                         try {
-
                             InputStream stream = new FileInputStream(new File(imageUrl));
                             UploadTask uploadTask = mountainImagesRef.putStream(stream);
                             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -234,11 +195,6 @@ public class InfoEditActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     if (task.isSuccessful()) {
                                         Uri downloadUri = task.getResult();
-
-                                        photo.setValue(downloadUri.toString());
-                                        name.setValue(Edit_Nickname);
-                                        pet.setValue(Edit_petName);
-                                        age.setValue(Edit_petAge);
 
                                         UserInfoDB userInfoDB = new UserInfoDB(Edit_name, Edit_Nickname, downloadUri.toString(), Edit_phoneNum);
                                         MyPetDB myPetDB = new MyPetDB(Edit_petName, Edit_petAge, Edit_petBirthday, Edit_petKind, Edit_petWeight, GenderCheck.getText().toString(), NeutralizationCheck.getText().toString(), VaccinationCheck.getText().toString());
@@ -334,8 +290,6 @@ public class InfoEditActivity extends AppCompatActivity {
 
                                                 EditText profile_Nickname = (EditText) findViewById(R.id.edit_Nickname);
                                                 profile_Nickname.setText((String) document.get("user_nickname"));
-
-                                                temp_uri = (String) document.get("user_profile");
                                             }
                                         });
 
@@ -350,15 +304,8 @@ public class InfoEditActivity extends AppCompatActivity {
                                                 EditText edit_petAge = (EditText) findViewById(R.id.edit_petAge);
                                                 edit_petAge.setText((String) document.get("petAge"));
 
-                                                Spinner Kind_Spinner = (Spinner) findViewById(R.id.Kind_spinner);
-
-                                                String myString = (String) document.get("petKind"); //the value you want the position for
-
-                                                ArrayAdapter myAdap = (ArrayAdapter) Kind_Spinner.getAdapter(); //cast to an ArrayAdapter
-
-                                                int spinnerPosition = myAdap.getPosition(myString);
-
-                                                Kind_Spinner.setSelection(spinnerPosition);
+                                                EditText edit_petKind = (EditText) findViewById(R.id.edit_petKind);
+                                                edit_petKind.setText((String) document.get("petKind"));
 
                                                 EditText edit_petWeight = (EditText) findViewById(R.id.edit_petWeight);
                                                 edit_petWeight.setText((String) document.get("petWeight"));
@@ -370,6 +317,12 @@ public class InfoEditActivity extends AppCompatActivity {
                                                 String str = sdf.format( new Date( i.toDate().getTime()));
                                                 Log.d("Debug", str);
 
+                                                try {
+                                                    Date endDate = sdf.parse(edit_petBirthday.getText().toString());
+
+                                                } catch (ParseException e) {
+                                                    e.printStackTrace();
+                                                }
 
                                                 edit_petBirthday.setText(str);
 
@@ -440,9 +393,9 @@ public class InfoEditActivity extends AppCompatActivity {
         {
             try {
                 uri = data.getData();
-                Log.d("Debug", uri.toString());
                 imageUrl = getRealPathFromUri(data.getData());
                 RequestOptions cropOptions = new RequestOptions();
+
                 Glide.with(getApplicationContext())
                         .load(imageUrl)
                         .apply(cropOptions.optionalCircleCrop())

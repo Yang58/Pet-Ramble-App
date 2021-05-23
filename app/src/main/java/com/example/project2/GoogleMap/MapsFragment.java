@@ -104,6 +104,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -157,7 +158,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static TextView marker_textView;
     private static String photoPath;
 
-    //내 위치 관련
+    //내 위치 관련 todo:내위치전역변수
     private static LatLng startPoint = null;
     private static LatLng endPoint = null;
     private static float walkDistanceResult[] = new float[1];
@@ -168,11 +169,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static ArrayList<LatLng> myCoordinateArray = new ArrayList<>();
     private static ArrayList<LatLng> myInterestArray = new ArrayList<>();
     private static long myWaitTime = 0;
+    private static String myPetWeight = null;
+    private static int tmp;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
     private static ArrayList<Polyline> otherLinesSaved = new ArrayList<>();
     private static HashMap<String, Marker> otherMarker = new HashMap<>();
+    private static ArrayList<Circle> circleArrayList = new ArrayList<>();
 
     //백그라운드
     private Intent serviceIntent;
@@ -261,6 +265,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     //나를 제외한 다른 사람의 위치 변경이 감지되었을 경우
                     if (otherUID.equals(user.getUid())) continue;
                     try {
+                        if(otherUID.equals("hotSpot")){
+                            for(Circle c : circleArrayList){
+                                c.remove();
+                            }
+                            for(DataSnapshot c : d.getChildren()) {
+                                HashMap<String, Double> value = (HashMap<String, Double>) c.getValue();
+                                CircleOptions circleOptions = new CircleOptions();
+                                circleOptions.clickable(true);
+                                circleOptions.strokeWidth(0);
+                                circleOptions.fillColor(Color.parseColor("#80fcac92"));
+                                circleOptions.radius(80);
+                                circleOptions.center(new LatLng(value.get("latitude"), value.get("longitude")));
+                                circleArrayList.add(mMap.addCircle(circleOptions));
+                                continue;
+                            }
+                        }
                         //데이터를 가져온다
                         HashMap<String, HashMap<String, Object>> value = (HashMap<String, HashMap<String, Object>>) d.getValue();
                         //도착 좌표
@@ -349,30 +369,29 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             myLinesSaved.add(mMap.addPolyline(myLineOption.add(startPoint, endPoint)));
             myBearingArray.add(location.getBearing());
             myCoordinateArray.add(endPoint);
-            if(Timestamp.now().getSeconds() - myWaitTime > 1){
+            if(Timestamp.now().getSeconds() - myWaitTime > 9){
                 myWaitTime=Timestamp.now().getSeconds();
 
-                CircleOptions circleOptions = new CircleOptions();
-                circleOptions.center(endPoint);
-                circleOptions.clickable(true);
-                circleOptions.strokeWidth(0);
-                circleOptions.fillColor(Color.parseColor("#80fcac92"));
-                circleOptions.radius(80);
+                MarkerOptions MarkerOptions = new MarkerOptions();
+                MarkerOptions.title("관심있는 장소");
+                MarkerOptions.snippet(String.valueOf(myInterestArray.size()));
+                MarkerOptions.position(endPoint);
 
                 if(myInterestArray.size()==0){
                     myInterestArray.add(endPoint);
-                    mMap.addCircle(circleOptions);
+                    mMap.addMarker(MarkerOptions);
                 }else {
-                    for (LatLng i : myInterestArray) {
+                    for (int i=0; i<myInterestArray.size(); i++) {
                         float[] result = new float[1];
-                        Location.distanceBetween(i.latitude, i.longitude, endPoint.latitude, endPoint.longitude, result);
+                        Location.distanceBetween(myInterestArray.get(i).latitude, myInterestArray.get(i).longitude, endPoint.latitude, endPoint.longitude, result);
                         if (result[0] > 80) {
                             myInterestArray.add(endPoint);
-                            mMap.addCircle(circleOptions);
+                            mMap.addMarker(MarkerOptions);
                             Log.wtf("거리", result[0] + "");
                         }
                     }
                 }
+                Log.wtf("리스트",myInterestArray.toString());
             }else{
                 myWaitTime=Timestamp.now().getSeconds();
             }
@@ -392,9 +411,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             endPoint = startPoint;
 
             try {
-                //임시로 걸은 거리 칼로리 칸에 표시
+                // 칼로리 표시
                 TextView tv = mContext.findViewById(R.id.map_txt_calorie);
-                tv.setText(String.valueOf(walkDistance));
+                double WalkTimeSum = (SystemClock.elapsedRealtime() - mChr.getBase()) / 1000;
+                double hour = WalkTimeSum / 60 / 60;
+                double int_weight = Double.valueOf(myPetWeight);
+                double kcal = int_weight * 3.8 * hour;
+                tv.setText(String.format("%.2f",kcal));
+                Log.wtf("시간",kcal+"");
             } catch (NullPointerException e) {
             }
         }
@@ -471,6 +495,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private void startProcess() {
         LocationManager lm = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
+        //애견 몸무게 획득
+        final String[] weight = new String[1];
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                           @Override
+                                           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                               DocumentSnapshot document = task.getResult();
+                                               weight[0] = document.getString("petWeight");
+                                               myPetWeight = weight[0];
+                                           }
+                                       });
+
         //권한 얻기
         getMapLocationPermission();
         setWalkButton(true);
@@ -481,11 +518,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         //지도 모든 선 지우기
         mMap.clear();
         myBearingArray = new ArrayList<>();
+        myInterestArray = new ArrayList<>();
         myLinesSaved = new ArrayList<>();
         myLineOption = new PolylineOptions();
         myLineOption.color(Color.GREEN).width(20);
         walkDistanceResult= new float[1];
         walkDistance = 0;
+        myWaitTime= Timestamp.now().getSeconds();
         startPoint = null;
         endPoint = null;
 
@@ -693,14 +732,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         //타유저 위치 갱신
         showOtherLocation();
 
-        //마커 정보 클릭시  팝업 으로 이동
+        //마커 정보 클릭시  팝업 으로 이동 todo:마커정보클릭
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-
-                MarkerClickPopup m = MarkerClickPopup.getInstance();
-                m.show(getFragmentManager(), MarkerClickPopup.TAG_EVENT_DIALOG);
-
 //                startActivityForResult(); 나중에 사용자 정보 데이터 전달
             }
         });
@@ -920,7 +955,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     //todo:마커클릭
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if(marker.getTitle().equals("관심장소!")) return true;
+        if(marker.getTitle().equals("관심있는 장소")) {
+            FragmentManager fm = getParentFragmentManager();
+            MarkerInfoClick popup = new MarkerInfoClick();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("latlng", myInterestArray.get(Integer.valueOf(marker.getSnippet())));
+            popup.setArguments(bundle);
+            fm.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
+                    .add(popup, "locationInfo")
+                    .commit();
+            Log.wtf("클릭","했어");
+            return true;
+        }
         String UID = marker.getTitle();
         FirebaseFirestore fbRef = FirebaseFirestore.getInstance();
         DocumentReference dbRef = fbRef.collection("users").document(UID);

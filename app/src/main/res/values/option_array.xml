@@ -2,14 +2,16 @@
 <resources>
     <string-array name="my_array">
         <item> 선택해주세요.</item>
-        <item>1년 미만의 자견</item>
-        <item>1년 이상의 중성화 하지 않음</item>
-        <item>중성화 완료 건강한 상태</item>
-        <item>노견</item>
-        <item>비만의 징후(다이어트 시작)</item>
-        <item> 심각한 비만 </item>
-        <item> 임신 상태 </item>
-        <item> 수유 기간 </item>
+        <item>이유식 ~ 4개월령</item>
+        <item>4개월령 ~ 성견</item>
+        <item>중성화하지 않은 경우</item>
+        <item>중성화한 경우</item>
+        <item>과체중</item>
+        <item> 비만 </item>
+        <item> 임신 전분 42일간 </item>
+        <item> 임신 후반 21일간 </item>
+        <item> 수유기간 </item>
+        <item> 노령견 </item>
     </string-array>
 
 </resources>

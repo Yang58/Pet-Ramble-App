@@ -1,6 +1,5 @@
 package com.example.project2.Friend;
 
-import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -205,8 +204,7 @@ public class PeopleFragment extends Fragment {
 
                 ProfileFragment profileFragment = new ProfileFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout1, profileFragment).commit();
-
+                transaction.replace(R.id.friend_frameLayout, profileFragment).commit();
             }
         });
 

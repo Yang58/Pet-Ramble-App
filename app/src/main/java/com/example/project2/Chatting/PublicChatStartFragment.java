@@ -78,7 +78,7 @@ public class PublicChatStartFragment extends Fragment {
 
                 PublicChattingFragment publicChattingFragment = new PublicChattingFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout1, publicChattingFragment).commit();
+                transaction.replace(R.id.friend_frameLayout, publicChattingFragment).commit();
 
                 /*
                 Intent intent = new Intent(getActivity(), PublicChattingFragment.class);
@@ -101,7 +101,7 @@ public class PublicChatStartFragment extends Fragment {
 
                 PublicChattingFragment publicChattingFragment = new PublicChattingFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout1, publicChattingFragment).commit();
+                transaction.replace(R.id.friend_frameLayout, publicChattingFragment).commit();
             }
         });
         showChatList();

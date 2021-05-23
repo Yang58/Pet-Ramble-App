@@ -11,16 +11,17 @@
         android:layout_height="wrap_content"
         android:id="@+id/bottomnav1"
         android:layout_alignParentTop="true"
-        android:background="@drawable/friend_custom"
         app:labelVisibilityMode="auto"
-        app:itemTextColor="@color/black"
-        app:itemIconTint="@color/black"
+        app:itemBackground="@color/custom1"
+        android:background="@color/custom2"
+        app:itemTextColor="@color/custom4"
+        app:itemIconTint="@color/custom3"
         app:menu="@menu/navgationmenu"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/black"
+        android:layout_height="1dp"
+        android:background="@color/custom4"
         android:layout_below="@+id/bottomnav1"/>
 
     <FrameLayout

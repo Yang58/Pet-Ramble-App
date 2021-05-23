@@ -503,6 +503,10 @@
     </ScrollView>
     <LinearLayout
         android:layout_width="match_parent"
+        android:background="@color/custom4"
+        android:layout_height="1dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="bottom"
@@ -512,6 +516,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
             android:background="@drawable/button_custom"
             android:text="완료"
             android:textStyle="bold" />
@@ -520,6 +528,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
             android:background="@drawable/button_custom"
             android:text="뒤로"
             android:textStyle="bold" />

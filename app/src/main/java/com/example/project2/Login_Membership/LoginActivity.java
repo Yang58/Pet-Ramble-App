@@ -1,7 +1,6 @@
 package com.example.project2.Login_Membership;
 
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -13,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.project2.Main.MainActivity;
@@ -57,9 +57,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         mAuth = FirebaseAuth.getInstance();
-
 
         id = (EditText) findViewById(R.id.edit_Login_id);
         pw  = (EditText) findViewById(R.id.edit_Login_pw);
@@ -80,10 +81,6 @@ public class LoginActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-        getSupportActionBar().setTitle("AppName");
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff000000));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

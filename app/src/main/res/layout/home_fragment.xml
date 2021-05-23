@@ -10,13 +10,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@color/custom1"
         android:orientation="vertical">
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
 
             <FrameLayout
                 android:id="@+id/container"
@@ -48,10 +47,10 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:gravity="center">
+                                android:orientation="vertical">
                                 <TextView
                                     android:id="@+id/home_text"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="건강 관리"
                                     android:textColor="@color/black"
@@ -60,7 +59,14 @@
                                     android:textSize="20dp"
                                     android:padding="5dp"
                                     android:layout_margin="10dp"
+                                    android:gravity="center"
                                     android:layout_gravity="top"/>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#9e9ac8"/>
+
                             </LinearLayout>
 
                             <RelativeLayout
@@ -91,7 +97,7 @@
                                             android:fontFamily="@font/tmoneyroundwindextrabold"
                                             android:text="몸무게 : "
                                             android:textColor="@color/black"
-                                            android:textSize="13dp" />
+                                            android:textSize="15dp" />
 
                                     </LinearLayout>
 
@@ -143,7 +149,7 @@
                                         android:text="옵션  "
                                         android:layout_margin="5dp"
                                         android:fontFamily="@font/tmoneyroundwindextrabold"
-                                        android:textSize="13dp"
+                                        android:textSize="15dp"
                                         android:textColor="@color/black"/>
 
                                 </LinearLayout>
@@ -171,7 +177,7 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/corner_border2"
+                                android:background="@drawable/corner_border3"
                                 android:layout_margin="10dp"
                                 android:gravity="center">
                                 <RelativeLayout
@@ -185,7 +191,7 @@
                                         android:layout_marginLeft="10dp"
                                         android:text="사료 칼로리 입력 :  "
                                         android:fontFamily="@font/tmoneyroundwindextrabold"
-                                        android:textSize="13dp"
+                                        android:textSize="15dp"
                                         android:textColor="@color/black"/>
 
                                     <EditText
@@ -196,7 +202,7 @@
                                         android:layout_alignBaseline="@+id/tx5"
                                         android:hint="1KG의 칼로리"
                                         android:gravity="center"
-                                        android:textSize="13dp"
+                                        android:textSize="15dp"
                                         android:background="@null"
                                         android:layout_toRightOf="@+id/tx5"/>
 
@@ -208,13 +214,13 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_margin="10dp"
-                                android:background="@drawable/corner_border2"
-                                android:orientation="horizontal"
+                                android:background="@drawable/corner_border"
+                                android:orientation="vertical"
                                 android:weightSum="5">
 
                                 <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="match_parent"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
                                     android:orientation="horizontal"
                                     android:layout_gravity="center"
                                     android:gravity="center"
@@ -237,6 +243,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_marginLeft="10dp"
                                             android:layout_margin="5dp"
+                                            android:gravity="center"
                                             android:text="필요 칼로리 :  "
                                             android:fontFamily="@font/tmoneyroundwindextrabold"
                                             android:textSize="12dp"
@@ -248,6 +255,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_marginLeft="10dp"
                                             android:layout_margin="5dp"
+                                            android:gravity="center"
                                             android:text="사료 급여량 :  "
                                             android:fontFamily="@font/tmoneyroundwindextrabold"
                                             android:textSize="12dp"
@@ -258,6 +266,7 @@
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:layout_margin="5dp"
+                                            android:gravity="center"
                                             android:layout_marginLeft="10dp"
                                             android:text="추천 산책 시간 :  "
                                             android:fontFamily="@font/tmoneyroundwindextrabold"
@@ -275,48 +284,46 @@
                                         android:layout_margin="5dp"
                                         android:layout_weight="2.5">
 
-
                                         <TextView
                                             android:id="@+id/home_text_kcal"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:background="@null"
                                             android:layout_margin="5dp"
-                                            android:gravity="center"
+                                            android:textColor="@color/black"
+                                            android:gravity="left"
                                             android:text=" 00 kcal"
                                             android:textSize="12dp" />
-
 
                                         <TextView
                                             android:id="@+id/home_text_feed"
                                             android:layout_margin="5dp"
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
+                                            android:textColor="@color/black"
                                             android:background="@null"
-                                            android:gravity="center"
+                                            android:gravity="left"
                                             android:text=" 00 g"
                                             android:textSize="12dp" />
-
 
                                         <TextView
                                             android:id="@+id/home_text_walking_time"
                                             android:layout_margin="5dp"
                                             android:layout_width="match_parent"
+                                            android:textColor="@color/black"
                                             android:layout_height="wrap_content"
                                             android:background="@null"
-                                            android:gravity="center"
+                                            android:gravity="left"
                                             android:text=" 00 분"
                                             android:textSize="12dp" />
 
-
                                     </LinearLayout>
-
 
                                 </LinearLayout>
 
                                 <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="match_parent"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
                                     android:layout_weight="2">
 
                                     <RelativeLayout
@@ -393,7 +400,7 @@
                                     android:textColor="@color/black"
                                     android:layout_gravity="left"
                                     android:fontFamily="@font/tmoneyroundwindextrabold"
-                                    android:textSize="15dp"
+                                    android:textSize="18dp"
                                     android:text="나의 강아지 정보  "/>
 
                                 <LinearLayout
@@ -405,18 +412,21 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:weightSum="5"
+                                        android:layout_marginTop="10dp"
+                                        android:weightSum="6"
                                         android:orientation="horizontal">
 
                                         <LinearLayout
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
-                                            android:layout_weight="2">
+                                            android:layout_weight="3">
 
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
-                                                android:textSize="12dp"
+                                                android:textSize="14dp"
+                                                android:fontFamily="@font/tmoneyroundwindregular"
+                                                android:textColor="@color/black"
                                                 android:layout_margin="5dp"
                                                 android:text="이름 : "/>
 
@@ -424,30 +434,35 @@
                                                 android:id="@+id/MPN"
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
-                                                android:textSize="12dp"
+                                                android:textSize="14dp"
+                                                android:fontFamily="@font/tmoneyroundwindregular"
+                                                android:textColor="@color/black"
                                                 android:layout_margin="5dp"
-                                                android:text="  "/>
+                                                android:text=" 데이터 없음"/>
 
                                         </LinearLayout>
 
                                         <LinearLayout
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
-                                            android:layout_weight="2">
+                                            android:layout_weight="3">
 
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
                                                 android:layout_margin="5dp"
-                                                android:textSize="12dp"
+                                                android:textSize="14dp"
+                                                android:fontFamily="@font/tmoneyroundwindregular"
+                                                android:textColor="@color/black"
                                                 android:text="나이 : "/>
                                             <TextView
                                                 android:id="@+id/MPA"
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
-                                                android:textSize="12dp"
+                                                android:textSize="14dp"
+                                                android:textColor="@color/black"
                                                 android:layout_margin="5dp"
-                                                android:text="  "/>
+                                                android:text="데이터 없음"/>
 
                                         </LinearLayout>
 
@@ -463,16 +478,20 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:textSize="12dp"
+                                            android:textSize="14dp"
+                                            android:fontFamily="@font/tmoneyroundwindregular"
+                                            android:textColor="@color/black"
                                             android:layout_margin="5dp"
                                             android:text="종류 : "/>
                                         <TextView
                                             android:id="@+id/MPK"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:textSize="12dp"
+                                            android:fontFamily="@font/tmoneyroundwindregular"
+                                            android:textSize="14dp"
+                                            android:textColor="@color/black"
                                             android:layout_margin="5dp"
-                                            android:text="  "/>
+                                            android:text="데이터 없음"/>
                                     </LinearLayout>
                                 </LinearLayout>
                             </LinearLayout>
@@ -501,10 +520,15 @@
                                 android:gravity="center"
                                 android:layout_gravity="center"
                                 android:textColor="@color/black"
-                                android:layout_margin="5dp"
+                                android:layout_margin="10dp"
                                 android:textStyle="bold"
                                 android:textSize="15dp"
                                 android:text="산책 기록"/>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#9e9ac8"/>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -516,7 +540,6 @@
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_margin="5dp"
-                                    android:background="@drawable/corner_border2"
                                     android:layout_height="match_parent">
                                     <TextView
                                         android:id="@+id/t1"
@@ -525,6 +548,7 @@
                                         android:layout_height="wrap_content"
                                         android:paddingTop="10dp"
                                         android:textColor="@color/black"
+                                        android:fontFamily="@font/tmoneyroundwindregular"
                                         android:text="총 횟수"
                                         android:layout_margin="5dp"
                                         android:layout_centerInParent="true"/>
@@ -533,6 +557,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="0"
+                                        android:fontFamily="@font/tmoneyroundwindregular"
                                         android:textColor="@color/black"
                                         android:layout_below="@+id/t1"
                                         android:layout_centerHorizontal="true"/>
@@ -542,7 +567,6 @@
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_margin="5dp"
-                                    android:background="@drawable/corner_border2"
                                     android:layout_height="match_parent">
                                     <TextView
                                         android:id="@+id/t3"
@@ -550,6 +574,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_margin="5dp"
+                                        android:fontFamily="@font/tmoneyroundwindregular"
                                         android:paddingTop="10dp"
                                         android:textColor="@color/black"
                                         android:text="총 산책 거리"
@@ -558,6 +583,7 @@
                                         android:id="@+id/tv_d"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:fontFamily="@font/tmoneyroundwindregular"
                                         android:text="0"
                                         android:textColor="@color/black"
                                         android:layout_below="@+id/t3"
@@ -570,7 +596,6 @@
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
                                     android:layout_margin="5dp"
-                                    android:background="@drawable/corner_border2"
                                     android:layout_weight="1">
 
                                     <TextView
@@ -580,6 +605,7 @@
                                         android:layout_height="wrap_content"
                                         android:textColor="@color/black"
                                         android:layout_margin="5dp"
+                                        android:fontFamily="@font/tmoneyroundwindregular"
                                         android:paddingTop="10dp"
                                         android:text="총 산책 시간"
                                         android:layout_centerInParent="true"/>
@@ -587,6 +613,7 @@
                                     <RelativeLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
+                                        android:layout_marginLeft="5dp"
                                         android:layout_below="@+id/t5">
 
                                         <TextView
@@ -594,6 +621,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_toLeftOf="@+id/tv2"
+                                            android:fontFamily="@font/tmoneyroundwindregular"
                                             android:text="0"
                                             android:textColor="@color/black" />
 
@@ -603,6 +631,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_toLeftOf="@+id/tvc"
                                             android:text="시간"
+                                            android:fontFamily="@font/tmoneyroundwindregular"
                                             android:textColor="@color/black" />
 
                                         <TextView
@@ -610,7 +639,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_centerInParent="true"
-                                            android:text=" "
+                                            android:text=""
                                             android:textColor="@color/black" />
 
                                         <TextView
@@ -619,6 +648,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_toRightOf="@id/tvc"
                                             android:text="00"
+                                            android:fontFamily="@font/tmoneyroundwindregular"
                                             android:textColor="@color/black" />
 
                                         <TextView
@@ -626,6 +656,7 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_toRightOf="@+id/tv_m"
+                                            android:fontFamily="@font/tmoneyroundwindregular"
                                             android:text="분"
                                             android:textColor="@color/black" />
                                     </RelativeLayout>

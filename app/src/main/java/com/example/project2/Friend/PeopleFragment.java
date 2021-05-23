@@ -92,7 +92,6 @@ public class PeopleFragment extends Fragment {
          */
         friend_text = (TextView) v.findViewById(R.id.friend_text);
 
-
         Log.d("Debug", "Running PeopleFragment");
         /*
         recyclerView = v.findViewById(R.id.recycleView);

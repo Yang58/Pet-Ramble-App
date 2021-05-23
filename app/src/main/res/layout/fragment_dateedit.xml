@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/friend_custom">
+        android:background="@color/custom1">
 
         <TextView
             android:id="@+id/edit_title"
@@ -20,7 +20,7 @@
             android:text="m월 dd일 일정 수정"
             android:textSize="20dp"
             android:fontFamily="@font/tmoneyroundwindextrabold"
-            android:textColor="@color/black">
+            android:textColor="@color/custom4">
         </TextView>
     </LinearLayout>
 

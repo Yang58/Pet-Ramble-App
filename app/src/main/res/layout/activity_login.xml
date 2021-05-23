@@ -36,20 +36,19 @@
             android:background="@drawable/edit_text_custom"
             android:layout_height="30dp"
             android:gravity="center"
-            android:ems="18"
+            android:inputType="textEmailAddress"
             android:hint="ID"
             android:layout_margin="13dp"/>
 
         <EditText
             android:id="@+id/edit_Login_pw"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@null"
+            android:layout_height="30dp"
+            android:layout_margin="13dp"
+            android:background="@drawable/edit_text_custom"
             android:gravity="center"
-            android:ems="18"
-            android:inputType="numberPassword"
-            android:hint="Pw"
-            android:layout_margin="13dp"/>
+            android:hint="PW"
+            android:inputType="numberPassword" />
 
     </LinearLayout>
 

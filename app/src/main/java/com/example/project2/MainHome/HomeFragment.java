@@ -172,7 +172,6 @@ public class HomeFragment extends Fragment {
                         }else{
                             if (Edit_Feed_kcal.length() == 0){
                                 // 옵션만 선택 했을 때 사료 칼로리  입력 X
-                                Toast.makeText(getContext().getApplicationContext()," 옵선 O 사료 X", Toast.LENGTH_SHORT).show();
                                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                                 DocumentReference documentReference = db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
                                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -187,9 +186,9 @@ public class HomeFragment extends Fragment {
                                                         String weight = documentSnapshot.getString("petWeight");
                                                         double standard_kcal = 70 * Math.pow( Double.valueOf(weight) , 0.75) * finalOption;
                                                         home_Day_kcal.setText(String.format("%.2f",standard_kcal)+ " kcal ");
+                                                        Toast.makeText(getContext().getApplicationContext(),"사료 칼로리를 입력하지 않으셨습니다.", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
-
                                             }else{
                                                 Toast.makeText(getContext().getApplicationContext(),"회원 정보가 없습니다.", Toast.LENGTH_SHORT).show();
                                             }
@@ -198,7 +197,6 @@ public class HomeFragment extends Fragment {
                                 });
                             }else{
                                 // 옵션과 사료 칼로리 모두 입력 했을 때
-                                Toast.makeText(getContext().getApplicationContext()," 옵선 O 사료 O", Toast.LENGTH_SHORT).show();
                                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                                 DocumentReference documentReference = db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
                                 documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -252,7 +250,7 @@ public class HomeFragment extends Fragment {
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             DocumentSnapshot document = task.getResult();
                             petname.setText(document.getString("petName"));
-                            petage.setText(document.getString("petAge"));
+                            petage.setText(document.getString("petAge") + " 살 ");
                             petkind.setText(document.getString("petKind"));
 
                             home_text.setText(document.getString("petName")+" 건강 관리 ");
@@ -280,9 +278,9 @@ public class HomeFragment extends Fragment {
                             });
                         }else{
                             h.setText("0");
-                            m.setText("0");
-                            c.setText("0");
-                            d.setText("0");
+                            m.setText("00");
+                            c.setText("0" + "회");
+                            d.setText("0" +"km");
                         }
                     }
                 }

@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:weightSum="3"
-                android:background="#BCFFF7E9"
+                android:background="@color/custom1"
                 android:layout_alignParentBottom="true">
 
                 <EditText

@@ -5,6 +5,9 @@
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/custom2</item>
+        <item name="colorPrimaryDark">@color/custom3</item>
+        <item name="colorAccent">@color/custom4</item>
         <!-- Customize your theme here. -->
     </style>
 

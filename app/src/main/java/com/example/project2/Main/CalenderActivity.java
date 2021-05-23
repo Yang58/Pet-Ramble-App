@@ -36,7 +36,6 @@ public class CalenderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calender);
 
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 

@@ -38,7 +38,7 @@ public class CalendarFragment extends Fragment {
     public String datename =null;
     public String str=null;
     public CalendarView calendarView;
-    public Button cha_Btn,save_Btn,friend_date;
+    public Button cha_Btn,friend_date;
     public TextView diaryTextView,textView2,textView3;
     public EditText contextEditText;
 
@@ -48,7 +48,7 @@ public class CalendarFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_calendar, container, false);
         calendarView=v.findViewById(R.id.calendarView);
         diaryTextView=v.findViewById(R.id.diaryTextView);
-        save_Btn=v.findViewById(R.id.save_Btn);
+
         cha_Btn=v.findViewById(R.id.cha_Btn);
         friend_date=v.findViewById(R.id.friend_date);
         textView2=v.findViewById(R.id.cm_detail_view_txt_like);
@@ -61,7 +61,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 diaryTextView.setVisibility(View.VISIBLE);
-                save_Btn.setVisibility(View.VISIBLE);
+
                 contextEditText.setVisibility(View.VISIBLE);
                 textView2.setVisibility(View.INVISIBLE);
                 cha_Btn.setVisibility(View.INVISIBLE);
@@ -71,25 +71,12 @@ public class CalendarFragment extends Fragment {
                 checkDay(year,month,dayOfMonth); // checkDay(year,month,dayOfMonth,userID);
             }
         });
-        save_Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CalendarDB calendarDB = new CalendarDB(datename,"12345",contextEditText.getText().toString(),true);
-                saveDiary(datename, calendarDB);
-                str=contextEditText.getText().toString();
-                textView2.setText(str);
-                save_Btn.setVisibility(View.INVISIBLE);
-                cha_Btn.setVisibility(View.VISIBLE);
 
-                contextEditText.setVisibility(View.INVISIBLE);
-                textView2.setVisibility(View.VISIBLE);
-            }
-        });
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 diaryTextView.setVisibility(View.VISIBLE);
-                save_Btn.setVisibility(View.VISIBLE);
+
                 contextEditText.setVisibility(View.VISIBLE);
                 textView2.setVisibility(View.INVISIBLE);
                 cha_Btn.setVisibility(View.INVISIBLE);
@@ -131,7 +118,7 @@ public class CalendarFragment extends Fragment {
             textView2.setVisibility(View.VISIBLE);
             textView2.setText(str);
 
-            save_Btn.setVisibility(View.INVISIBLE);
+
             friend_date.setVisibility(View.VISIBLE);
             cha_Btn.setVisibility(View.VISIBLE);
 
@@ -185,7 +172,7 @@ public class CalendarFragment extends Fragment {
             if(textView2.getText()==null){
                 textView2.setVisibility(View.INVISIBLE);
                 diaryTextView.setVisibility(View.VISIBLE);
-                save_Btn.setVisibility(View.VISIBLE);
+
                 cha_Btn.setVisibility(View.INVISIBLE);
                 contextEditText.setVisibility(View.VISIBLE);
             }

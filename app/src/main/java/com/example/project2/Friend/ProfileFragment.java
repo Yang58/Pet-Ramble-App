@@ -56,6 +56,7 @@ public class ProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         Button btn_back = (Button) v.findViewById(R.id.btn_Back);
         Button btn_chat = (Button) v.findViewById(R.id.btn_Chat);
+        Log.d("Debug","running "+TAG);
 
         getParentFragmentManager().setFragmentResultListener("key",this,new FragmentResultListener(){
             @Override
@@ -159,7 +160,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 PeopleFragment peopleFragment = new PeopleFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout, peopleFragment).commit();
+                transaction.replace(R.id.friend_frameLayout1, peopleFragment).commit();
             }
         });
 
@@ -169,7 +170,7 @@ public class ProfileFragment extends Fragment {
                 String ID = result;
                 FriendChatFragment friendChatFragment = new FriendChatFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout, friendChatFragment).commit();
+                transaction.replace(R.id.friend_frameLayout1, friendChatFragment).commit();
 
                 Log.d("Debug","sending " + result);
 

@@ -25,7 +25,7 @@ public class FriendMainActivity extends AppCompatActivity {
         peopleFragment = new PeopleFragment();
         publicChatStartFragment = new PublicChatStartFragment();
 
-        FM.beginTransaction().replace(R.id.friend_frameLayout,peopleFragment).commit();
+        FM.beginTransaction().replace(R.id.friend_frameLayout1,peopleFragment).commit();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomnav);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -34,11 +34,11 @@ public class FriendMainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case (R.id.action_people):
                         peopleFragment = new PeopleFragment();
-                        FM.beginTransaction().replace(R.id.friend_frameLayout,peopleFragment).commit();
+                        FM.beginTransaction().replace(R.id.friend_frameLayout1,peopleFragment).commit();
                         break;
                     case (R.id.action_chat):
                         publicChatStartFragment = new PublicChatStartFragment();
-                        FM.beginTransaction().replace(R.id.friend_frameLayout, publicChatStartFragment).commit();
+                        FM.beginTransaction().replace(R.id.friend_frameLayout1, publicChatStartFragment).commit();
                         /*
                         Intent intent = new Intent(getApplicationContext(), PublicChatStartFragment.class);
                         startActivity(intent);

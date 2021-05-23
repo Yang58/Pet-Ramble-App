@@ -287,7 +287,7 @@ public class UserinfoActivity extends AppCompatActivity {
                 UserProfileUploader(userinfo);
                 EmptyFriendlistUploader(f_list);
 
-                }
+            }
             else {
                 Log.d(TAG,"3. 사진 uri 있음 ");
                 try {
@@ -412,4 +412,3 @@ public class UserinfoActivity extends AppCompatActivity {
 
 
 }
-

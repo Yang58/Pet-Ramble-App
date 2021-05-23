@@ -51,6 +51,7 @@ public class HomeFragment extends Fragment {
     TextView petage ;
     TextView petkind ;
 
+
     TextView home_text;
     TextView petweight;
     Spinner Option_Spinner;
@@ -140,24 +141,20 @@ public class HomeFragment extends Fragment {
                 double Option = 0;
                 if(position == 0){
                 }else if(position == 1){
-                    Option = 3;
+                    Option = 2.5;
                 }else if(position == 2){
-                    Option = 2;
+                    Option = 1.8;
                 }else if(position == 3){
-                    Option = 1.8;
-                }else if(position == 4){
                     Option = 1.6;
+                }else if(position == 4){
+                    Option = 1.4;
                 }else if(position == 5){
-                    Option = 1.4;
+                    Option = 1.2;
                 }else if(position == 6){
-                    Option = 1;
+                    Option = 0.9;
                 }else if(position == 7){
-                    Option = 1.8;
+                    Option = 2.0;
                 }else if(position == 8){
-                    Option = 3;
-                }else if(position == 9){
-                    Option = 1.4;
-                }else if(position == 10){
                     Option = 1.4;
                 }
                 home_btn_Check = v.findViewById(R.id.home_button_check);
@@ -185,8 +182,8 @@ public class HomeFragment extends Fragment {
                                                     @Override
                                                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                                                         String weight = documentSnapshot.getString("petWeight");
-                                                        double standard_kcal = 70 * Math.pow( Double.valueOf(weight) , 0.75) * finalOption;
-                                                        home_Day_kcal.setText(String.format("%.2f",standard_kcal)+ " kcal ");
+                                                        double day_kcal = 70 * Double.valueOf(weight) * 0.75 * finalOption;
+                                                        home_Day_kcal.setText(String.format("%.2f",day_kcal)+ " kcal ");
                                                     }
                                                 });
 

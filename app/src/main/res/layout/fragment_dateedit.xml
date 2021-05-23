@@ -95,6 +95,16 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:id="@+id/schedule_locate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_custom"
+            android:layout_margin="5dp"
+            android:layout_above="@+id/schedule_sav"
+            android:text="위치 설정">
+        </Button>
+
+        <Button
             android:id="@+id/schedule_sav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

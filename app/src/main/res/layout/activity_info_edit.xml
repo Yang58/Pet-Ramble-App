@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:hint="이미지를 누르면 프로필 사진을 추가 할 수 있습니다."
+            android:hint="이미지를 누르면 프로필 사진을 수정 할 수 있습니다."
             android:textStyle="bold"
             android:gravity="center"/>
     </LinearLayout>
@@ -362,13 +362,12 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_weight="3">
-                        <EditText
-                            android:id="@+id/edit_petKind"
+                        <Spinner
+                            android:id="@+id/Kind_spinner"
                             android:layout_width="match_parent"
                             android:layout_height="35dp"
+                            android:entries="@array/my_petArray"
                             android:layout_marginLeft="10dp"
-                            android:ems="8"
-                            android:background="@drawable/edit_text_custom"
                             android:gravity="center"
                             android:inputType="text"
                             android:textStyle="bold" />

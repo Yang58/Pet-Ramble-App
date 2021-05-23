@@ -133,46 +133,40 @@ public class LocationBackground extends Service {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 try {
-                                    if(PROGRESS_CURRENT[0]>=PROGRESS_MAX[0]) return;
                                     if (snapshot.getChildrenCount() > 0) {
-                                        int cnt = 0;
                                         for (DataSnapshot d : snapshot.getChildren()) {
                                             HashMap<String, Double> value = (HashMap<String, Double>) d.getValue();
                                             float[] distance = new float[1];
                                             Location.distanceBetween(value.get("latitude"), value.get("longitude"),
                                                     interestPoint.get(PROGRESS_CURRENT[0]).latitude, interestPoint.get(PROGRESS_CURRENT[0]).longitude, distance);
-                                            if (distance[0] < 100) {
+                                            if (distance[0] < 80) {
                                                 //장소 업데이트
                                                 LatLng latLng = new LatLng((value.get("latitude") + interestPoint.get(PROGRESS_CURRENT[0]).latitude) / 2,
                                                         (value.get("longitude") + interestPoint.get(PROGRESS_CURRENT[0]).longitude) / 2);
                                                 db.child(d.getKey()).setValue(latLng);
-                                                PROGRESS_CURRENT[0]++;
                                                 notification.setProgress(PROGRESS_MAX[0], PROGRESS_CURRENT[0], false).setContentText(String.valueOf(percentage));
                                                 mNotificationManager.notify(1, notification.build());
-                                                Log.wtf("장소업뎃",+distance[0]+", "+d.getKey());
-                                                break;
+                                                Log.wtf("장소업뎃","asdf");
                                             } else {
-                                                if(cnt>=snapshot.getChildrenCount()-1) {
-                                                    //새 장소 추가
-                                                    db.child(String.valueOf(hash.hashCode())).setValue(interestPoint.get(PROGRESS_CURRENT[0]));
-                                                    PROGRESS_CURRENT[0]++;
-                                                    notification.setProgress(PROGRESS_MAX[0], PROGRESS_CURRENT[0], false).setContentText(String.valueOf(percentage));
-                                                    mNotificationManager.notify(1, notification.build());
-                                                    Log.wtf("새장소추가", +distance[0] + ", " + String.valueOf(hash.hashCode()));
-                                                    break;
-                                                }
+                                                //새 장소 추가
+                                                PROGRESS_CURRENT[0]++;
+                                                db.child(String.valueOf(hash.hashCode())).setValue(interestPoint.get(PROGRESS_CURRENT[0]));
+                                                notification.setProgress(PROGRESS_MAX[0], PROGRESS_CURRENT[0], false).setContentText(String.valueOf(percentage));
+                                                mNotificationManager.notify(1, notification.build());
+                                                Log.wtf("새장소추가","asdf");
                                             }
-                                            cnt++;
                                         }
+                                        Log.wtf("for문 안돌아감","asdf");
                                     } else {
                                         //아무것도 없을때
                                         db.child(String.valueOf(hash.hashCode())).setValue(interestPoint.get(PROGRESS_CURRENT[0]));
                                         PROGRESS_CURRENT[0]++;
                                         notification.setProgress(PROGRESS_MAX[0], PROGRESS_CURRENT[0], false).setContentText(String.valueOf(percentage));
                                         mNotificationManager.notify(1, notification.build());
-                                        return;
+                                        Log.wtf("암것도없음","asdf");
                                     }
                                 }catch(Exception e){
+                                    e.printStackTrace();
                                 }
                             }
 
@@ -181,7 +175,7 @@ public class LocationBackground extends Service {
 
                             }
                         });
-                        if(PROGRESS_CURRENT[0]>=PROGRESS_MAX[0]) break;
+                        Log.wtf("?? 뭐지","asdf");
                     }
 
                     notification.setContentTitle("저장을 완료했어요!").setProgress(0, 0, false).setContentText("");

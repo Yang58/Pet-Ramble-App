@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,6 +45,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -57,11 +59,12 @@ public class DateEditFragment extends Fragment {
     public TextView title;
     private String datename;
     private String timename;
-    private Button save_btn, savealarm_btn;
+    private Button save_btn, savealarm_btn,locate_btn;
     private EditText edit_schedule;
     private RadioGroup Personal_check;
     private RadioButton personal_t,personal_f;
     private Boolean Personal = true;
+    private Location savepoint;
 
 
 
@@ -76,6 +79,7 @@ public class DateEditFragment extends Fragment {
         title = v.findViewById(R.id.edit_title);
         save_btn = v.findViewById(R.id.schedule_sav);
         savealarm_btn = v.findViewById(R.id.schedule_alarm);
+        locate_btn = v.findViewById(R.id.schedule_locate);
         edit_schedule = v.findViewById(R.id.schedule_edit);
         Personal_check = v.findViewById(R.id.personal);
         timename = String.format(timepicker.getHour()+":"+ timepicker.getMinute());
@@ -88,6 +92,7 @@ public class DateEditFragment extends Fragment {
                         setcontent(datename);
                     }
         });
+
 
 
 
@@ -127,8 +132,7 @@ public class DateEditFragment extends Fragment {
             public void onClick(View view) {
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-                CalendarDB calendarDB = new CalendarDB(datename,timename,edit_schedule.getText().toString(),Personal);
+                CalendarDB calendarDB = new CalendarDB(datename,timename,edit_schedule.getText().toString(),Personal,savepoint);
                 db.collection("community").document(user.getUid()).collection("calendar").document(datename).set(calendarDB)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -153,13 +157,25 @@ public class DateEditFragment extends Fragment {
             }
         });
 
+        locate_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), LocateActivity.class);
+                intent.putExtra("datename",datename);
+                intent.putExtra("timename",timename);
+                intent.putExtra("Content",edit_schedule.getText().toString());
+                intent.putExtra("Personal",Personal);
+                startActivity(intent);
+            }
+        });
+
         savealarm_btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                CalendarDB calendarDB = new CalendarDB(datename,timename,edit_schedule.getText().toString(),Personal);
+                CalendarDB calendarDB = new CalendarDB(datename,timename,edit_schedule.getText().toString(),Personal,savepoint);
                 db.collection("community").document(user.getUid()).collection("calendar").document(datename).set(calendarDB)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -219,6 +235,7 @@ public class DateEditFragment extends Fragment {
                             } catch (Exception e){
                                 e.printStackTrace();
                             }
+                            savepoint = (Location) document.get("savepoint");
                             //timename = String.format("%d:%d",time[0],time[1]);
                         }
                     });

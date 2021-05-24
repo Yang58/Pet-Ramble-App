@@ -79,8 +79,12 @@ public class LocationBackground extends Service {
             if (intent.getAction().equals("startForeground")) {
                 startFgService();
             } else if (intent.getAction().equals("startUploadPaths")) {
-                interestPoint = intent.getParcelableArrayListExtra("interest");
-                startUpPaths();
+                try {
+                    interestPoint = intent.getParcelableArrayListExtra("interest");
+                    startUpPaths();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }catch (NullPointerException e){}
         return START_STICKY;
@@ -128,7 +132,6 @@ public class LocationBackground extends Service {
                         String hash = String.valueOf(Timestamp.now().getNanoseconds());
                         int percentage = Math.round((PROGRESS_CURRENT[0]/PROGRESS_MAX[0]-1)*100);
 
-                        Log.wtf("iter",PROGRESS_CURRENT[0]+", "+PROGRESS_MAX[0]);
                         db.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -141,7 +144,7 @@ public class LocationBackground extends Service {
                                             float[] distance = new float[1];
                                             Location.distanceBetween(value.get("latitude"), value.get("longitude"),
                                                     interestPoint.get(PROGRESS_CURRENT[0]).latitude, interestPoint.get(PROGRESS_CURRENT[0]).longitude, distance);
-                                            if (distance[0] < 100) {
+                                            if (distance[0] < 75) {
                                                 //장소 업데이트
                                                 LatLng latLng = new LatLng((value.get("latitude") + interestPoint.get(PROGRESS_CURRENT[0]).latitude) / 2,
                                                         (value.get("longitude") + interestPoint.get(PROGRESS_CURRENT[0]).longitude) / 2);

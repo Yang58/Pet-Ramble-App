@@ -129,7 +129,9 @@ public class ProfileFragment extends Fragment {
                                                         }
 
                                                         RadioButton gender1 = (RadioButton) v.findViewById(R.id.gender1);
+                                                        gender1.setEnabled(false);
                                                         RadioButton gender2 = (RadioButton) v.findViewById(R.id.gender2);
+                                                        gender2.setEnabled(false);
                                                         String pet_gender = (String) document.get("petGender");
 
                                                         if (pet_gender.equals("남아")) {
@@ -141,7 +143,9 @@ public class ProfileFragment extends Fragment {
                                                         }
 
                                                         RadioButton neutral1 = (RadioButton) v.findViewById(R.id.NeutralizationGroup1);
+                                                        neutral1.setEnabled(false);
                                                         RadioButton neutral2 = (RadioButton) v.findViewById(R.id.NeutralizationGroup2);
+                                                        neutral2.setEnabled(false);
 
                                                         String pet_neutral = (String) document.get("petNeutralization");
 
@@ -154,8 +158,9 @@ public class ProfileFragment extends Fragment {
                                                         }
 
                                                         RadioButton vaccine1 = (RadioButton) v.findViewById(R.id.VaccinationGroup1);
+                                                        vaccine1.setEnabled(false);
                                                         RadioButton vaccine2 = (RadioButton) v.findViewById(R.id.VaccinationGroup2);
-
+                                                        vaccine2.setEnabled(false);
                                                         String pet_vaccine = (String) document.get("petNeutralization");
 
                                                         if (pet_vaccine.equals("예")) {

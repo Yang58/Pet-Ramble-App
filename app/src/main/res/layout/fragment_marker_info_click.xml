@@ -18,21 +18,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <fragment
-            android:id="@+id/marker_info_fragment_view"
-            android:name="com.google.android.gms.maps.SupportStreetViewPanoramaFragment"
+        <WebView
+            android:id="@+id/marker_info_web_view"
             android:layout_width="301dp"
             android:layout_height="234dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="20dp"
+            android:isScrollContainer="false" />
 
         <TextView
             android:id="@+id/marker_info_txt_placeName"
             android:layout_width="301dp"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_gravity="center_horizontal"
             android:text="Place Name Here"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:autoSizeTextType="uniform" />
 
         <Space
             android:layout_width="match_parent"

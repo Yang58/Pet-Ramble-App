@@ -71,20 +71,7 @@ public class CalendarFragment extends Fragment {
                 checkDay(year,month,dayOfMonth); // checkDay(year,month,dayOfMonth,userID);
             }
         });
-        save_Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CalendarDB calendarDB = new CalendarDB(datename,"12345",contextEditText.getText().toString(),true);
-                saveDiary(datename, calendarDB);
-                str=contextEditText.getText().toString();
-                textView2.setText(str);
-                save_Btn.setVisibility(View.INVISIBLE);
-                cha_Btn.setVisibility(View.VISIBLE);
 
-                contextEditText.setVisibility(View.INVISIBLE);
-                textView2.setVisibility(View.VISIBLE);
-            }
-        });
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {

@@ -1,7 +1,11 @@
 package com.example.project2.GoogleMap;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +16,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.project2.R;
@@ -19,6 +31,12 @@ import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
 import com.google.android.gms.maps.StreetViewPanorama;
 import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.StreetViewPanoramaLocation;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.auth.User;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -38,7 +56,7 @@ import java.net.URL;
  * Use the {@link MarkerInfoClick#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MarkerInfoClick extends DialogFragment implements OnStreetViewPanoramaReadyCallback {
+public class MarkerInfoClick extends DialogFragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -86,19 +104,63 @@ public class MarkerInfoClick extends DialogFragment implements OnStreetViewPanor
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_marker_info_click, container, false);
         Bundle bundle = getArguments();
-        location = bundle.getParcelable("latlng");
-        SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
-                (SupportStreetViewPanoramaFragment) getChildFragmentManager().findFragmentById(R.id.marker_info_fragment_view);
-        streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
-        new getResult().execute();
+        try {
+            location = bundle.getParcelable("latlng");
+            WebView webView = view.findViewById(R.id.marker_info_web_view);
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+            webView.getSettings().setDomStorageEnabled(true);
+            webView.getSettings().setAppCachePath(getContext().getCacheDir().getPath());
+            webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+            webView.loadUrl("file:///android_asset/roadView.html?lat="+location.latitude+"&lng="+location.longitude);
+            new getResult().execute();
+            Button cancelBtn = (Button) view.findViewById(R.id.marker_info_btn_no);
+            cancelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    FirebaseDatabase dbInstance = FirebaseDatabase.getInstance();
+                    DatabaseReference db = dbInstance.getReference().child("mapData").child(user);
+                    db.child("isMarkerDelete").setValue("false");
+                    getDialog().dismiss();
+                }
+            });
+            Button removeBtn = (Button) view.findViewById(R.id.marker_info_btn_yes);
+            if(getArguments().getBoolean("isStart")) {
+                removeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        FirebaseDatabase dbInstance = FirebaseDatabase.getInstance();
+                        DatabaseReference db = dbInstance.getReference().child("mapData").child(user);
+                        db.child("isMarkerDelete").setValue("true");
+                        getDialog().dismiss();
+                    }
+                });
+            }else{
+                removeBtn.setBackgroundColor(Color.GRAY);
+                removeBtn.setClickable(false);
+            }
+        }catch (Exception e){
+            getDialog().dismiss();
+        }
+
         return view;
+    }
+
+    public class WebViewCall {
+
+        @JavascriptInterface
+
+        public void setMessage(final String arg, final String arg2) {
+        }
     }
 
     public class getResult extends AsyncTask {
 
         @Override
         protected Void doInBackground(Object... objects) {
-            String getFromApi = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=20&types=point_of_interest&sensor=false&language=ko&key=AIzaSyCqOFbgT-WPnY3yWj3xzOERy8cpj_TQfEM"
+            String getFromApi = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=60&types=point_of_interest&sensor=false&language=ko&key=AIzaSyCqOFbgT-WPnY3yWj3xzOERy8cpj_TQfEM"
                     +"&location="+location.latitude+","+location.longitude;
 
             URL url = null;
@@ -173,12 +235,5 @@ public class MarkerInfoClick extends DialogFragment implements OnStreetViewPanor
             }
             return null;
         }
-    }
-
-    @Override
-    public void onStreetViewPanoramaReady(@NonNull StreetViewPanorama streetViewPanorama) {
-        LatLng sanFrancisco = location;
-        streetViewPanorama.setPosition(sanFrancisco);
-        streetViewPanorama.setStreetNamesEnabled(true);
     }
 }

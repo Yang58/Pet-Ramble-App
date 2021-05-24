@@ -55,6 +55,7 @@ public class PublicChattingFragment extends Fragment{
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
                 CHAT_NAME = bundle.getString("chatName");
                 USER_NAME = bundle.getString("userName");
+
                 Log.d("Debug", CHAT_NAME);
                 Log.d("Debug", USER_NAME);
                 //USER_NAME ="asdf";
@@ -66,12 +67,12 @@ public class PublicChattingFragment extends Fragment{
                     public void onClick(View v) {
                         if (chat_edit.getText().toString().equals(""))
                             return;
-                        /*
-                        ChatDTO chat = new ChatDTO(USER_NAME, chat_edit.getText().toString(), Timestamp.now().getSeconds()); //ChatDTO를 이용하여 데이터를 묶는다.
+
+                        ChatDTO chat = new ChatDTO(USER_NAME, chat_edit.getText().toString(),null,Timestamp.now().getSeconds()); //ChatDTO를 이용하여 데이터를 묶는다.
                         databaseReference.child("publicchat").child(CHAT_NAME).push().setValue(chat); // 데이터 푸쉬
                         chat_edit.setText(""); //입력창 초기화
 
-                         */
+
                     }
                 });
             }
@@ -89,22 +90,21 @@ public class PublicChattingFragment extends Fragment{
     private void addMessage(DataSnapshot dataSnapshot, ArrayAdapter<String> adapter) {
         ChatDTO chatDTO = dataSnapshot.getValue(ChatDTO.class);
         long time = chatDTO.getTimestamp()*1000;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         adapter.add(sdf.format(time) + " " + chatDTO.getUserName() + " : " + chatDTO.getMessage());
     }
 
     private void removeMessage(DataSnapshot dataSnapshot, ArrayAdapter<String> adapter) {
         ChatDTO chatDTO = dataSnapshot.getValue(ChatDTO.class);
         long time = chatDTO.getTimestamp()*1000;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         adapter.remove(sdf.format(time)+" " + chatDTO.getUserName() + " : " + chatDTO.getMessage());
     }
 
     private void openChat(String chatName) {
         // 리스트 어댑터 생성 및 세팅
         final ArrayAdapter<String> adapter
-
-                = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, android.R.id.text1);
+                = new ArrayAdapter<String>(getActivity(), R.layout.listview_chat, R.id.chat_text);
         chat_view.setAdapter(adapter);
 
         // 데이터 받아오기 및 어댑터 데이터 추가 및 삭제 등..리스너 관리

@@ -140,6 +140,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static ArrayList<Float> myBearingArray = new ArrayList<>();
     private static ArrayList<LatLng> myCoordinateArray = new ArrayList<>();
     private static ArrayList<LatLng> myInterestArray = new ArrayList<>();
+    private static ArrayList<Marker> myInterestMarkerArray = new ArrayList<>();
     private static long myWaitTime = 0;
     private static String myPetWeight = null;
     private static int tmp;
@@ -248,7 +249,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                                 circleOptions.clickable(true);
                                 circleOptions.strokeWidth(0);
                                 circleOptions.fillColor(Color.parseColor("#80fcac92"));
-                                circleOptions.radius(80);
+                                circleOptions.radius(68);
                                 circleOptions.center(new LatLng(value.get("latitude"), value.get("longitude")));
                                 circleArrayList.add(mMap.addCircle(circleOptions));
                                 continue;
@@ -339,29 +340,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
 
             //선 그리기
+            myLineOption = new PolylineOptions();
+            myLineOption.color(Color.GREEN).width(20);
             myLinesSaved.add(mMap.addPolyline(myLineOption.add(startPoint, endPoint)));
             myBearingArray.add(location.getBearing());
             myCoordinateArray.add(endPoint);
-            if(Timestamp.now().getSeconds() - myWaitTime > 9){
+
+            //관심 장소 등록록
+           if(Timestamp.now().getSeconds() - myWaitTime > 9){
                 myWaitTime=Timestamp.now().getSeconds();
 
                 MarkerOptions MarkerOptions = new MarkerOptions();
                 MarkerOptions.title("관심있는 장소");
-                MarkerOptions.snippet(String.valueOf(myInterestArray.size()));
                 MarkerOptions.position(endPoint);
 
                 if(myInterestArray.size()==0){
                     myInterestArray.add(endPoint);
-                    mMap.addMarker(MarkerOptions);
+                    MarkerOptions.snippet("0");
+                    myInterestMarkerArray.add(mMap.addMarker(MarkerOptions));
                 }else {
-                    for (int i=0; i<myInterestArray.size(); i++) {
                         float[] result = new float[1];
-                        Location.distanceBetween(myInterestArray.get(i).latitude, myInterestArray.get(i).longitude, endPoint.latitude, endPoint.longitude, result);
-                        if (result[0] > 80) {
+                        Location.distanceBetween(myInterestArray.get(myInterestArray.size()-1).latitude, myInterestArray.get(myInterestArray.size()-1).longitude, endPoint.latitude, endPoint.longitude, result);
+                        if (result[0] > 80 && !myInterestArray.get(myInterestArray.size()-1).equals(endPoint)) {
                             myInterestArray.add(endPoint);
-                            mMap.addMarker(MarkerOptions);
+                            MarkerOptions.snippet(String.valueOf(myInterestArray.size()-1));
+                            myInterestMarkerArray.add( mMap.addMarker(MarkerOptions));
                             Log.wtf("거리", result[0] + "");
-                        }
                     }
                 }
                 Log.wtf("리스트",myInterestArray.toString());
@@ -493,8 +497,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         myBearingArray = new ArrayList<>();
         myInterestArray = new ArrayList<>();
         myLinesSaved = new ArrayList<>();
-        myLineOption = new PolylineOptions();
-        myLineOption.color(Color.GREEN).width(20);
         walkDistanceResult= new float[1];
         walkDistance = 0;
         myWaitTime= Timestamp.now().getSeconds();
@@ -940,46 +942,92 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             FragmentManager fm = getParentFragmentManager();
             MarkerInfoClick popup = new MarkerInfoClick();
             Bundle bundle = new Bundle();
-            bundle.putParcelable("latlng", myInterestArray.get(Integer.valueOf(marker.getSnippet())));
+            try {
+                final ExtendedFloatingActionButton endButton = (ExtendedFloatingActionButton) v.findViewById(R.id.btn_finish);
+                bundle.putParcelable("latlng", myInterestArray.get(Integer.valueOf(marker.getSnippet())));
+                bundle.putBoolean("isStart", endButton.getVisibility()==View.VISIBLE);
+            }catch (Exception e){}
             popup.setArguments(bundle);
             fm.beginTransaction()
                     .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
                     .add(popup, "locationInfo")
                     .commit();
-            Log.wtf("클릭","했어");
+
+            String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            FirebaseDatabase dbInstance = FirebaseDatabase.getInstance();
+            DatabaseReference db = dbInstance.getReference().child("mapData").child(user).child("isMarkerDelete");
+            final String[] isMarkerDelete = new String[1];
+            isMarkerDelete[0]="false";
+            db.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    try {
+                        isMarkerDelete[0] = String.valueOf(snapshot.getValue());
+                        Log.wtf("ismarker", isMarkerDelete[0]);
+                        if(isMarkerDelete[0].equals("true")) {
+                            db.setValue("false");
+                            int index = Integer.valueOf(marker.getSnippet());
+                            try {
+                                myInterestArray.remove(index);
+                                myInterestMarkerArray.get(index).remove();
+                                myInterestMarkerArray.remove(index);
+                                for (Marker m : myInterestMarkerArray) {
+                                    int markerIndex = Integer.valueOf(m.getSnippet());
+                                    Log.wtf("상태", "인덱스:" + index + "마커인덱스:" + markerIndex);
+                                    if (markerIndex != 0 && markerIndex > index) {
+                                        m.setSnippet(String.valueOf(markerIndex - 1));
+                                        Log.wtf("상태", "총 마커 수:" + myInterestMarkerArray.size() + "지워진 마커:" + index + "/수정된 마커:" + markerIndex + "->" + m.getSnippet());
+                                    }
+                                }
+                                db.removeEventListener(this);
+                            }catch (Exception e){
+
+                            }
+                        }
+                    }catch(NullPointerException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            return true;
+        }else {
+            String UID = marker.getTitle();
+            FirebaseFirestore fbRef = FirebaseFirestore.getInstance();
+            DocumentReference dbRef = fbRef.collection("users").document(UID);
+            dbRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                    String profileImg = value.getString("photoUrl");
+                    String petName = value.getString("petName");
+                    String name = value.getString("name");
+                    String perKind = value.getString("petKind");
+                    String petAge = value.getString("petAge");
+
+                    if (name == null) return;
+
+                    FragmentManager fm = getParentFragmentManager();
+                    MarkerClickPopup popup = new MarkerClickPopup();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("photoUrl", profileImg);
+                    bundle.putString("name", name);
+                    bundle.putString("petName", petName);
+                    bundle.putString("petKind", perKind);
+                    bundle.putString("petAge", petAge);
+                    popup.setArguments(bundle);
+                    fm.beginTransaction()
+                            .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
+                            .add(popup, "userInfo")
+                            .commit();
+                }
+            });
+
             return true;
         }
-        String UID = marker.getTitle();
-        FirebaseFirestore fbRef = FirebaseFirestore.getInstance();
-        DocumentReference dbRef = fbRef.collection("users").document(UID);
-        dbRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                String profileImg = value.getString("photoUrl");
-                String petName = value.getString("petName");
-                String name = value.getString("name");
-                String perKind = value.getString("petKind");
-                String petAge = value.getString("petAge");
-
-                if (name == null) return;
-
-                FragmentManager fm = getParentFragmentManager();
-                MarkerClickPopup popup = new MarkerClickPopup();
-                Bundle bundle = new Bundle();
-                bundle.putString("photoUrl", profileImg);
-                bundle.putString("name", name);
-                bundle.putString("petName", petName);
-                bundle.putString("petKind", perKind);
-                bundle.putString("petAge", petAge);
-                popup.setArguments(bundle);
-                fm.beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_bottom, R.anim.slide_in_top, R.anim.slide_out_top)
-                        .add(popup, "userInfo")
-                        .commit();
-            }
-        });
-
-        return true;
     }
 
     private void setCustomMarkerView() {

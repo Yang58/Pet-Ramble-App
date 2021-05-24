@@ -223,6 +223,7 @@
                             android:layout_weight="2"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:enabled="false"
                             android:orientation="horizontal">
 
                             <RadioButton
@@ -271,6 +272,7 @@
                             android:layout_weight="2"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:enabled="false"
                             android:orientation="horizontal">
 
                             <RadioButton
@@ -319,6 +321,7 @@
                             android:layout_weight="2"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:enabled="false"
                             android:orientation="horizontal">
 
                             <RadioButton

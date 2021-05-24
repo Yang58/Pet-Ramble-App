@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.project2.Chatting.PublicChatStartFragment;
 import com.example.project2.Main.MainActivity;
@@ -21,7 +22,7 @@ public class FriendFragment extends Fragment {
 
     MainActivity activity;
 
-    PeopleFragment peopleFragment;
+    PeopleFragment peoplefragment;
     PublicChatStartFragment publicChatStartFragment;
     RankingFragment rankingFragment;
 
@@ -44,13 +45,12 @@ public class FriendFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //프래그먼트 메인을 인플레이트해주고 컨테이너에 붙여달라는 뜻임
         ViewGroup v = (ViewGroup) inflater.inflate(R.layout.friend__fragement , container, false);
-        FragmentManager FM = getChildFragmentManager();
-
-        peopleFragment = new PeopleFragment();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        peoplefragment = new PeopleFragment();
         publicChatStartFragment = new PublicChatStartFragment();
         rankingFragment = new RankingFragment();
 
-        FM.beginTransaction().replace(R.id.friend_frameLayout1,peopleFragment).commit();
+        transaction.replace(R.id.friend_frameLayout1, peoplefragment).commit();
 
         BottomNavigationView bottomNavigationView = v.findViewById(R.id.bottomnav1);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -58,18 +58,21 @@ public class FriendFragment extends Fragment {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case (R.id.action_people):
-                        peopleFragment = new PeopleFragment();
-                        FM.beginTransaction().replace(R.id.friend_frameLayout1,peopleFragment).commit();
+                        FragmentTransaction transaction1 = getActivity().getSupportFragmentManager().beginTransaction();
+                        peoplefragment = new PeopleFragment();
+                        transaction1.replace(R.id.friend_frameLayout1, peoplefragment).commit();
                         break;
 
                     case (R.id.action_chat):
+                        FragmentTransaction transaction2 = getActivity().getSupportFragmentManager().beginTransaction();
                         publicChatStartFragment = new PublicChatStartFragment();
-                        FM.beginTransaction().replace(R.id.friend_frameLayout1, publicChatStartFragment).commit();
+                        transaction2.replace(R.id.friend_frameLayout1, publicChatStartFragment).commit();
                         break;
 
                     case (R.id.action_ranking):
-                        publicChatStartFragment = new PublicChatStartFragment();
-                        FM.beginTransaction().replace(R.id.friend_frameLayout1, rankingFragment).commit();
+                        FragmentTransaction transaction3 = getActivity().getSupportFragmentManager().beginTransaction();
+                        rankingFragment = new RankingFragment();
+                        transaction3.replace(R.id.friend_frameLayout1, rankingFragment).commit();
                         break;
                 }
                 return false;

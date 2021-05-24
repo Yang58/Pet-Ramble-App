@@ -25,7 +25,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class PublicChatStartFragment extends Fragment {
 
@@ -50,16 +54,21 @@ public class PublicChatStartFragment extends Fragment {
         user_next = (Button) v.findViewById(R.id.user_next);
         chat_list = (ListView) v.findViewById(R.id.chat_list);
 
-//        DocumentReference UserInfo = firestoreDatabase.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
-//        UserInfo.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-//                user_name = value.getString("user_name");
-//                Log.d("Debug", user_name);
-//                TextView welcome_message = (TextView) v.findViewById(R.id.welcome);
-//                welcome_message.setText("환영합니다 " + user_name + "님.");
-//            }
-//        });
+        DocumentReference UserInfo = firestoreDatabase.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+        UserInfo.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                user_name = value.getString("user_name");
+                Log.d("Debug", user_name);
+                /*
+                TextView welcome_message = (TextView) v.findViewById(R.id.welcome);
+
+
+              welcome_message.setText("환영합니다 " + user_name + "님.");
+
+                 */
+          }
+        });
 
         user_next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +87,7 @@ public class PublicChatStartFragment extends Fragment {
 
                 PublicChattingFragment publicChattingFragment = new PublicChattingFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout, publicChattingFragment).commit();
+                transaction.replace(R.id.friend_frameLayout1, publicChattingFragment).commit();
 
                 /*
                 Intent intent = new Intent(getActivity(), PublicChattingFragment.class);
@@ -101,7 +110,7 @@ public class PublicChatStartFragment extends Fragment {
 
                 PublicChattingFragment publicChattingFragment = new PublicChattingFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout, publicChattingFragment).commit();
+                transaction.replace(R.id.friend_frameLayout1, publicChattingFragment).commit();
             }
         });
         showChatList();

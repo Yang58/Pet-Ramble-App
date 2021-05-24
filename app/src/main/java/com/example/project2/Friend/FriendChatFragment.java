@@ -73,8 +73,6 @@ public class FriendChatFragment extends Fragment {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
 
-
-
         getParentFragmentManager().setFragmentResultListener("Chatfriend",this,new FragmentResultListener(){
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
@@ -128,26 +126,27 @@ public class FriendChatFragment extends Fragment {
     private void addMessage(DataSnapshot dataSnapshot, ArrayAdapter<String> adapter) {
         ChatDTO chatDTO = dataSnapshot.getValue(ChatDTO.class);
         long time = chatDTO.getTimestamp()*1000;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
         if(chatDTO.getPhotourl() == null) {
             adapter.add(sdf.format(time) + " " + chatDTO.getUserName() + " : " + chatDTO.getMessage());
         } else{
 
         }
+
     }
 
     private void removeMessage(DataSnapshot dataSnapshot, ArrayAdapter<String> adapter) {
         ChatDTO chatDTO = dataSnapshot.getValue(ChatDTO.class);
         long time = chatDTO.getTimestamp()*1000;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         adapter.remove(sdf.format(time)+" " + chatDTO.getUserName() + " : " + chatDTO.getMessage());
     }
 
     private void openChat(String chatName) {
         // 리스트 어댑터 생성 및 세팅
-        @SuppressLint("ResourceType")
         final ArrayAdapter<String> adapter
-                = new ArrayAdapter<String>(getActivity(), R.id.listview_chat, R.id.chat_text);
+                = new ArrayAdapter<String>(getActivity(), R.layout.listview_chat, R.id.chat_text);
         chat_view.setAdapter(adapter);
 
         // 데이터 받아오기 및 어댑터 데이터 추가 및 삭제 등..리스너 관리

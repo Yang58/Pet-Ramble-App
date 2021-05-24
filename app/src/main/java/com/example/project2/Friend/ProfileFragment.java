@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -119,9 +120,51 @@ public class ProfileFragment extends Fragment {
 
                                                         Timestamp i = (Timestamp) document.get("petBrithday");
                                                         SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
-                                                        String str = sdf.format( new Date( i.toDate().getTime()));
+                                                        try {
+                                                            String str = sdf.format(new Date(i.toDate().getTime()));
+                                                            profile_petBirthday.setText(str);
+                                                        } catch(Exception e){
+                                                            profile_petBirthday.setText("????");
+                                                            e.printStackTrace();
+                                                        }
 
-                                                        profile_petBirthday.setText(str);
+                                                        RadioButton gender1 = (RadioButton) v.findViewById(R.id.gender1);
+                                                        RadioButton gender2 = (RadioButton) v.findViewById(R.id.gender2);
+                                                        String pet_gender = (String) document.get("petGender");
+
+                                                        if (pet_gender.equals("남아")) {
+                                                            Log.d("Debug", "true");
+                                                            gender1.setChecked(true);
+                                                        } else {
+                                                            Log.d("Debug", "false");
+                                                            gender2.setChecked(true);
+                                                        }
+
+                                                        RadioButton neutral1 = (RadioButton) v.findViewById(R.id.NeutralizationGroup1);
+                                                        RadioButton neutral2 = (RadioButton) v.findViewById(R.id.NeutralizationGroup2);
+
+                                                        String pet_neutral = (String) document.get("petNeutralization");
+
+                                                        if (pet_neutral.equals("예")) {
+                                                            Log.d("Debug", "true");
+                                                            neutral1.setChecked(true);
+                                                        } else {
+                                                            Log.d("Debug", "false");
+                                                            neutral2.setChecked(true);
+                                                        }
+
+                                                        RadioButton vaccine1 = (RadioButton) v.findViewById(R.id.VaccinationGroup1);
+                                                        RadioButton vaccine2 = (RadioButton) v.findViewById(R.id.VaccinationGroup2);
+
+                                                        String pet_vaccine = (String) document.get("petNeutralization");
+
+                                                        if (pet_vaccine.equals("예")) {
+                                                            Log.d("Debug", "true");
+                                                            vaccine1.setChecked(true);
+                                                        } else {
+                                                            Log.d("Debug", "false");
+                                                            vaccine2.setChecked(true);
+                                                        }
 
                                                         /*
                                                         asdf = (String) document.get("petGender");
@@ -159,7 +202,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 PeopleFragment peopleFragment = new PeopleFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout, peopleFragment).commit();
+                transaction.replace(R.id.friend_frameLayout1, peopleFragment).commit();
             }
         });
 
@@ -169,7 +212,7 @@ public class ProfileFragment extends Fragment {
                 String ID = result;
                 FriendChatFragment friendChatFragment = new FriendChatFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.friend_frameLayout, friendChatFragment).commit();
+                transaction.replace(R.id.friend_frameLayout1, friendChatFragment).commit();
 
                 Log.d("Debug","sending " + result);
 

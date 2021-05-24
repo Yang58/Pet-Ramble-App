@@ -31,6 +31,7 @@
             android:foregroundServiceType="location" />
 
         <activity android:name=".Chatting.MessageActivity" />
+        <activity android:name=".Main.LocateActivity" />
         <activity android:name=".Main.InquiryActivity" />
         <activity android:name=".Main.CalenderActivity" />
         <activity

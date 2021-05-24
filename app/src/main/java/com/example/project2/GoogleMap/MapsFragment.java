@@ -374,7 +374,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             myCoordinateArray.add(endPoint);
 
             //관심 장소 등록록
-           if(Timestamp.now().getSeconds() - myWaitTime > 1){
+           if(Timestamp.now().getSeconds() - myWaitTime > 9){
                 myWaitTime=Timestamp.now().getSeconds();
 
                 MarkerOptions MarkerOptions = new MarkerOptions();

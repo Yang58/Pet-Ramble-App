@@ -247,4 +247,16 @@ public class LocationBackground extends Service {
         NotificationManager notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
         notificationManager.deleteNotificationChannel("channel");
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+
+        Log.wtf("서비스", "앱 종료로 인한 정지");
+        stopForeground(true);
+        NotificationManager notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+        notificationManager.deleteNotificationChannel("channel");
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
 }

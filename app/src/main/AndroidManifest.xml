@@ -19,10 +19,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:requestLegacyExternalStorage="true">
+        android:theme="@style/AppTheme">
+        <activity android:name=".Friend.RankingFragment"></activity>
 
         <service
             android:name=".GoogleMap.LocationBackground"
@@ -60,6 +61,7 @@
         <activity
             android:name=".Main.MainActivity"
             android:label="@string/app_name">
+
             <!-- android:theme="@style/AppTheme.NoActionBar" -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -78,15 +80,14 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <receiver android:name=".Main.DeviceBootReceiver"
+        <receiver
+            android:name=".Main.DeviceBootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".Main.AlarmReceiver" />
     </application>
-
 
 </manifest>

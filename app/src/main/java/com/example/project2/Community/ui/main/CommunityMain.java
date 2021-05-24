@@ -1,10 +1,6 @@
 package com.example.project2.Community.ui.main;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,37 +26,23 @@ import com.example.project2.Community.listView.recyclerAdapter;
 import com.example.project2.Community.listView.recyclerClass;
 import com.example.project2.Community.listView.recyclerOnItemClick;
 import com.example.project2.R;
-import com.example.project2.Community.listView.listViewAdapter;
 import com.example.project2.tensorflowTest;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.Inflater;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -139,8 +121,8 @@ public class CommunityMain extends Fragment {
         final SwipeRefreshLayout refreshLayout = view.findViewById(R.id.cm_main_container_refresh);
         final Button sndBtn = view.findViewById(R.id.sendButton);
         final TextView tField = view.findViewById(R.id.naeyongField);
-        final FloatingActionButton floatBtn = view.findViewById(R.id.cm_main_btn_floating);
-        final FloatingActionButton floatBtn2 = view.findViewById(R.id.cm_main_btn_floating2);
+        final ExtendedFloatingActionButton floatBtn = view.findViewById(R.id.cm_main_btn_floating);
+        final ExtendedFloatingActionButton floatBtn2 = view.findViewById(R.id.cm_main_btn_floating2);
 
         //이름 가져오기
         final String[] userName = new String[1];

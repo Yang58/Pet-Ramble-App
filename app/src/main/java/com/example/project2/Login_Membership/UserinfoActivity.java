@@ -244,7 +244,6 @@ public class UserinfoActivity extends AppCompatActivity {
             SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
             Date petBrithday = sdf.parse(petBirthday.getText().toString());
 
-
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
             user  = FirebaseAuth.getInstance().getCurrentUser();

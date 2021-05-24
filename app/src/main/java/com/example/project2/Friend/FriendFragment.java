@@ -23,6 +23,7 @@ public class FriendFragment extends Fragment {
 
     PeopleFragment peopleFragment;
     PublicChatStartFragment publicChatStartFragment;
+    RankingFragment rankingFragment;
 
     @Override
     public void onAttach(Context context) {
@@ -47,6 +48,7 @@ public class FriendFragment extends Fragment {
 
         peopleFragment = new PeopleFragment();
         publicChatStartFragment = new PublicChatStartFragment();
+        rankingFragment = new RankingFragment();
 
         FM.beginTransaction().replace(R.id.friend_frameLayout1,peopleFragment).commit();
 
@@ -63,10 +65,11 @@ public class FriendFragment extends Fragment {
                     case (R.id.action_chat):
                         publicChatStartFragment = new PublicChatStartFragment();
                         FM.beginTransaction().replace(R.id.friend_frameLayout1, publicChatStartFragment).commit();
-                        /*
-                        Intent intent = new Intent(getApplicationContext(), PublicChatStartFragment.class);
-                        startActivity(intent);
-                        */
+                        break;
+
+                    case (R.id.action_ranking):
+                        publicChatStartFragment = new PublicChatStartFragment();
+                        FM.beginTransaction().replace(R.id.friend_frameLayout1, rankingFragment).commit();
                         break;
                 }
                 return false;

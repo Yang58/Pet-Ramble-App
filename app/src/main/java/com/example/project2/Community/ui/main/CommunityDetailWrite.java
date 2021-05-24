@@ -1,10 +1,7 @@
 package com.example.project2.Community.ui.main;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,7 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompatSideChannelService;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -31,7 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -42,14 +38,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.Timestamp;
 
 /**
@@ -113,8 +101,8 @@ public class CommunityDetailWrite extends Fragment {
         final TextView dpId = view.findViewById(R.id.cm_main_txt_id);
         final TextView dpName = view.findViewById(R.id.cm_main_txt_name);
         final ImageView dpCover = view.findViewById(R.id.cm_main_img_cover_picture);
-        final FloatingActionButton sndBtn = view.findViewById(R.id.sendButton);
-        final FloatingActionButton imgUpBtn = view.findViewById(R.id.cameraButton);
+        final ExtendedFloatingActionButton sndBtn = view.findViewById(R.id.sendButton);
+        final ExtendedFloatingActionButton imgUpBtn = view.findViewById(R.id.cameraButton);
         final TextView tField = view.findViewById(R.id.naeyongField);
         final LinearLayout layout = view.findViewById(R.id.cm_detail_write_container_layout);
         final InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);

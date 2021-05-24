@@ -10,15 +10,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -28,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,14 +36,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.project2.Community.functions.loadImage;
 import com.example.project2.FirebaseDB.WalkingDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
-import com.google.android.gms.common.internal.FallbackServiceBroker;
-import com.google.android.gms.dynamic.SupportFragmentWrapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -63,20 +56,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Cap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.CustomCap;
-import com.google.android.gms.maps.model.Dash;
-import com.google.android.gms.maps.model.Dot;
-import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PatternItem;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -86,7 +70,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -99,23 +82,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMarkerClickListener {
@@ -182,6 +154,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private Intent serviceIntent;
 
     private GoogleMap nMap;
+    private String nickname ;
 
     Chronometer mChr;
 
@@ -578,9 +551,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
         otherMarker.clear();
 
+        DocumentReference db1 = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+        db1.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot documentSnapshot1 = task.getResult();
+                nickname = documentSnapshot1.getString("user_nickname");
+            }
+        });
+
 
         DocumentReference db = firestore.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");
-
         int finalMin = min;
         db.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -613,11 +594,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                                     int hour = sum_m / 60;
                                     sum_m = sum_m % 60;
 
-                                    WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h + hour), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
+                                    WalkingDB walkingDB = new WalkingDB(nickname,String.valueOf(sum_h + hour), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
                                     WalkingUploader(walkingDB);
                                 }else{
 
-                                    WalkingDB walkingDB = new WalkingDB(String.valueOf(sum_h), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
+                                    WalkingDB walkingDB = new WalkingDB(nickname,String.valueOf(sum_h), String.valueOf(sum_m), String.valueOf(sum_c), String.valueOf(sum_d));
                                     WalkingUploader(walkingDB);
 
                                 }
@@ -641,7 +622,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
                     if (finalMin >= 5) { // 5분 이상 산책 했을 때
                         Log.e(TAG, "Walk Data Null");
-                        WalkingDB walkingDB = new WalkingDB(String.valueOf(hour), String.valueOf(finalMin), String.valueOf(count), String.valueOf(walkDistance));
+                        WalkingDB walkingDB = new WalkingDB(nickname,String.valueOf(hour), String.valueOf(finalMin), String.valueOf(count), String.valueOf(walkDistance));
                         WalkingUploader(walkingDB);
 
                         Intent intent = new Intent(getContext().getApplicationContext(), WalkFinishPopup.class);

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/corner_border"
+        android:layout_height="100dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="5"
+            android:orientation="horizontal">
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="5"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:weightSum="2">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/tv_Nickname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="사용자 닉네임"
+                        android:layout_gravity="center"
+                        android:textSize="18dp"
+                        android:layout_centerInParent="true"
+                        android:paddingTop="5dp"
+                        android:textColor="@color/black"
+                        android:layout_margin="5dp"
+                        android:paddingLeft="10dp"
+                        android:fontFamily="@font/tmoneyroundwindregular"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/outline_military_tech_black_24"
+                        android:layout_alignParentRight="true"
+                        android:padding="10dp"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.8">
+                        <TextView
+                            android:id="@+id/t1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="횟수"
+                            android:layout_centerInParent="true"
+                            android:gravity="center"
+                            android:textSize="15dp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/tmoneyroundwindregular"
+                            android:layout_marginLeft="5dp"/>
+
+                        <TextView
+                            android:id="@+id/tv_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="0 회"
+                            android:textSize="14dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/tmoneyroundwindregular"
+                            android:layout_toRightOf="@+id/t1"
+                            android:layout_marginLeft="5dp"/>
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.1">
+                            <TextView
+                                android:id="@+id/t2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:text="산책 거리"
+                                android:textSize="15dp"
+                                android:textColor="@color/black"
+                                android:fontFamily="@font/tmoneyroundwindregular"
+                                android:gravity="center"
+                                android:layout_marginLeft="10dp"/>
+
+                            <TextView
+                                android:id="@+id/tv_distance"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="0 km"
+                                android:textSize="14dp"
+                                android:fontFamily="@font/tmoneyroundwindregular"
+                                android:gravity="center"
+                                android:layout_toRightOf="@+id/t2"
+                                android:layout_marginLeft="5dp"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.1">
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                            <TextView
+                                android:id="@+id/t3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:fontFamily="@font/tmoneyroundwindregular"
+                                android:text="산책 시간 :"
+                                android:gravity="center"
+                                android:textSize="15dp"
+                                android:textColor="@color/black"
+                                android:layout_marginLeft="5dp"/>
+
+
+                            <TextView
+                                android:id="@+id/tv_time_h"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:text="0 H"
+                                android:textSize="14dp"
+                                android:gravity="center"
+                                android:fontFamily="@font/tmoneyroundwindregular"
+                                android:layout_toRightOf="@+id/t3"
+                                android:layout_marginLeft="5dp"/>
+                            <TextView
+                                android:id="@+id/tv_time_m"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:textSize="14dp"
+                                android:text="0 m"
+                                android:gravity="center"
+                                android:fontFamily="@font/tmoneyroundwindregular"
+                                android:layout_toRightOf="@+id/tv_time_h"
+                                android:layout_marginLeft="5dp"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

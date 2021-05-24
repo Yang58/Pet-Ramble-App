@@ -13,113 +13,287 @@
         android:id="@+id/tf_img"
         android:layout_width="255dp"
         android:layout_height="275dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="300px"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
         android:scaleType="centerCrop"
         app:srcCompat="@android:drawable/ic_menu_gallery" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10px"
+        android:weightSum="7"
         android:orientation="vertical">
-
         <TextView
-            android:id="@+id/tf_btn_1"
-            android:layout_width="220dp"
-            android:layout_height="41dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/round_corner_textview"
-            android:backgroundTint="@android:color/holo_orange_dark"
-            android:gravity="center"
-            android:padding="2px"
-            android:text="TextView"
-            android:textAlignment="center"
-            android:textColor="?android:attr/textColorTertiaryInverse"
-            app:autoSizeTextType="uniform" />
+            android:id="@+id/t6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="이미지와 가장 비슷한 종류를 찾아봤어요!"
+            android:textSize="15dp"
+            android:layout_gravity="center"
+            android:fontFamily="@font/tmoneyroundwindextrabold"
+            android:gravity="center"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2px"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:weightSum="5"
+            android:orientation="horizontal"
+            android:layout_weight="1.5">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/tf_btn_2"
-                android:layout_width="220dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="1px"
-                android:layout_marginRight="1px"
-                android:layout_weight="1"
-                android:background="@drawable/round_corner_textview"
-                android:backgroundTint="@android:color/holo_orange_dark"
-                android:gravity="center"
-                android:padding="2px"
-                android:text="TextView"
-                android:textAlignment="center"
-                android:textColor="?android:attr/textColorTertiaryInverse"
-                app:autoSizeTextType="uniform" />
+                <TextView
+                    android:id="@+id/t1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="1위"
+                    android:textSize="35dp"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                    android:gravity="center"/>
 
-            <TextView
-                android:id="@+id/tf_btn_3"
-                android:layout_width="220dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="1px"
-                android:layout_marginRight="1px"
-                android:layout_weight="1"
-                android:background="@drawable/round_corner_textview"
-                android:backgroundTint="@android:color/holo_orange_dark"
-                android:gravity="center"
-                android:padding="2px"
-                android:text="TextView"
-                android:textAlignment="center"
-                android:textColor="?android:attr/textColorTertiaryInverse"
-                app:autoSizeTextType="uniform" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/tf_btn_4"
-                android:layout_width="220dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="1px"
-                android:layout_marginRight="1px"
-                android:layout_weight="1"
-                android:background="@drawable/round_corner_textview"
-                android:backgroundTint="@android:color/holo_orange_dark"
-                android:gravity="center"
-                android:padding="2px"
-                android:text="TextView"
-                android:textAlignment="center"
-                android:textColor="?android:attr/textColorTertiaryInverse"
-                app:autoSizeTextType="uniform" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4">
 
-            <TextView
-                android:id="@+id/tf_btn_5"
-                android:layout_width="220dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="1px"
-                android:layout_marginRight="1px"
-                android:layout_weight="1"
-                android:background="@drawable/round_corner_textview"
-                android:backgroundTint="@android:color/holo_orange_dark"
-                android:gravity="center"
-                android:padding="2px"
-                android:text="TextView"
-                android:textAlignment="center"
-                android:textColor="?android:attr/textColorTertiaryInverse"
-                app:autoSizeTextType="uniform" />
+                <TextView
+                    android:id="@+id/tf_btn_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/round_corner_textview"
+                    android:backgroundTint="@color/custom2"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:padding="2px"
+                    android:text="TextView"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    app:autoSizeTextType="uniform" />
+
+            </LinearLayout>
+
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/tf_btn_getImg"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:weightSum="5"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/t2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="2위"
+                    android:textSize="25dp"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                    android:gravity="center"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4">
+
+                <TextView
+                    android:id="@+id/tf_btn_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/round_corner_textview"
+                    android:backgroundTint="@color/custom2"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:padding="2px"
+                    android:text="TextView"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    app:autoSizeTextType="uniform" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:weightSum="5"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/t3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="3위"
+                    android:textSize="25dp"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4">
+
+                <TextView
+                    android:id="@+id/tf_btn_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/round_corner_textview"
+                    android:backgroundTint="@color/custom2"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:padding="2px"
+                    android:text="TextView"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    app:autoSizeTextType="uniform" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:weightSum="5"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/t4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="4위"
+                    android:textSize="25dp"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4">
+
+                <TextView
+                    android:id="@+id/tf_btn_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/round_corner_textview"
+                    android:backgroundTint="@color/custom2"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:padding="2px"
+                    android:text="TextView"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    app:autoSizeTextType="uniform" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:weightSum="5"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/t5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="5위"
+                    android:textSize="25dp"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/tmoneyroundwindextrabold"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4">
+
+                <TextView
+                    android:id="@+id/tf_btn_5"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/round_corner_textview"
+                    android:backgroundTint="@color/custom2"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:padding="2px"
+                    android:text="TextView"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    app:autoSizeTextType="uniform" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="가져오기" />
+            android:layout_marginRight="10dp"
+            android:hint="뒤로가기를 누르시면 종료합니다."
+            android:layout_gravity="right"
+            android:gravity="right"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.5">
+
+            <Button
+                android:id="@+id/tf_btn_getImg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:layout_margin="10dp"
+                android:background="@drawable/button_custom"
+                android:text="사진 불러오기"/>
+        </RelativeLayout>
 
     </LinearLayout>
+
+
 
 </LinearLayout>

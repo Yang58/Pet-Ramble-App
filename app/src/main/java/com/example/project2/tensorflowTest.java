@@ -3,18 +3,11 @@ package com.example.project2;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,18 +17,22 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+
 import com.example.project2.Main.MainActivity;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.support.common.FileUtil;
+import org.tensorflow.lite.support.common.TensorProcessor;
 import org.tensorflow.lite.support.common.ops.NormalizeOp;
 import org.tensorflow.lite.support.image.ImageProcessor;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.image.ops.ResizeOp;
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
-import org.tensorflow.lite.support.common.TensorProcessor;
 import org.tensorflow.lite.support.label.TensorLabel;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -71,6 +68,7 @@ public class tensorflowTest extends Fragment {
     private static final int REQUEST_IMAGE_1 = 1;
     private static Bitmap selectImage;
     private static ArrayList<TextView> listBtn = new ArrayList<>();
+    private static ArrayList<TextView> text = new ArrayList<>();
 
     public tensorflowTest() {
         // Required empty public constructor
@@ -116,9 +114,20 @@ public class tensorflowTest extends Fragment {
         listBtn.add(v.findViewById(R.id.tf_btn_4));
         listBtn.add(v.findViewById(R.id.tf_btn_5));
 
+        text.add(v.findViewById(R.id.t1));
+        text.add(v.findViewById(R.id.t2));
+        text.add(v.findViewById(R.id.t3));
+        text.add(v.findViewById(R.id.t4));
+        text.add(v.findViewById(R.id.t5));
+        text.add(v.findViewById(R.id.t6));
+
         for(TextView b : listBtn){
             b.setVisibility(View.GONE);
         }
+        for(TextView a : text){
+            a.setVisibility(View.GONE);
+        }
+
 
         Button b = view.findViewById(R.id.tf_btn_getImg);
         b.setOnClickListener(new View.OnClickListener() {
@@ -182,12 +191,15 @@ public class tensorflowTest extends Fragment {
 
                 for(String key : keySetList) {
                     if(cnt>listBtn.size()-1) break;
+                    TextView a = text.get(cnt);
                     TextView b = listBtn.get(cnt);
+                    a.setVisibility(View.VISIBLE);
                     b.setVisibility(View.VISIBLE);
                     b.setText("");
                     b.setText(key+"\n"+String.format("%.2f",topList.get(key))+"%");
                     cnt++;
                 }
+
 
 
                 ImageView imageView = (ImageView) v.findViewById(R.id.tf_img);

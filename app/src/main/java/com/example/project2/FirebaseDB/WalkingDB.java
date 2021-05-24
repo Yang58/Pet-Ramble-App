@@ -2,17 +2,28 @@ package com.example.project2.FirebaseDB;
 
 public class WalkingDB {
 
+    private String user_nick;
     private String Walking_Time_h;
     private String Walking_Time_m;
     private String Walking_Count;
     private String Walking_Distance;
 
-    public WalkingDB(String Walking_Time_h, String Walking_Time_m, String Walking_Count,String Walking_Distance){
+    public WalkingDB(String user_nick,String Walking_Time_h, String Walking_Time_m, String Walking_Count,String Walking_Distance){
+        this.user_nick = user_nick;
         this.Walking_Time_h = Walking_Time_h;
         this.Walking_Time_m = Walking_Time_m;
         this.Walking_Count = Walking_Count;
         this.Walking_Distance = Walking_Distance;
     }
+
+    public String getUser_nick() {
+        return user_nick;
+    }
+
+    public void setUser_nick(String user_nick) {
+        this.user_nick = user_nick;
+    }
+
     public String getWalking_Time_h() {
         return Walking_Time_h;
     }

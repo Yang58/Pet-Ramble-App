@@ -13,6 +13,10 @@ public class UserInfoDB {
         this.user_phoneNumber = user_phoneNumber;
     }
 
+    public UserInfoDB(String user_nickname){
+        this.user_nickname = user_nickname;
+    }
+
     public String getUser_name() {
         return user_name;
     }

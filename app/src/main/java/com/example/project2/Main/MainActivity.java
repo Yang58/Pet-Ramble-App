@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private long backKeyPressedTime = 0;
     final int GET_GALLERY_IMAGE = 200;
 
+    private long BackKeyPressedTime = 0 ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d(TAG, "Resultcode = 0");
                                     Log.d(TAG, "No such document");
                                 }
-                                Log.d(TAG, "Resultcode = ?");
                             }
                         }
                     } else {
@@ -228,5 +229,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return super.onOptionsItemSelected(item);
         }
+
     }
+
 

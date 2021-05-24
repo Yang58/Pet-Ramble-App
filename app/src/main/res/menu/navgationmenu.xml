@@ -14,8 +14,8 @@
 
         <item
             android:id="@+id/action_ranking"
-            android:icon="@drawable/baseline_chat_black_24dp"
-            android:title="순위"/>
+            android:icon="@drawable/round_star_24"
+            android:title="기록"/>
 
     </group>
 

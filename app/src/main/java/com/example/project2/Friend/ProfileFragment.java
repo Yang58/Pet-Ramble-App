@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -62,8 +61,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
                 result = bundle.getString("ID_Clicked");
-                TextView profile_welcome = (TextView) v.findViewById(R.id.profile_welcome);
-                profile_welcome.setText(result + "님의 정보");
+//                TextView profile_welcome = (TextView) v.findViewById(R.id.profile_welcome);
+//                profile_welcome.setText(result + "님의 정보");
                 Log.d("Debug","result=" + result);
 
                 db.collection("Login_user").whereEqualTo("user_ID", result).get()
@@ -92,8 +91,8 @@ public class ProfileFragment extends Fragment {
                                                         TextView profile_phoneNum = (TextView) v.findViewById(R.id.profile_phoneNum);
                                                         profile_phoneNum.setText((String) document.get("user_phoneNumber"));
                                                         Log.d("Debug","2="+(String) document.get("user_phoneNumber"));
-                                                        TextView profile_Nickname =(TextView) v.findViewById(R.id.profile_Nickname);
-                                                        profile_Nickname.setText((String) document.get("user_nickname"));
+//                                                        TextView profile_Nickname =(TextView) v.findViewById(R.id.profile_Nickname);
+//                                                        profile_Nickname.setText((String) document.get("user_nickname"));
                                                         Log.d("Debug", "3="+(String) document.get("user_nickname"));
 
 
@@ -111,11 +110,11 @@ public class ProfileFragment extends Fragment {
                                                         TextView profile_petName = (TextView) v.findViewById(R.id.profile_petName);
                                                         profile_petName.setText((String) document.get("petName"));
                                                         TextView profile_petAge = (TextView) v.findViewById(R.id.profile_petAge);
-                                                        profile_petAge.setText((String) document.get("petAge"));
+                                                        profile_petAge.setText((String) document.get("petAge") + " 살");
                                                         TextView profile_petKind = (TextView) v.findViewById(R.id.profile_petKind);
                                                         profile_petKind.setText((String) document.get("petKind"));
                                                         TextView profile_petWeight = (TextView) v.findViewById(R.id.profile_petWeight);
-                                                        profile_petWeight.setText((String) document.get("petWeight"));
+                                                        profile_petWeight.setText((String) document.get("petWeight") + " kg");
                                                         TextView profile_petBirthday = (TextView) v.findViewById(R.id.profile_petBirthday);
 
                                                         Timestamp i = (Timestamp) document.get("petBrithday");

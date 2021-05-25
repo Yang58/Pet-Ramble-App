@@ -41,10 +41,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class HomeFragment extends Fragment {
+
+    static final String TAG = "HomeFragment";
 
     ImageView petImage;
     TextView petname ;
@@ -244,18 +247,25 @@ public class HomeFragment extends Fragment {
             Log.e("HomeFragment","회원 정보 없음");
         }else{
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo").get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo")
+                    .addSnapshotListener(MetadataChanges.INCLUDE,new EventListener<DocumentSnapshot>() {
                         @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            DocumentSnapshot document = task.getResult();
-                            petname.setText(document.getString("petName"));
-                            petage.setText(document.getString("petAge") + " 살 ");
-                            petkind.setText(document.getString("petKind"));
+                        public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w(TAG, "Listen failed.", e);
+                                return;
+                            }
+                            if (value != null && value.exists()) {
+                                Log.d(TAG, value + " data: success");
+                                petname.setText(value.getString("petName"));
+                                petage.setText(value.getString("petAge") + " 살 ");
+                                petkind.setText(value.getString("petKind"));
 
-                            home_text.setText(document.getString("petName")+" 건강 관리 ");
-                            petweight.setText(document.getString("petWeight")+" KG ");
-
+                                home_text.setText(value.getString("petName")+" 건강 관리 ");
+                                petweight.setText(value.getString("petWeight")+" KG ");
+                            } else {
+                                Log.d(TAG, value + " data: null");
+                            }
                         }
                     });
             DocumentReference doc = FBdb.collection("Login_user").document(user.getUid()).collection("Info").document("Walk");

@@ -201,7 +201,6 @@ public class tensorflowTest extends Fragment {
                 }
 
 
-
                 ImageView imageView = (ImageView) v.findViewById(R.id.tf_img);
                 imageView.setImageBitmap(bitmap);
             } catch (IOException e) {

@@ -49,7 +49,7 @@
                     android:layout_marginBottom="80dp"
                     android:backgroundTint="@color/custom1"
                     android:clickable="true"
-                    android:text="종류 찾기"
+                    android:text="견종 찾기"
                     android:theme="@style/MaterialTheme"
                     app:icon="@android:drawable/ic_menu_search"
                     app:fabSize="auto"

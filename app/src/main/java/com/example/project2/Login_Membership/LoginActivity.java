@@ -124,18 +124,6 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        // 비밀번호찾기 버튼 클릭
-        btn_resetPassword = (TextView) findViewById(R.id.btn_resetPassword);
-        btn_resetPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent intent = new Intent(getApplicationContext(), ResetpasswordActivity.class);
-                startActivity(intent);
-            }
-        });
-
     }
 
     @Override
@@ -210,7 +198,6 @@ public class LoginActivity extends AppCompatActivity {
 
     public void UserUpload(){
         // Firebase 회원정보
-
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("users").document(user.getUid());

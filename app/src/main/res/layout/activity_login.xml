@@ -50,6 +50,19 @@
             android:hint="PW"
             android:inputType="numberPassword" />
 
+
+        <TextView
+            android:id="@+id/btn_User"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/custom4"
+            android:layout_gravity="right"
+            android:textSize="13dp"
+            android:layout_margin="13dp"
+            android:fontFamily="@font/tmoneyroundwindextrabold"
+            android:gravity="center"
+            android:text="회원가입"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -81,68 +94,6 @@
 
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="비밀번호를 까먹으셨나요 ?  "/>
-
-            <TextView
-                android:id="@+id/btn_resetPassword"
-                android:textColor="@android:color/holo_red_light"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="비밀번호 찾기"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="회원이 아니신가요 ?  "/>
-
-            <TextView
-                android:id="@+id/btn_User"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/holo_red_light"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="회원가입 하기"/>
-
-        </LinearLayout>
-
-
-
-    </LinearLayout>
-
-
-
-
-
 
 
 </LinearLayout>

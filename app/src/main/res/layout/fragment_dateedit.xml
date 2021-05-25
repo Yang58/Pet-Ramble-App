@@ -17,7 +17,7 @@
             android:gravity="center"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="m월 dd일 일정 수정"
+            android:text="m월 dd일 일정 저장"
             android:textSize="20dp"
             android:fontFamily="@font/tmoneyroundwindextrabold"
             android:textColor="@color/custom4">

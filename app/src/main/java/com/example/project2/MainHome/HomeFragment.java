@@ -110,6 +110,7 @@ public class HomeFragment extends Fragment {
         Edit_Feed_kcal = v.findViewById(R.id.home_Edit_feed_kcal);
         home_Day_kcal = v.findViewById(R.id.home_text_kcal);
         home_Day_feed = v.findViewById(R.id.home_text_feed);
+        home_Walking_time = v.findViewById(R.id.home_text_walking_time);
 
         c = v.findViewById(R.id.tv_c);
         d = v.findViewById(R.id.tv_d);
@@ -143,25 +144,25 @@ public class HomeFragment extends Fragment {
                 double Option = 0;
                 if(position == 0){
                 }else if(position == 1){
-                    Option = 3;
+                    Option = 3;//         이유식 ~ 4개월령
                 }else if(position == 2){
-                    Option = 2;
+                    Option = 2;//         4개월령 ~ 성견
                 }else if(position == 3){
-                    Option = 1.8;
+                    Option = 1.8;//       중성화하지 않은 경우
                 }else if(position == 4){
-                    Option = 1.6;
+                    Option = 1.6;//       중성화한 경우
                 }else if(position == 5){
-                    Option = 1.4;
+                    Option = 1.4;//       과체중
                 }else if(position == 6){
-                    Option = 1;
+                    Option = 1;//         비만
                 }else if(position == 7){
-                    Option = 1.8;
+                    Option = 1.8;//       임신 전분 42일간
                 }else if(position == 8){
-                    Option = 3;
+                    Option = 3.1;//         임신 후반 21일간
                 }else if(position == 9){
-                    Option = 1.4;
+                    Option = 1.4;//       수유기간
                 }else if(position == 10){
-                    Option = 1.4;
+                    Option = 1.4;//       노령견
                 }
                 home_btn_Check = v.findViewById(R.id.home_button_check);
                 double finalOption = Option;
@@ -186,6 +187,16 @@ public class HomeFragment extends Fragment {
                                                 documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                     @Override
                                                     public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String v = documentSnapshot.getString("petVaccination");
+                                                        if(v.equals("예")) {
+                                                            if(finalOption == 3){
+                                                                home_Walking_time.setText("산책 금지");
+                                                            }else{
+                                                                home_Walking_time.setText("30~60");
+                                                            }
+                                                        }else{
+                                                            home_Walking_time.setText("산책 금지");
+                                                        }
                                                         String weight = documentSnapshot.getString("petWeight");
                                                         double standard_kcal = 70 * Math.pow( Double.valueOf(weight) , 0.75) * finalOption;
                                                         home_Day_kcal.setText(String.format("%.2f",standard_kcal)+ " kcal ");
@@ -211,6 +222,16 @@ public class HomeFragment extends Fragment {
                                                 documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                     @Override
                                                     public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String v = documentSnapshot.getString("petVaccination");
+                                                        if(v.equals("예")) {
+                                                            if(finalOption == 3){
+                                                                home_Walking_time.setText("산책 금지");
+                                                            }else{
+                                                                home_Walking_time.setText("30~60");
+                                                            }
+                                                        }else{
+                                                            home_Walking_time.setText("산책 금지");
+                                                        }
                                                         String weight = documentSnapshot.getString("petWeight");
                                                         double day_kcal = 70 * Math.pow( Double.valueOf(weight) , 0.75) * finalOption;
                                                         double day_feed = 1000 * day_kcal / Double.valueOf(Edit_Feed_kcal.getText().toString());

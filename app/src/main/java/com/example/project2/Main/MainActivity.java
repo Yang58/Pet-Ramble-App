@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     private long backKeyPressedTime = 0;
     final int GET_GALLERY_IMAGE = 200;
 
-    private long BackKeyPressedTime = 0 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,24 +68,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             FirebaseFirestore fbdb = FirebaseFirestore.getInstance();
             DocumentReference docRef = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
-
-            //            DocumentReference documentReference = fbdb.collection("Login_user").document(user.getUid());
-//            documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//                @Override
-//                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-//                    textViewEmail.setText(value.getString("user_ID"));
-//                    Log.d("MainActivity","User_ID : " + textViewEmail);
-//                }
-//            });
-//
-//            DocumentReference UserInfo = fbdb.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
-//            UserInfo.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//                @Override
-//                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-//                    textViewName.setText(value.getString("user_name")+"님 안녕하세요");
-//                    Log.d("MainActivity","User_ID : " + textViewEmail);
-//                }
-//            });
 
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() { // 유저 uid에 애견정보가 있다면 정보 출력
                 @Override
@@ -220,8 +201,13 @@ public class MainActivity extends AppCompatActivity {
             }
             if (id == R.id.action_inquiry) {
                 Toast.makeText(this, "문의하기", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), UserinfoActivity.class);
-                startActivity(intent);
+                Intent email = new Intent(Intent.ACTION_SEND);
+                email.setType("plain/text");
+                String[] address = {"lloesmp@naver.com"};
+                email.putExtra(Intent.EXTRA_EMAIL, address);
+                email.putExtra(Intent.EXTRA_SUBJECT, "제목");
+                email.putExtra(Intent.EXTRA_TEXT,"문의 내용");
+                startActivity(email);
             }
             return super.onOptionsItemSelected(item);
         }

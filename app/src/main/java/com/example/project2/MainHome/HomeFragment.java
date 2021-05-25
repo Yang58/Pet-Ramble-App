@@ -292,7 +292,9 @@ public class HomeFragment extends Fragment {
                     new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Glide.with(getContext()).load(uri).apply(new RequestOptions().circleCrop()).into(petImage);
+                            try {
+                                Glide.with(getContext()).load(uri).apply(new RequestOptions().circleCrop()).into(petImage);
+                            }catch (Exception e){}
 //                            Glide.with(getContext()).load(uri).into(petImage);
                         }
                     }).addOnFailureListener(new OnFailureListener() {

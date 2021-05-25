@@ -23,7 +23,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -59,6 +61,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -118,6 +121,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    private static int origHeight;
+
     //파이어베이스 인스턴스
     FirebaseAuth user = FirebaseAuth.getInstance();
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();  //DB
@@ -144,6 +149,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static long myWaitTime = 0;
     private static String myPetWeight = null;
     private static int tmp;
+    private static Switch myLocationSwitch;
 
     //다른 사람 위치 표시
     private static HashMap<String, ArrayList<PolylineOptions>> otherLines = new HashMap<>();
@@ -187,6 +193,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             CameraPosition mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
         v = inflater.inflate(R.layout.activity_maps_fragment, container, false);
+        myLocationSwitch = v.findViewById(R.id.switch_my_location_visible);
+
+        myLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)myLocationSwitch.setText("내 위치 표시 중");
+                else myLocationSwitch.setText("내 위치 표시 안하는 중");
+            }
+        });
 
         ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
         actionBar.hide();
@@ -381,10 +396,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 16));
 
             //리얼타임 데이터베이스에 실시간으로 노드 전송
-            startRef.setValue(startPoint);
-            endRef.setValue(endPoint);
-            lastTimeRef.setValue(Timestamp.now());
-
+            myLocationSwitch = v.findViewById(R.id.switch_my_location_visible);
+            if(myLocationSwitch.isChecked()) {
+                startRef.setValue(startPoint);
+                endRef.setValue(endPoint);
+                lastTimeRef.setValue(Timestamp.now());
+            }
             endPoint = startPoint;
 
             try {
@@ -419,6 +436,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     public void makeStatistics() {
         serviceIntent.setAction("startUploadPaths");
         serviceIntent.putParcelableArrayListExtra("interest",myInterestArray);
+        serviceIntent.putParcelableArrayListExtra("way",myCoordinateArray);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             mContext.startForegroundService(serviceIntent);
         else mContext.startService(serviceIntent);
@@ -502,6 +520,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         myWaitTime= Timestamp.now().getSeconds();
         startPoint = null;
         endPoint = null;
+        
+        //지정한 저장한 위치 불러오기
+        getSelectedPathFromSave();
 
         myWaitTime = Timestamp.now().getSeconds();
 
@@ -517,6 +538,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
         //걸은 미터수 초기화
         walkDistance = 0;
+    }
+
+    private void getSelectedPathFromSave() {
     }
 
     //todo:버튼종료
@@ -696,6 +720,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         mMap = googleMap;
 
         mMap.setOnMarkerClickListener(this);
+
+        //밤낮 구분해서 테마 설정
+        Date nowTime = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH");
+        int nowHour = Integer.valueOf(sdf.format(nowTime));
+        if((nowHour>18 && nowHour<=24) || (nowHour>0 && nowHour<=6)){
+
+        }else{
+        }
 
         setDefaultLocation(); // GPS를 찾지 못하는 장소에 있을 경우 지도의 초기 위치가 필요함.
 
@@ -1054,35 +1087,35 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     }
 
     public void cashingImage(String UID) {
-        FirebaseFirestore dbRef = FirebaseFirestore.getInstance();
-        FirebaseStorage storageRef = FirebaseStorage.getInstance();
+        try {
+            FirebaseFirestore dbRef = FirebaseFirestore.getInstance();
+            FirebaseStorage storageRef = FirebaseStorage.getInstance();
 
-        //이미지 파일 캐싱
-        String fileName = String.valueOf(UID.hashCode());
-        String fileType = ".JPG";
-        File imageCache = new File(getContext().getCacheDir(), fileName + fileType);
+            //이미지 파일 캐싱
+            String fileName = String.valueOf(UID.hashCode());
+            String fileType = ".JPG";
+            File imageCache = new File(getContext().getCacheDir(), fileName + fileType);
 
-        if (!imageCache.exists()) {
-            //캐싱된 이미지가 아직 존재하지 않을 경우
-            String innerFileType = fileType;
-            dbRef.collection("users").document(UID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                    loadImage loadImage = new loadImage(getContext().getCacheDir(), value.getString("photoUrl"), fileName, innerFileType);
-                    loadImage.execute();
-                    photoPath = mContext.getCacheDir().toString() + "/" + fileName + innerFileType;
-                }
-            });
-        } else {
-            try {
-                File imageCacheList = new File(getContext().getCacheDir().toString());
-                for (File j : imageCacheList.listFiles()) {
-                    if (j.getName().equals(fileName + fileType)) {
-                        photoPath = j.getPath();
+            if (!imageCache.exists()) {
+                //캐싱된 이미지가 아직 존재하지 않을 경우
+                String innerFileType = fileType;
+                dbRef.collection("users").document(UID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                        loadImage loadImage = new loadImage(getContext().getCacheDir(), value.getString("photoUrl"), fileName, innerFileType);
+                        loadImage.execute();
+                        photoPath = mContext.getCacheDir().toString() + "/" + fileName + innerFileType;
                     }
-                }
-            }catch(Exception e){}
-        }
+                });
+            } else {
+                    File imageCacheList = new File(getContext().getCacheDir().toString());
+                    for (File j : imageCacheList.listFiles()) {
+                        if (j.getName().equals(fileName + fileType)) {
+                            photoPath = j.getPath();
+                        }
+                    }
+            }
+        }catch (Exception e){}
     }
 }
 

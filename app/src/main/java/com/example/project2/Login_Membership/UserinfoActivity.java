@@ -445,5 +445,10 @@ public class UserinfoActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(this,"정보 작성을 완료하고 완료 버튼을 눌러주세요.",Toast.LENGTH_SHORT).show();
+        return;
+    }
 }
 

@@ -69,6 +69,7 @@ public class LocationBackground extends Service {
     private static Thread mThread;
     private static int mCount = 0;
     private static ArrayList<LatLng> interestPoint;
+    private static ArrayList<LatLng> wayPoint;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -81,6 +82,7 @@ public class LocationBackground extends Service {
             } else if (intent.getAction().equals("startUploadPaths")) {
                 try {
                     interestPoint = intent.getParcelableArrayListExtra("interest");
+                    wayPoint = intent.getParcelableArrayListExtra("way");
                     startUpPaths();
                 }catch (Exception e){
                     e.printStackTrace();
@@ -112,7 +114,7 @@ public class LocationBackground extends Service {
             NotificationCompat.Builder notification
                     = new NotificationCompat.Builder(getApplicationContext(), "channel")
                     .setSmallIcon(R.drawable.loading3)
-                    .setContentTitle("산책하신 길을 저장하는 중이에요")
+                    .setContentTitle("관심 장소를 지도에 반영하고 있어요.")
                     .setContentText("0%")
                     .setContentIntent(pendingIntent);
 
@@ -129,6 +131,7 @@ public class LocationBackground extends Service {
                     while(PROGRESS_CURRENT[0]<PROGRESS_MAX[0]){
                         FirebaseDatabase dbInstance = FirebaseDatabase.getInstance();
                         DatabaseReference db = dbInstance.getReference().child("mapData").child("hotSpot");
+
                         String hash = String.valueOf(Timestamp.now().getNanoseconds());
                         int percentage = Math.round((PROGRESS_CURRENT[0]/PROGRESS_MAX[0]-1)*100);
 
@@ -185,6 +188,23 @@ public class LocationBackground extends Service {
                             }
                         });
                         if(PROGRESS_CURRENT[0]>=PROGRESS_MAX[0]) break;
+                    }
+
+
+                    notification.setContentTitle("산책하신 경로를 저장하는 중이에요.")
+                                .setContentText("0/0");
+                    PROGRESS_CURRENT[0]=0;
+                    PROGRESS_MAX[0]=wayPoint.size();
+                    while (PROGRESS_CURRENT[0]<PROGRESS_MAX[0]){
+                        DocumentReference mapDB = FirebaseFirestore.getInstance().collection("map_data").document(FirebaseAuth.getInstance().getUid()).collection("walk_history").document(String.valueOf(Timestamp.now().getNanoseconds()));
+                        ArrayList<LatLng> points = new ArrayList<>();
+                        HashMap<String, ArrayList<LatLng>> updata = new HashMap<>();
+                        points.add(wayPoint.get(PROGRESS_CURRENT[0]));
+                        updata.put("walk_way", points);
+                        mapDB.set(updata);
+                        PROGRESS_CURRENT[0]++;
+                        notification.setProgress(PROGRESS_MAX[0], PROGRESS_CURRENT[0], false).setContentText(String.valueOf(PROGRESS_CURRENT[0])+"/"+String.valueOf(PROGRESS_MAX[0]-1));
+                        mNotificationManager.notify(1, notification.build());
                     }
 
                     notification.setContentTitle("저장을 완료했어요!").setProgress(0, 0, false).setContentText("");

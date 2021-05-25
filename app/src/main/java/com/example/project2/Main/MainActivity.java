@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             friendFragment = new FriendFragment();
 
             transaction = FM.beginTransaction();
-            transaction.replace(R.id.container,homeFragment).commit();
+            transaction.add(R.id.container,homeFragment,"home").commit();
             ActionBar actionBar = getSupportActionBar();
             BottomNavigationView bottomNavigationView = findViewById(R.id.main_nav);
             bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

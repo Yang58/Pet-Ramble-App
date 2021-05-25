@@ -68,7 +68,6 @@ public class tensorflowTest extends AppCompatActivity {
 
     private static View v;
     private static final int REQUEST_IMAGE_1 = 1;
-    private static Bitmap selectImage;
     private static ArrayList<TextView> listBtn = new ArrayList<>();
     private static ArrayList<TextView> text = new ArrayList<>();
 
@@ -98,24 +97,26 @@ public class tensorflowTest extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_tensorflow_test);
         //종류 표시될 버튼들
-        listBtn.add(v.findViewById(R.id.tf_btn_1));
-        listBtn.add(v.findViewById(R.id.tf_btn_2));
-        listBtn.add(v.findViewById(R.id.tf_btn_3));
-        listBtn.add(v.findViewById(R.id.tf_btn_4));
-        listBtn.add(v.findViewById(R.id.tf_btn_5));
+        if(listBtn.size()==0) {
+            listBtn.add(findViewById(R.id.tf_btn_1));
+            listBtn.add(findViewById(R.id.tf_btn_2));
+            listBtn.add(findViewById(R.id.tf_btn_3));
+            listBtn.add(findViewById(R.id.tf_btn_4));
+            listBtn.add(findViewById(R.id.tf_btn_5));
 
-        text.add(v.findViewById(R.id.t1));
-        text.add(v.findViewById(R.id.t2));
-        text.add(v.findViewById(R.id.t3));
-        text.add(v.findViewById(R.id.t4));
-        text.add(v.findViewById(R.id.t5));
-        text.add(v.findViewById(R.id.t6));
+            text.add(findViewById(R.id.t1));
+            text.add(findViewById(R.id.t2));
+            text.add(findViewById(R.id.t3));
+            text.add(findViewById(R.id.t4));
+            text.add(findViewById(R.id.t5));
+            text.add(findViewById(R.id.t6));
 
-        for(TextView b : listBtn){
-            b.setVisibility(View.GONE);
-        }
-        for(TextView a : text){
-            a.setVisibility(View.GONE);
+            for(TextView b : listBtn){
+                b.setVisibility(View.GONE);
+            }
+            for(TextView a : text){
+                a.setVisibility(View.GONE);
+            }
         }
 
 
@@ -137,21 +138,22 @@ public class tensorflowTest extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.wtf("단계","onActivityResult");
         if (requestCode == REQUEST_IMAGE_1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
             Uri uri = data.getData();
 
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(v.getContext().getContentResolver(), uri);
-                selectImage=bitmap;
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                Bitmap selectImage=bitmap;
                 // Log.d(TAG, String.valueOf(bitmap));
                 int cx=224, cy=224;
                 Bitmap scaeldBitmap = Bitmap.createScaledBitmap(selectImage,cx,cy,false);
                 int pixels[] = new int[cx*cy];
                 scaeldBitmap.getPixels(pixels,0,cx,0,0,cx,cy);
                 ByteBuffer inputImage=getInputImage_2(pixels,cx,cy);
-                Interpreter tf_lite = getTfliteInterpreter("graph.tflite");
+                Interpreter tf_lite = null;
+                tf_lite = getTfliteInterpreter("graph.tflite");
                 float[][] pred = new float[1][121];
                 tf_lite.run(inputImage, pred);
 

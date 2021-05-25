@@ -91,7 +91,8 @@ public class UserinfoActivity extends AppCompatActivity {
 
     private List<String> friend;
     private List<String> friend_mail;
-    private String pet_kind ;
+    private String pet_kind;
+    private Date petBrithday;
 
 
     @Override
@@ -174,30 +175,37 @@ public class UserinfoActivity extends AppCompatActivity {
         Check.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                if(Edit_name.length() > 0 && Edit_Phone.length() > 0 && Edit_Nickname.length() > 0) { // 회원 정보 입력 완료
-                    if (petName.length() > 0 && petAge.length() > 0 && petBirthday.length() > 0 && petWeight.length() > 0) { // 애견 정보 입력 완료
+                SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
+                try {
+                    petBrithday = sdf.parse(petBirthday.getText().toString());
+                    if(Edit_name.length() > 0 && Edit_Phone.length() > 0 && Edit_Nickname.length() > 0) { // 회원 정보 입력 완료
+                        if (petName.length() > 0 && petAge.length() > 0 && petBirthday.length() > 0 && petWeight.length() > 0) { // 애견 정보 입력 완료
+                            if(pet_kind == null){
+                                Log.e(TAG,"2. test log " + pet_kind );
+                                Toast.makeText(UserinfoActivity.this,"반려견 종류를 선택해주세요.",Toast.LENGTH_SHORT).show();
+                            }else if (pet_kind != null){
+                                Log.e(TAG,"2. test log Success" );
+                                profileUpdate(pet_kind);
+                                Intent intent = new Intent(UserinfoActivity.this, MainActivity.class);
+                                intent.putExtra("check",1);
+                                startActivity(intent);
+                                finish();
 
-                        if(pet_kind == null){
-                            Log.e(TAG,"2. test log " + pet_kind );
-                            Toast.makeText(UserinfoActivity.this,"반려견 종류를 선택해주세요.",Toast.LENGTH_SHORT).show();
-                        }else if (pet_kind != null){
-                            Log.e(TAG,"2. test log Success" );
-                            profileUpdate(pet_kind);
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            intent.putExtra("check",1);
-                            startActivity(intent);
-                            finish();
-
+                            }
+                        }else{
+                            Toast.makeText(UserinfoActivity.this,"반려견 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
                         }
                     }else{
-                        Toast.makeText(UserinfoActivity.this,"반려견 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserinfoActivity.this,"사용자 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
                     }
-                }else{
-                    Toast.makeText(UserinfoActivity.this,"사용자 정보를 입력해주세요.",Toast.LENGTH_SHORT).show();
+                } catch (ParseException e) {
+                    Toast.makeText(UserinfoActivity.this,"생일을 정확히 입력하세요.",Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 }
             }
         });
 
+        petBirthday.setFocusable(false);
         petBirthday.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -278,9 +286,6 @@ public class UserinfoActivity extends AppCompatActivity {
         String petName = ((EditText) findViewById(R.id.edit_petName)).getText().toString();
         String petAge = ((EditText) findViewById(R.id.edit_petAge)).getText().toString();
         String petWeight = ((EditText)findViewById(R.id.edit_petWeight)).getText().toString();
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat( "yyyyMMdd" , Locale.KOREA );
-            Date petBrithday = sdf.parse(petBirthday.getText().toString());
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
@@ -362,11 +367,8 @@ public class UserinfoActivity extends AppCompatActivity {
                     Log.e(TAG, "에러: " + e.toString());
                 }
             }
-        } catch (ParseException e) {
-            Log.d(TAG,"null error!");
-            e.printStackTrace();
         }
-    }
+
 
     private void UserinfoUploader(UserInfoDB userDB){
         Log.d(TAG,"7. UserinfoUploader ");
@@ -442,11 +444,6 @@ public class UserinfoActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
-
-
-
 
 }
 

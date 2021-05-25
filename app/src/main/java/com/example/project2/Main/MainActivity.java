@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -120,6 +121,9 @@ public class MainActivity extends AppCompatActivity {
 
             FM = getSupportFragmentManager();
             homeFragment = new HomeFragment();
+            fragmentMap = new MapsFragment();
+            fragment_Community = new CommunityMain();
+            friendFragment = new FriendFragment();
 
             transaction = FM.beginTransaction();
             transaction.replace(R.id.container,homeFragment).commit();
@@ -131,31 +135,39 @@ public class MainActivity extends AppCompatActivity {
                     switch (item.getItemId()) {
                         case (R.id.action_home):
                             if (FM.findFragmentByTag("home") == null) {
-                                homeFragment = new HomeFragment();
                                 FM.beginTransaction().add(R.id.container, homeFragment,"home").addToBackStack(null).commit();
+                            }else{
+                                Fragment getTag = FM.findFragmentByTag("home");
+                                FM.beginTransaction().replace(R.id.container, getTag,"home").addToBackStack(null).commit();
                             }
                             actionBar.show();
                             break;
                         case (R.id.action_maps):
                             if (FM.findFragmentByTag("map") == null) {
-                                fragmentMap = new MapsFragment();
                                 FM.beginTransaction().add(R.id.container, fragmentMap,"map").addToBackStack(null).commit();
+                            }else{
+                                Fragment getTag = FM.findFragmentByTag("map");
+                                FM.beginTransaction().replace(R.id.container, getTag,"map").addToBackStack(null).commit();
                             }
                             actionBar.hide();
                             break;
 
                         case R.id.action_comm:
                             if (FM.findFragmentByTag("community") == null) {
-                                fragment_Community = new CommunityMain();
                                 FM.beginTransaction().add(R.id.container, fragment_Community,"community").addToBackStack(null).commit();
+                            }else{
+                                Fragment getTag = FM.findFragmentByTag("community");
+                                FM.beginTransaction().replace(R.id.container, getTag,"community").addToBackStack(null).commit();
                             }
                             actionBar.hide();
                             break;
 
                         case R.id.action_friend:
                             if (FM.findFragmentByTag("friend") == null) {
-                                friendFragment = new FriendFragment();
-                                FM.beginTransaction().replace(R.id.container, friendFragment,"friend").addToBackStack(null).commit();
+                                FM.beginTransaction().replace(R.id.container, friendFragment, "friend").addToBackStack(null).commit();
+                            }else{
+                                Fragment getTag = FM.findFragmentByTag("friend");
+                                FM.beginTransaction().replace(R.id.container, getTag,"friend").addToBackStack(null).commit();
                             }
                             actionBar.hide();
                             break;

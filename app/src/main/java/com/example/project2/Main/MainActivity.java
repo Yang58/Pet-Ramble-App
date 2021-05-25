@@ -28,6 +28,7 @@ import com.example.project2.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -35,6 +36,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.sql.Time;
 
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentTransaction transaction;
 
     private long backKeyPressedTime = 0;
+    private boolean isBackPressed = false;
     final int GET_GALLERY_IMAGE = 200;
 
 
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        backKeyPressedTime = Timestamp.now().getSeconds();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -212,6 +217,26 @@ public class MainActivity extends AppCompatActivity {
             return super.onOptionsItemSelected(item);
         }
 
+    @Override
+    public void onBackPressed() {
+        if(!isBackPressed) {
+            isBackPressed=true;
+            backKeyPressedTime = Timestamp.now().getSeconds();
+            return;
+        }
+        FragmentManager fm = getSupportFragmentManager();
+        Log.wtf("asdf",fm.getBackStackEntryCount()+"");
+        if(fm.getBackStackEntryCount()==0) {
+            if (Timestamp.now().getSeconds() > backKeyPressedTime + 1) {
+                backKeyPressedTime = Timestamp.now().getSeconds();
+                return;
+            }else{
+                finish();
+            }
+        }else{
+            super.onBackPressed();
+        }
     }
+}
 
 

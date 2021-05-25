@@ -1,9 +1,11 @@
 package com.example.project2.Login_Membership;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.content.CursorLoader;
 
@@ -33,6 +37,7 @@ import com.example.project2.FirebaseDB.User;
 import com.example.project2.FirebaseDB.UserInfoDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
+import com.example.project2.tensorflowTest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -151,6 +156,10 @@ public class UserinfoActivity extends AppCompatActivity {
                 }else{
                     InputMethodManager mInputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     mInputMethodManager.hideSoftInputFromWindow(petBirthday.getWindowToken(), 0);
+                    if (position == 1) {
+                        Intent intent = new Intent(getApplicationContext(), tensorflowTest.class);
+                        startActivityForResult(intent, 7465);
+                    }
                     pet_kind = (String) parent.getItemAtPosition(position);
                     Log.e(TAG,"1. test log : "+ pet_kind );
                 }
@@ -190,9 +199,31 @@ public class UserinfoActivity extends AppCompatActivity {
         });
 
         petBirthday.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
-                Toast.makeText(UserinfoActivity.this,"8자리숫자를 입력하세요(예:20020525)",Toast.LENGTH_SHORT).show();
+                DatePickerDialog datePickerDialog = new DatePickerDialog(UserinfoActivity.this);
+                datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        String tmpDate="";
+                        if(month+1>9) {
+                            tmpDate = Integer.toString(year) + Integer.toString(month+1) + Integer.toString(dayOfMonth);
+                        }else{
+                            tmpDate = Integer.toString(year) +"0"+ Integer.toString(month+1) + Integer.toString(dayOfMonth);
+                        }
+                        Log.wtf("asdf",tmpDate);
+                        SimpleDateFormat sDate = new SimpleDateFormat("yyyyMMdd");
+                        try {
+                            Date date = sDate.parse(tmpDate);
+                            String d = sDate.format(date);
+                            petBirthday.setText(d);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                datePickerDialog.show();
             }
         });
     }
@@ -215,6 +246,13 @@ public class UserinfoActivity extends AppCompatActivity {
             }catch (Exception e){
                 e.printStackTrace();
             }
+        }else if(requestCode == 7465 && resultCode == RESULT_OK){
+            pet_kind = data.getExtras().getString("my_data");
+            EditText photo_value = findViewById(R.id.kind_photoValue);
+            Kind_spinner.setVisibility(View.GONE);
+            photo_value.setVisibility(View.VISIBLE);
+            photo_value.setText(pet_kind);
+            photo_value.setEnabled(false);
         }
     }
     // uri 절대경로 가져오기

@@ -128,10 +128,10 @@ public class CommunityMain extends Fragment {
         final String[] userName = new String[1];
 
         //onComplete 리스너 없이 통신하면 통신상태가 느릴 경우 null이 출력될 수도 있음
-        db.collection("users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                userName[0] = task.getResult().getString("name");
+                userName[0] = task.getResult().getString("user_name");
             }
         });
 
@@ -175,12 +175,6 @@ public class CommunityMain extends Fragment {
         floatBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fm = getParentFragmentManager();
-                fm.beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_bottom,R.anim.slide_out_bottom,R.anim.slide_in_top,R.anim.slide_out_top)
-                        .add(R.id.container, new tensorflowTest())
-                        .addToBackStack("frag_communityWrite")
-                        .commit();
             }
         });
 
@@ -292,18 +286,25 @@ public class CommunityMain extends Fragment {
     public void getList(String uid, getCallback inCall, completeCallback outCall) {
         //유저 UID 기반으로 각 컬렉션에 접근
         communityDB = db.collection("community").document(uid);
-        usersDB = db.collection("users").document(uid);
+        DocumentReference usersDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+        DocumentReference petDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
         storageDB = FirebaseStorage.getInstance();
         StorageReference storageRef = storageDB.getReference();
 
+        final String[] dogName=new String[1];
+        petDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                dogName[0] = task.getResult().getString("petName");
+            }
+        });
         //이름 추출 이후 글 주출
         usersDB.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        String userName = task.getResult().getString("name");
-                        String dogName = task.getResult().getString("petName");
-                        String profileImage = task.getResult().getString("photoUrl");
+                        String userName = task.getResult().getString("user_nickname");
+                        String profileImage = task.getResult().getString("user_profile");
 
                         //글 가져오기
                         //이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
@@ -318,7 +319,7 @@ public class CommunityMain extends Fragment {
                                                 tmpItem.setContext(result.getString("content"));
                                                 tmpItem.setUpTime(result.getTimestamp("uptime"));
                                                 tmpItem.setMyName(userName);
-                                                tmpItem.setDogName("&" + dogName);
+                                                tmpItem.setDogName("&" + dogName[0]);
                                                 tmpItem.setUserUid(uid);
                                                 tmpItem.setArticleUid(result.getId());
                                                 tmpItem.setLikeNum(result.getLong("likeNum").intValue());

@@ -371,6 +371,18 @@
                             android:gravity="center"
                             android:inputType="text"
                             android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/kind_photoValue2"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/edit_text_custom"
+                            android:ems="8"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout

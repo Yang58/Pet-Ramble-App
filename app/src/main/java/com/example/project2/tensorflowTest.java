@@ -16,8 +16,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -53,7 +55,7 @@ import static android.app.Activity.RESULT_OK;
  * Use the {@link tensorflowTest#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class tensorflowTest extends Fragment {
+public class tensorflowTest extends AppCompatActivity {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,25 +90,13 @@ public class tensorflowTest extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tensorflow_test, container, false);
-        v=view;
-
+        setContentView(R.layout.fragment_tensorflow_test);
         //종류 표시될 버튼들
         listBtn.add(v.findViewById(R.id.tf_btn_1));
         listBtn.add(v.findViewById(R.id.tf_btn_2));
@@ -129,7 +119,7 @@ public class tensorflowTest extends Fragment {
         }
 
 
-        Button b = view.findViewById(R.id.tf_btn_getImg);
+        Button b = findViewById(R.id.tf_btn_getImg);
         b.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
@@ -142,7 +132,6 @@ public class tensorflowTest extends Fragment {
 
             }
         });
-        return view;
     }
 
     @Override
@@ -179,29 +168,47 @@ public class tensorflowTest extends Fragment {
                 //실제로 사용할 견종, 확률
                 for (int i = 0; i<pred[0].length; i++){
                     topList.put(labels.get(i),  pred[0][i]*100);
+                    Log.wtf(labels.get(i),pred[0][i]*100+"");
                 }
-                int cnt=0;
                 //내림차순 정렬
-                List<String> keySetList = new ArrayList<>(topList.keySet());
+                List<String> keySetList = new ArrayList<>();
+                keySetList.addAll(topList.keySet());
                 Collections.sort(keySetList, (o1, o2) -> (topList.get(o2).compareTo(topList.get(o1))));
 
+                for(TextView a : text){
+                    a.setVisibility(View.GONE);
+                }
                 for(TextView b : listBtn){
                     b.setVisibility(View.GONE);
                 }
 
+                int cnt=0;
                 for(String key : keySetList) {
                     if(cnt>listBtn.size()-1) break;
+                    Log.wtf("키", key);
                     TextView a = text.get(cnt);
                     TextView b = listBtn.get(cnt);
                     a.setVisibility(View.VISIBLE);
                     b.setVisibility(View.VISIBLE);
                     b.setText("");
                     b.setText(key+"\n"+String.format("%.2f",topList.get(key))+"%");
+                    b.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            listBtn=new ArrayList<>();
+                            text=new ArrayList<>();
+                            Intent intent = new Intent();
+                            intent.putExtra("my_data",key);
+                            setResult(RESULT_OK,intent);
+                            finish();
+                        }
+                    });
                     cnt++;
                 }
 
+                tf_lite.close();
 
-                ImageView imageView = (ImageView) v.findViewById(R.id.tf_img);
+                ImageView imageView = (ImageView) findViewById(R.id.tf_img);
                 imageView.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -225,7 +232,7 @@ public class tensorflowTest extends Fragment {
     }
     private Interpreter getTfliteInterpreter(String modelPath) {
         try {
-            return new Interpreter(loadModelFile((MainActivity)v.getContext(), modelPath));
+            return new Interpreter(loadModelFile(this, modelPath));
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -242,64 +249,33 @@ public class tensorflowTest extends Fragment {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
-    public void callresult(){
-
-        ImageProcessor imageProcessor =
-                new ImageProcessor.Builder()
-                        .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
-                        .build();
-
-        TensorImage tImage = new TensorImage(DataType.UINT8);
-
-        tImage.load(selectImage);
-        tImage = imageProcessor.process(tImage);
-
-        TensorBuffer probabilityBuffer =
-                TensorBuffer.createFixedSize(new int[]{1, 1001}, DataType.UINT8);
-
-        Interpreter tflite = null;
-        try{
-            MappedByteBuffer tfliteModel
-                    = FileUtil.loadMappedFile(v.getContext(),
-                    "converted_model.tflite");
-            tflite = new Interpreter(tfliteModel);
-        } catch (IOException e){
-            Log.e("tfliteSupport", "Error reading model", e);
-        }
-
-        if(null != tflite) {
-            tflite.run(tImage.getBuffer(), probabilityBuffer.getBuffer());
-        }
-
-        final String ASSOCIATED_AXIS_LABELS = "labels.txt";
-        List associatedAxisLabels = null;
-
-        try {
-            associatedAxisLabels = FileUtil.loadLabels(v.getContext(),ASSOCIATED_AXIS_LABELS);
-        } catch (IOException e) {
-            Log.e("tfliteSupport", "Error reading label file", e);
-        }
-
-        TensorProcessor probabilityProcessor =
-                new TensorProcessor.Builder().add(new NormalizeOp(0, 255)).build();
-
-        if (null != associatedAxisLabels) {
-            // Map of labels and their corresponding probability
-            TensorLabel labels = new TensorLabel(associatedAxisLabels,
-                    probabilityProcessor.process(probabilityBuffer));
-            Log.wtf("",labels.getCategoryList().toString());
-
-            // Create a map to access the result based on label
-            Map floatMap = labels.getMapWithFloatValue();
-        }
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void selfPermissionCheck(){
         String tmp = "";
-        MainActivity ma = (MainActivity)getActivity();
-        v.getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
         tmp+=Manifest.permission.READ_EXTERNAL_STORAGE+" ";
-        ActivityCompat.requestPermissions(ma,tmp.trim().split(" "),1);
+        ActivityCompat.requestPermissions(this,tmp.trim().split(" "),1);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        listBtn=new ArrayList<>();
+        text=new ArrayList<>();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Bitmap selectImage = null;
+        ArrayList<TextView> listBtn = new ArrayList<>();
+        ArrayList<TextView> text = new ArrayList<>();
+        for(TextView b : listBtn){
+            b.setVisibility(View.GONE);
+        }
+        for(TextView a : text){
+            a.setVisibility(View.GONE);
+        }
     }
 }

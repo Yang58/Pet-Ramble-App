@@ -342,36 +342,52 @@
                     android:layout_margin="5dp"
                     android:weightSum="5"
                     android:orientation="horizontal">
+
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="2dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_gravity="right"
-                            android:text=" 종류 "
                             android:layout_margin="5dp"
-                            android:textSize="15dp"
+                            android:fontFamily="@font/tmoneyroundwindextrabold"
+                            android:text=" 종류 "
                             android:textColor="@color/black"
-                            android:fontFamily="@font/tmoneyroundwindextrabold"/>
+                            android:textSize="15dp" />
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_weight="3">
+
                         <Spinner
                             android:id="@+id/Kind_spinner"
                             android:layout_width="match_parent"
                             android:layout_height="35dp"
-                            android:entries="@array/my_petArray"
                             android:layout_marginLeft="10dp"
+                            android:entries="@array/my_petArray"
                             android:gravity="center"
                             android:inputType="text"
                             android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/kind_photoValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/edit_text_custom"
+                            android:ems="8"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
                     </LinearLayout>
+
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"

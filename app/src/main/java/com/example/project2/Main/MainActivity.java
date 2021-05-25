@@ -130,49 +130,33 @@ public class MainActivity extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case (R.id.action_home):
-                            if (homeFragment == null) {
+                            if (FM.findFragmentByTag("home") == null) {
                                 homeFragment = new HomeFragment();
-                                FM.beginTransaction().add(R.id.container, homeFragment).commit();
+                                FM.beginTransaction().add(R.id.container, homeFragment,"home").addToBackStack(null).commit();
                             }
-                            if (homeFragment != null) FM.beginTransaction().show(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
                             actionBar.show();
                             break;
                         case (R.id.action_maps):
-                            if (fragmentMap == null) {
+                            if (FM.findFragmentByTag("map") == null) {
                                 fragmentMap = new MapsFragment();
-                                FM.beginTransaction().add(R.id.container, fragmentMap).commit();
+                                FM.beginTransaction().add(R.id.container, fragmentMap,"map").addToBackStack(null).commit();
                             }
-                            if (homeFragment != null) FM.beginTransaction().hide(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().show(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
                             actionBar.hide();
                             break;
 
                         case R.id.action_comm:
-                            if (fragment_Community == null) {
+                            if (FM.findFragmentByTag("community") == null) {
                                 fragment_Community = new CommunityMain();
-                                FM.beginTransaction().add(R.id.container, fragment_Community).commit();
+                                FM.beginTransaction().add(R.id.container, fragment_Community,"community").addToBackStack(null).commit();
                             }
-                            if (homeFragment != null) FM.beginTransaction().hide(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().show(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().hide(friendFragment).commit();
                             actionBar.hide();
                             break;
 
                         case R.id.action_friend:
-                            if (friendFragment == null) {
+                            if (FM.findFragmentByTag("friend") == null) {
                                 friendFragment = new FriendFragment();
-                                FM.beginTransaction().add(R.id.container, friendFragment).commit();
+                                FM.beginTransaction().replace(R.id.container, friendFragment,"friend").addToBackStack(null).commit();
                             }
-                            if (homeFragment != null) FM.beginTransaction().hide(homeFragment).commit();
-                            if (fragmentMap != null) FM.beginTransaction().hide(fragmentMap).commit();
-                            if (fragment_Community != null) FM.beginTransaction().hide(fragment_Community).commit();
-                            if (friendFragment != null) FM.beginTransaction().show(friendFragment).commit();
                             actionBar.hide();
                             break;
                     }

@@ -68,6 +68,7 @@ public class CommunityDetailView extends Fragment {
     private String mParam2;
     private DocumentReference communityDB;
     private DocumentReference usersDB;
+    private DocumentReference petDB;
     private View view;
     private Map<String, ArrayList<String>> relatedList;
     private String userUid;
@@ -299,7 +300,8 @@ public class CommunityDetailView extends Fragment {
     public void getRelatedList(String userUid, String articleUid, getListCallback inCall) {
         //유저 UID 기반으로 각 컬렉션에 접근
         communityDB = db.collection("community").document(userUid);
-        usersDB = db.collection("users").document(userUid);
+        usersDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+        petDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
 
         communityDB.collection("article").document(articleUid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -383,21 +385,29 @@ public class CommunityDetailView extends Fragment {
         //유저 UID 기반으로 각 컬렉션에 접근
         //게시글ID(docRef)->article->유저ID
         userUid = docRef.getParent().getParent().getId();
-        usersDB = db.collection("users").document(userUid);
+        usersDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+        petDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
         FirebaseStorage storageDB = FirebaseStorage.getInstance();
         StorageReference storageRef = storageDB.getReference();
 
         //글이 중복으로 들어가면 안되기 때문에 우선 모든 글 제거 후 시작
         recyclerAdapter tmpAdapter = new recyclerAdapter();
 
+        final String[] dogName=new String[1];
+        petDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                dogName[0] = task.getResult().getString("petName");
+            }
+        });
         //이름 추출 이후 글 주출
         usersDB.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        String userName = task.getResult().getString("name");
-                        String dogName = task.getResult().getString("petName");
-                        String profileImage = task.getResult().getString("photoUrl");
+                        String userName = task.getResult().getString("user_name");
+
+                        String profileImage = task.getResult().getString("user_profile");
 
                         //글 가져오기
                         //이름 로딩보다 글 로딩이 먼저 될 경우를 대비해서 여기 배치
@@ -412,7 +422,7 @@ public class CommunityDetailView extends Fragment {
                                             tmpItem.setContext(result.getString("content"));
                                             tmpItem.setUpTime(result.getTimestamp("uptime"));
                                             tmpItem.setMyName(userName);
-                                            tmpItem.setDogName("&" + dogName);
+                                            tmpItem.setDogName("&" + dogName[0]);
                                             tmpItem.setUserUid(userUid);
                                             tmpItem.setArticleUid(result.getId());
                                             tmpItem.setLikeNum(result.getLong("likeNum").intValue());

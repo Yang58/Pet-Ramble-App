@@ -1,9 +1,11 @@
 package com.example.project2.Login_Membership;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -14,7 +16,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -23,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.content.CursorLoader;
 
@@ -32,6 +37,7 @@ import com.example.project2.FirebaseDB.MyPetDB;
 import com.example.project2.FirebaseDB.UserInfoDB;
 import com.example.project2.Main.MainActivity;
 import com.example.project2.R;
+import com.example.project2.tensorflowTest;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,10 +48,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -54,6 +62,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.file.WatchEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,6 +88,7 @@ public class InfoEditActivity extends AppCompatActivity {
     private EditText edit_petWeight;
     private Spinner Kind_spinner;
     private String temp_uri;
+    private ImageButton get_petKind;
     Uri uri;
     ImageView Edit_profile;
 
@@ -95,6 +105,8 @@ public class InfoEditActivity extends AppCompatActivity {
         edit_petWeight = (EditText) findViewById(R.id.edit_petWeight);
         edit_petBirthday = (EditText) findViewById(R.id.edit_birthday);
         Edit_profile = (ImageView) findViewById(R.id.edit_Profile);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         edit_name.setInputType(EditorInfo.TYPE_NULL);
         edit_name.setOnClickListener(new View.OnClickListener() {
@@ -122,6 +134,10 @@ public class InfoEditActivity extends AppCompatActivity {
                 }else{
                     InputMethodManager mInputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     mInputMethodManager.hideSoftInputFromWindow(edit_petBirthday.getWindowToken(), 0);
+                    if (position == 1) {
+                        Intent intent = new Intent(getApplicationContext(), tensorflowTest.class);
+                        startActivityForResult(intent, 7465);
+                    }
                     edit_petKind = (String) parent.getItemAtPosition(position);
                     Log.e(TAG,"1. test log : "+ edit_petKind );
                 }
@@ -131,10 +147,6 @@ public class InfoEditActivity extends AppCompatActivity {
                 Toast.makeText(InfoEditActivity.this,"반려견 종류를 선택해주세요.",Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         Log.d("Debug", "Running InfoEditActivitiy");
         Log.d("Debug", user.getUid());
@@ -264,10 +276,34 @@ public class InfoEditActivity extends AppCompatActivity {
 
             }
     });
+
+    edit_petBirthday.setFocusable(false);
    edit_petBirthday.setOnClickListener(new View.OnClickListener() {
+         @RequiresApi(api = Build.VERSION_CODES.N)
          @Override
         public void onClick(View v) {
-            Toast.makeText(InfoEditActivity.this,"8자리숫자를 입력하세요(예:20020525)",Toast.LENGTH_SHORT).show();
+             DatePickerDialog datePickerDialog = new DatePickerDialog(InfoEditActivity.this);
+             datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+                 @Override
+                 public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                     String tmpDate="";
+                     if(month+1>9) {
+                         tmpDate = Integer.toString(year) + Integer.toString(month+1) + Integer.toString(dayOfMonth);
+                     }else{
+                         tmpDate = Integer.toString(year) +"0"+ Integer.toString(month+1) + Integer.toString(dayOfMonth);
+                     }
+                     Log.wtf("asdf",tmpDate);
+                     SimpleDateFormat sDate = new SimpleDateFormat("yyyyMMdd");
+                     try {
+                         Date date = sDate.parse(tmpDate);
+                         String d = sDate.format(date);
+                         edit_petBirthday.setText(d);
+                     } catch (ParseException e) {
+                         e.printStackTrace();
+                     }
+                 }
+             });
+             datePickerDialog.show();
         }
     });
 }
@@ -448,6 +484,13 @@ public class InfoEditActivity extends AppCompatActivity {
             }catch (Exception e){
                 e.printStackTrace();
             }
+        }else if(requestCode == 7465 && resultCode == RESULT_OK){
+            edit_petKind = data.getExtras().getString("my_data");
+            EditText photo_value = findViewById(R.id.kind_photoValue2);
+            Kind_spinner.setVisibility(View.GONE);
+            photo_value.setVisibility(View.VISIBLE);
+            photo_value.setText(edit_petKind);
+            photo_value.setEnabled(false);
         }
     }
 

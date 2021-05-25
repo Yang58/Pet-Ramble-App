@@ -1071,17 +1071,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     loadImage loadImage = new loadImage(getContext().getCacheDir(), value.getString("photoUrl"), fileName, innerFileType);
                     loadImage.execute();
                     photoPath = mContext.getCacheDir().toString() + "/" + fileName + innerFileType;
-                    Log.wtf("캐싱", photoPath);
                 }
             });
         } else {
-            File imageCacheList = new File(getContext().getCacheDir().toString());
-            for (File j : imageCacheList.listFiles()) {
-                if (j.getName().equals(fileName + fileType)) {
-                    photoPath = j.getPath();
-                    Log.wtf("이미지 캐싱", j.getPath());
+            try {
+                File imageCacheList = new File(getContext().getCacheDir().toString());
+                for (File j : imageCacheList.listFiles()) {
+                    if (j.getName().equals(fileName + fileType)) {
+                        photoPath = j.getPath();
+                    }
                 }
-            }
+            }catch(Exception e){}
         }
     }
 }

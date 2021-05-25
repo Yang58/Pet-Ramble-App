@@ -2,6 +2,7 @@
 <resources>
     <string-array name="my_petArray">
         <item> 선택해주세요.</item>
+        <item> 사진으로 자동 인식하기 </item>
         <item> 아펜핀셔 </item>
         <item> 아프간 하운드 </item>
         <item> 아프리카 사냥개 </item>
@@ -60,6 +61,8 @@
         <item> 푸들 </item>
         <item> 토이 푸들 </item>
         <item> 요크셔 테리어 </item>
+        <item> 믹스견 </item>
+        <item> 기타 </item>
 
     </string-array>
 </resources>

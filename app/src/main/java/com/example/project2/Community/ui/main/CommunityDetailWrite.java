@@ -57,6 +57,7 @@ public class CommunityDetailWrite extends Fragment {
     private final static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference communityDB;
     private DocumentReference usersDB;
+    private DocumentReference petDB;
     private View view;
     static final int REQ_CODE = 1;
     private String imgURL;
@@ -107,7 +108,8 @@ public class CommunityDetailWrite extends Fragment {
         final LinearLayout layout = view.findViewById(R.id.cm_detail_write_container_layout);
         final InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        usersDB = db.collection("users").document(user.getUid());
+        usersDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("UserInfo");
+        petDB = db.collection("Login_user").document(user.getUid()).collection("Info").document("PetInfo");
         communityDB = db.collection("community").document(user.getUid());
 
         //빈칸을 클릭하면 키보드 내려지게 하기
@@ -121,7 +123,12 @@ public class CommunityDetailWrite extends Fragment {
         usersDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                dpName.setText(task.getResult().getString("name"));
+                dpName.setText(task.getResult().getString("userInfo"));
+            }
+        });
+        petDB.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 dpId.setText("&" + task.getResult().getString("petName"));
             }
         });

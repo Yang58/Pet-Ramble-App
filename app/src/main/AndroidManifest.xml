@@ -24,6 +24,7 @@
         android:theme="@style/AppTheme"
         android:hardwareAccelerated="true"
         android:usesCleartextTraffic="true"
+        android:largeHeap="true"
         android:requestLegacyExternalStorage="true">
 
         <service
@@ -52,6 +53,7 @@
         <activity android:name=".Login_Membership.UserJoinActivity" />
         <activity android:name=".Login_Membership.LoginActivity" />
         <activity android:name=".Friend.FriendMainActivity" />
+        <activity android:name=".tensorflowTest" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

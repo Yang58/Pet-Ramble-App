@@ -4,33 +4,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Friend.FriendFragment"
-    android:orientation="vertical">
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    tools:context=".Friend.FriendFragment">
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomnav1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bottomnav1"
         android:layout_alignParentTop="true"
-        app:labelVisibilityMode="auto"
-        app:itemBackground="@color/custom1"
         android:background="@color/custom2"
-        app:itemTextColor="@color/custom4"
+        app:itemBackground="@color/custom1"
         app:itemIconTint="@color/custom3"
-        app:menu="@menu/navgationmenu"/>
+        app:itemTextColor="@color/custom4"
+        app:labelVisibilityMode="auto"
+        app:menu="@menu/navgationmenu" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/custom4"
-        android:layout_below="@+id/bottomnav1"/>
+        android:layout_below="@+id/bottomnav1"
+        android:background="@color/custom4" />
 
     <FrameLayout
         android:id="@+id/friend_frameLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/bottomnav1"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

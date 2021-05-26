@@ -37,8 +37,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.sql.Time;
-
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
 
@@ -65,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageReference = storage.getReference();
-        Log.wtf("유저",user.getUid());
         // Firebase 회원정보
         if (user == null) { // 회원 정보가 없을시 로그인 화면이동
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);

@@ -92,14 +92,6 @@
 
 
         <Button
-            android:id="@+id/btn_chatting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_custom"
-            android:layout_margin="5dp"
-            android:text="채팅하기" />
-
-        <Button
             android:id="@+id/btn_exit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

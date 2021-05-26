@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -61,7 +62,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -156,6 +156,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private static ArrayList<Polyline> otherLinesSaved = new ArrayList<>();
     private static HashMap<String, Marker> otherMarker = new HashMap<>();
     private static ArrayList<Circle> circleArrayList = new ArrayList<>();
+    CircleOptions circleOptions = new CircleOptions();
 
     //백그라운드
     private Intent serviceIntent;
@@ -195,6 +196,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         v = inflater.inflate(R.layout.activity_maps_fragment, container, false);
         myLocationSwitch = v.findViewById(R.id.switch_my_location_visible);
 
+        circleOptions.clickable(true);
+        circleOptions.strokeWidth(0);
+        circleOptions.fillColor(Color.parseColor("#80fcac92"));
+        circleOptions.radius(68);
         myLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -239,6 +244,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         return v;
     }
 
+    public class async extends AsyncTask {
+        Thread thread;
+
+        public void setThread(Thread th){
+            thread=th;
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            thread.start();
+            return null;
+        }
+    }
+
     //타 사용자 위치 표시
     public void showOtherLocation() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -260,11 +279,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                             }
                             for(DataSnapshot c : d.getChildren()) {
                                 HashMap<String, Double> value = (HashMap<String, Double>) c.getValue();
-                                CircleOptions circleOptions = new CircleOptions();
-                                circleOptions.clickable(true);
-                                circleOptions.strokeWidth(0);
-                                circleOptions.fillColor(Color.parseColor("#80fcac92"));
-                                circleOptions.radius(68);
                                 circleOptions.center(new LatLng(value.get("latitude"), value.get("longitude")));
                                 circleArrayList.add(mMap.addCircle(circleOptions));
                                 continue;
@@ -286,7 +300,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                         int time = Integer.valueOf(value.get("lastTime").get("seconds").toString());
                         int passedTime = (int) Timestamp.now().getSeconds() - time;
                         //만일 접속종료 마지막 위치가 현재 위치와 같다면( = 산책중이 아니라면)패스
-                        if (passedTime > 10) {
+                        if (passedTime > 3) {
                             otherMarker.get(otherUID).remove();
                             otherMarker.remove(otherUID);
                             continue;
@@ -355,14 +369,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
 
             //선 그리기
-            myLineOption = new PolylineOptions();
-            myLineOption.color(Color.GREEN).width(20);
             myLinesSaved.add(mMap.addPolyline(myLineOption.add(startPoint, endPoint)));
             myBearingArray.add(location.getBearing());
             myCoordinateArray.add(endPoint);
 
             //관심 장소 등록록
-           if(Timestamp.now().getSeconds() - myWaitTime > 9){
+           if(Timestamp.now().getSeconds() - myWaitTime > 1){
                 myWaitTime=Timestamp.now().getSeconds();
 
                 MarkerOptions MarkerOptions = new MarkerOptions();
@@ -398,9 +410,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             //리얼타임 데이터베이스에 실시간으로 노드 전송
             myLocationSwitch = v.findViewById(R.id.switch_my_location_visible);
             if(myLocationSwitch.isChecked()) {
-                startRef.setValue(startPoint);
-                endRef.setValue(endPoint);
-                lastTimeRef.setValue(Timestamp.now());
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startRef.setValue(startPoint);
+                        endRef.setValue(endPoint);
+                        lastTimeRef.setValue(Timestamp.now());
+
+                    }
+                }).start();
             }
             endPoint = startPoint;
 
@@ -520,16 +538,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         myWaitTime= Timestamp.now().getSeconds();
         startPoint = null;
         endPoint = null;
-        
-        //지정한 저장한 위치 불러오기
-        getSelectedPathFromSave();
 
         myWaitTime = Timestamp.now().getSeconds();
 
+        myLineOption = new PolylineOptions();
+        myLineOption.color(Color.GREEN).width(20);
         //최초 위치 갱신
         getDeviceLocation();
         //위치정보 업데이트 시작
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 2, loListener);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000,
+                2, loListener);
         //백그라운드 서비스 시작
         serviceIntent.setAction("startForeground");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -746,7 +764,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         setCustomMarkerView();
 
         //타유저 위치 갱신
-        showOtherLocation();
+        Thread th = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                showOtherLocation();
+            }
+        });
+        async ac = new async();
+        ac.setThread(th);
+        ac.execute();
 
         //마커 정보 클릭시  팝업 으로 이동 todo:마커정보클릭
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -1099,10 +1125,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             if (!imageCache.exists()) {
                 //캐싱된 이미지가 아직 존재하지 않을 경우
                 String innerFileType = fileType;
-                dbRef.collection("users").document(UID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                dbRef.collection("Login_user").document(UID).collection("Info").document("UserInfo").get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
-                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                        loadImage loadImage = new loadImage(getContext().getCacheDir(), value.getString("photoUrl"), fileName, innerFileType);
+                    public void onSuccess(DocumentSnapshot snapshot) {
+                        loadImage loadImage = new loadImage(getContext().getCacheDir(), snapshot.getString("user_profile"), fileName, innerFileType);
                         loadImage.execute();
                         photoPath = mContext.getCacheDir().toString() + "/" + fileName + innerFileType;
                     }

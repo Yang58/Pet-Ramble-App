@@ -103,7 +103,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="♡좋아요!"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -111,7 +112,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="☆공유하기"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <Space
                     android:layout_width="150dp"

@@ -10,31 +10,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.project2.Main.MainActivity;
-
-import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.support.common.FileUtil;
-import org.tensorflow.lite.support.common.TensorProcessor;
-import org.tensorflow.lite.support.common.ops.NormalizeOp;
-import org.tensorflow.lite.support.image.ImageProcessor;
-import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.support.image.ops.ResizeOp;
-import org.tensorflow.lite.support.label.TensorLabel;
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,9 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -119,6 +102,17 @@ public class tensorflowTest extends AppCompatActivity {
             }
         }
 
+        ImageView imageView = (ImageView) findViewById(R.id.tf_img);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View v) {
+                selfPermissionCheck2();
+                Intent intent = new Intent();
+                intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, 12);
+            }
+        });
 
         Button b = findViewById(R.id.tf_btn_getImg);
         b.setOnClickListener(new View.OnClickListener() {
@@ -138,13 +132,22 @@ public class tensorflowTest extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.wtf("단계","onActivityResult");
-        if (requestCode == REQUEST_IMAGE_1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        Log.wtf("단계","onActivityResult, "+resultCode);
+        if (resultCode == RESULT_OK) {
 
             Uri uri = data.getData();
 
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                Bitmap bitmap=null;
+                if(requestCode == 12) {
+                    bitmap = (Bitmap) data.getExtras().get("data");
+                }else if(requestCode == REQUEST_IMAGE_1){
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                }
+
+                ImageView imageView = (ImageView) findViewById(R.id.tf_img);
+                imageView.setImageBitmap(bitmap);
+
                 Bitmap selectImage=bitmap;
                 // Log.d(TAG, String.valueOf(bitmap));
                 int cx=224, cy=224;
@@ -209,9 +212,6 @@ public class tensorflowTest extends AppCompatActivity {
                 }
 
                 tf_lite.close();
-
-                ImageView imageView = (ImageView) findViewById(R.id.tf_img);
-                imageView.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -256,6 +256,14 @@ public class tensorflowTest extends AppCompatActivity {
         String tmp = "";
         checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
         tmp+=Manifest.permission.READ_EXTERNAL_STORAGE+" ";
+        ActivityCompat.requestPermissions(this,tmp.trim().split(" "),1);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void selfPermissionCheck2(){
+        String tmp = "";
+        checkSelfPermission(Manifest.permission.CAMERA);
+        tmp+=Manifest.permission.CAMERA+" ";
         ActivityCompat.requestPermissions(this,tmp.trim().split(" "),1);
     }
 
